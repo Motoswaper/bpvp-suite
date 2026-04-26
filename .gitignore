@@ -1,0 +1,9 @@
+node_modules/
+.next/
+.run/
+*.log
+.env
+.env.rpc
+backups/
+backend/data/
+*.pid

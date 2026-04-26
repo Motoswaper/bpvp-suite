@@ -1,0 +1,54 @@
+services:
+  axe-engine:
+    build: { context: ., dockerfile: Dockerfile }
+    entrypoint: ["/usr/local/bin/axe-engine"]
+    environment:
+      - AXE_STRICT_MODE=true
+      - HTTP_PORT=8080
+      - AXE_API_KEY=axe-local-dev-key
+      - AXE_HMAC_SECRET=axe-local-hmac-secret
+      - AXE_RATE_LIMIT_PER_MINUTE=600
+      - WATCHER_MAX_SYNC_LAG_SECONDS=300
+      - AXE_DATA_DIR=/var/lib/axe
+    ports: ["18080:8080"]
+    volumes:
+      - axe_engine_data:/var/lib/axe
+  axe-indexer:
+    build: { context: ., dockerfile: Dockerfile }
+    entrypoint: ["/usr/local/bin/axe-indexer"]
+    environment:
+      - AXE_STRICT_MODE=true
+      - HTTP_PORT=8081
+      - AXE_API_KEY=axe-local-dev-key
+      - AXE_HMAC_SECRET=axe-local-hmac-secret
+      - AXE_RATE_LIMIT_PER_MINUTE=600
+      - AXE_DATA_DIR=/var/lib/axe
+      - AXE_BITCOIN_MODE=${AXE_BITCOIN_MODE:-mock}
+      - BITCOIN_RPC_URL=${BITCOIN_RPC_URL:-}
+      - BITCOIN_RPC_USER=${BITCOIN_RPC_USER:-}
+      - BITCOIN_RPC_PASS=${BITCOIN_RPC_PASS:-}
+      - BITCOIN_START_HEIGHT=${BITCOIN_START_HEIGHT:-0}
+      - BITCOIN_CONFIRMATIONS=${BITCOIN_CONFIRMATIONS:-2}
+      - INDEXER_MAX_RETRIES=${INDEXER_MAX_RETRIES:-3}
+      - INDEXER_MAX_DEAD_LETTERS=${INDEXER_MAX_DEAD_LETTERS:-100}
+    ports: ["18081:8081"]
+    volumes:
+      - axe_indexer_data:/var/lib/axe
+  axe-watcher:
+    build: { context: ., dockerfile: Dockerfile }
+    entrypoint: ["/usr/local/bin/axe-watcher"]
+    environment:
+      - AXE_STRICT_MODE=true
+      - HTTP_PORT=8082
+      - ENGINE_URL=http://axe-engine:8080
+      - INDEXER_URL=http://axe-indexer:8081
+      - WATCH_INTERVAL_SECONDS=2
+      - AXE_API_KEY=axe-local-dev-key
+      - AXE_HMAC_SECRET=axe-local-hmac-secret
+      - AXE_RATE_LIMIT_PER_MINUTE=600
+    ports: ["18082:8082"]
+    depends_on: [axe-engine, axe-indexer]
+
+volumes:
+  axe_engine_data:
+  axe_indexer_data:

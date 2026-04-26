@@ -1,0 +1,1 @@
+export function Navbar({title}:{title:string}){return <header className="mb-6 flex items-center justify-between"><h2 className="text-2xl font-semibold">{title}</h2><p className="text-xs text-slate-400">Bitcoin L1 Infrastructure</p></header>;}
