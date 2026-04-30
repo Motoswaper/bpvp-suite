@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BPVP Wallet Desktop</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="card">
+        <h1>BPVP Wallet Desktop (Beta)</h1>
+        <p>Bitcoin Protocol = Value Protocol</p>
+        <p class="hint">Test networks only: Signet/Testnet. Mainnet is not supported.</p>
+      </header>
+
+      <section class="grid">
+        <div class="card">
+          <h2>1) Initialize Vault</h2>
+          <label>Vault path <input id="vaultPath" value=".bpvp-wallet.vault" /></label>
+          <label>Passphrase <input id="passphrase" type="password" /></label>
+          <label>Network
+            <select id="network">
+              <option value="signet">signet</option>
+              <option value="testnet">testnet</option>
+            </select>
+          </label>
+          <button id="btnInit">Initialize</button>
+        </div>
+
+        <div class="card">
+          <h2>2) Create Seed</h2>
+          <label><input id="showMnemonic" type="checkbox" /> Show mnemonic once</label>
+          <button id="btnCreate">Create Seed</button>
+        </div>
+
+        <div class="card">
+          <h2>3) Derive Address</h2>
+          <label>Index <input id="index" value="0" /></label>
+          <button id="btnDerive">Derive</button>
+        </div>
+
+        <div class="card">
+          <h2>4) Sign Challenge Message</h2>
+          <label>Message <textarea id="message">BPVP wallet link nonce: example123</textarea></label>
+          <button id="btnSign">Sign</button>
+        </div>
+
+        <div class="card">
+          <h2>5) Vault Status</h2>
+          <button id="btnStatus">Check status</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Output</h2>
+        <pre id="output">Ready.</pre>
+      </section>
+    </main>
+
+    <script type="module" src="./renderer.mjs"></script>
+  </body>
+</html>

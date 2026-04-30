@@ -7,3 +7,9 @@ node_modules/
 backups/
 backend/data/
 *.pid
+
+# BPVP wallet build artifacts
+bpvp-wallet/release/
+bpvp-wallet/dist/
+bpvp-wallet/node_modules/
+*.tsbuildinfo

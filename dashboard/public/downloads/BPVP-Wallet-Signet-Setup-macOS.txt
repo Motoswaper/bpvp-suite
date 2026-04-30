@@ -1,0 +1,17 @@
+BPVP Wallet Signet/Testnet Setup - macOS
+
+Status: Beta starter package channel enabled.
+Network policy: test-only (Signet/Testnet), no mainnet.
+
+Steps:
+1) Install BPVP Wallet beta build for macOS.
+2) Create a fresh test wallet (never reuse production keys).
+3) Select Signet (recommended) or Testnet.
+4) Request test coins from faucet.
+5) Open BPVP Suite -> Profile -> Connect wallet.
+6) Sign challenge and verify linked address.
+
+Security:
+- Never import real seed phrases.
+- Never send real BTC to test addresses.
+- Keep test wallet isolated from production systems.

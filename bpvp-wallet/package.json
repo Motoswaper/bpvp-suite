@@ -1,0 +1,76 @@
+{
+  "name": "bpvp-wallet",
+  "version": "0.1.0",
+  "description": "BPVP Wallet desktop beta for Signet/Testnet",
+  "author": "BPVP",
+  "private": true,
+  "type": "module",
+  "main": "desktop/main.mjs",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "desktop:start": "npm run build && electron desktop/main.mjs",
+    "desktop:dev": "npm run desktop:start",
+    "package:win": "npm run build && electron-builder --win nsis portable",
+    "package:linux": "npm run build && electron-builder --linux AppImage deb tar.gz",
+    "package:mac": "npm run build && electron-builder --mac dmg zip",
+    "package:all": "npm run build && electron-builder --mac --win --linux",
+    "package:dir": "npm run build && electron-builder --dir"
+  },
+  "dependencies": {
+    "bip32": "^5.0.0",
+    "bip39": "^3.1.0",
+    "bitcoinjs-lib": "^6.1.7",
+    "bitcoinjs-message": "^2.2.0",
+    "ecpair": "^3.0.0",
+    "tiny-secp256k1": "^2.2.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "tsx": "^4.20.6",
+    "typescript": "^5.5.4"
+  },
+  "build": {
+    "appId": "com.bpvp.wallet",
+    "productName": "BPVP Wallet",
+    "files": [
+      "desktop/**/*",
+      "dist/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "npmRebuild": false,
+    "asar": true,
+    "mac": {
+      "category": "public.app-category.finance",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "linux": {
+      "category": "Finance",
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.gz"
+      ]
+    }
+  }
+}
