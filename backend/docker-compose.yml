@@ -1,40 +1,60 @@
 services:
+  bitcoin-core:
+    restart: unless-stopped
+    image: ruimarinho/bitcoin-core:latest
+    command:
+      - -signet
+      - -server=1
+      - -txindex=1
+      - -rpcbind=0.0.0.0
+      - -rpcallowip=0.0.0.0/0
+      - -rpcport=39332
+      - -rpcuser=${BITCOIN_RPC_USER:-axe-rpc}
+      - -rpcpassword=${BITCOIN_RPC_PASS:-axe-rpc-pass}
+    volumes:
+      - bitcoin_signet_data:/home/bitcoin/.bitcoin
+    ports: ["39332:39332"]
+
   axe-engine:
+    restart: unless-stopped
     build: { context: ., dockerfile: Dockerfile }
     entrypoint: ["/usr/local/bin/axe-engine"]
     environment:
       - AXE_STRICT_MODE=true
       - HTTP_PORT=8080
-      - AXE_API_KEY=axe-local-dev-key
-      - AXE_HMAC_SECRET=axe-local-hmac-secret
+      - AXE_API_KEY=${AXE_API_KEY:?AXE_API_KEY is required}
+      - AXE_HMAC_SECRET=${AXE_HMAC_SECRET:?AXE_HMAC_SECRET is required}
       - AXE_RATE_LIMIT_PER_MINUTE=600
       - WATCHER_MAX_SYNC_LAG_SECONDS=300
       - AXE_DATA_DIR=/var/lib/axe
-    ports: ["18080:8080"]
+    ports: ["28080:8080"]
     volumes:
       - axe_engine_data:/var/lib/axe
   axe-indexer:
+    restart: unless-stopped
     build: { context: ., dockerfile: Dockerfile }
     entrypoint: ["/usr/local/bin/axe-indexer"]
     environment:
       - AXE_STRICT_MODE=true
       - HTTP_PORT=8081
-      - AXE_API_KEY=axe-local-dev-key
-      - AXE_HMAC_SECRET=axe-local-hmac-secret
+      - AXE_API_KEY=${AXE_API_KEY:?AXE_API_KEY is required}
+      - AXE_HMAC_SECRET=${AXE_HMAC_SECRET:?AXE_HMAC_SECRET is required}
       - AXE_RATE_LIMIT_PER_MINUTE=600
       - AXE_DATA_DIR=/var/lib/axe
       - AXE_BITCOIN_MODE=${AXE_BITCOIN_MODE:-mock}
-      - BITCOIN_RPC_URL=${BITCOIN_RPC_URL:-}
+      - BITCOIN_RPC_URL=${BITCOIN_RPC_URL:-http://bitcoin-core:39332}
       - BITCOIN_RPC_USER=${BITCOIN_RPC_USER:-}
       - BITCOIN_RPC_PASS=${BITCOIN_RPC_PASS:-}
       - BITCOIN_START_HEIGHT=${BITCOIN_START_HEIGHT:-0}
       - BITCOIN_CONFIRMATIONS=${BITCOIN_CONFIRMATIONS:-2}
       - INDEXER_MAX_RETRIES=${INDEXER_MAX_RETRIES:-3}
       - INDEXER_MAX_DEAD_LETTERS=${INDEXER_MAX_DEAD_LETTERS:-100}
-    ports: ["18081:8081"]
+    ports: ["28081:8081"]
     volumes:
       - axe_indexer_data:/var/lib/axe
+    depends_on: [bitcoin-core]
   axe-watcher:
+    restart: unless-stopped
     build: { context: ., dockerfile: Dockerfile }
     entrypoint: ["/usr/local/bin/axe-watcher"]
     environment:
@@ -43,12 +63,13 @@ services:
       - ENGINE_URL=http://axe-engine:8080
       - INDEXER_URL=http://axe-indexer:8081
       - WATCH_INTERVAL_SECONDS=2
-      - AXE_API_KEY=axe-local-dev-key
-      - AXE_HMAC_SECRET=axe-local-hmac-secret
+      - AXE_API_KEY=${AXE_API_KEY:?AXE_API_KEY is required}
+      - AXE_HMAC_SECRET=${AXE_HMAC_SECRET:?AXE_HMAC_SECRET is required}
       - AXE_RATE_LIMIT_PER_MINUTE=600
-    ports: ["18082:8082"]
+    ports: ["28082:8082"]
     depends_on: [axe-engine, axe-indexer]
 
 volumes:
+  bitcoin_signet_data:
   axe_engine_data:
   axe_indexer_data:
