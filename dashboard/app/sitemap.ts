@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
+import { getPublicSiteUrl } from "@/lib/siteUrl";
 
-const base = "https://testnet.btc-defi.com";
+const base = getPublicSiteUrl();
 
 const routes = [
   "",

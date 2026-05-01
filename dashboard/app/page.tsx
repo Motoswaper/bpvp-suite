@@ -1,6 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { TestnetGuestAccess } from "@/components/auth/TestnetGuestAccess";
 import { getSessionFromServerCookies } from "@/lib/auth";
+import { getPublicSiteUrl } from "@/lib/siteUrl";
 
 type Locale = "en" | "es";
 
@@ -178,7 +179,7 @@ export default async function HomePage({ searchParams }: { searchParams?: { lang
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "BPVP Suite",
-    url: "https://testnet.btc-defi.com",
+    url: getPublicSiteUrl(),
     description:
       "Bitcoin-native DeFi operating layer for BTC, BTC-Fi, market workflows, lending, trust, and settlement.",
     sameAs: ["https://bitcoin.org"],
