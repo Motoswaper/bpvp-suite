@@ -18,8 +18,38 @@ function releasePageUrl(repo: string, tag: string) {
   return `https://github.com/${repo}/releases/tag/${tag}`;
 }
 
-function downloadUrl(repo: string, tag: string, fileName: string) {
-  return `https://github.com/${repo}/releases/download/${tag}/${encodeURIComponent(fileName)}`;
+function workflowRunsUrl(repo: string) {
+  return `https://github.com/${repo}/actions/workflows/bpvp-wallet-release.yml`;
+}
+
+type ReleaseAsset = {
+  name: string;
+  browser_download_url: string;
+};
+
+type ReleasePayload = {
+  html_url: string;
+  assets: ReleaseAsset[];
+};
+
+async function fetchRelease(repo: string, tag: string): Promise<ReleasePayload | null> {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/releases/tags/${tag}`, {
+      headers: { Accept: "application/vnd.github+json" },
+      next: { revalidate: 300 },
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as ReleasePayload;
+    if (!json || !Array.isArray(json.assets)) return null;
+    return json;
+  } catch {
+    return null;
+  }
+}
+
+function assetUrl(assets: ReleaseAsset[], fileName: string): string | null {
+  const match = assets.find((item) => item.name === fileName);
+  return match?.browser_download_url ?? null;
 }
 
 export default async function WalletPage() {
@@ -28,7 +58,19 @@ export default async function WalletPage() {
 
   const repo = process.env.NEXT_PUBLIC_BPVP_WALLET_REPO?.trim() || DEFAULT_REPO;
   const tag = process.env.NEXT_PUBLIC_BPVP_WALLET_TAG?.trim() || DEFAULT_TAG;
-  const releaseUrl = releasePageUrl(repo, tag);
+  const release = await fetchRelease(repo, tag);
+  const releaseUrl = release?.html_url || releasePageUrl(repo, tag);
+  const assets = release?.assets ?? [];
+  const links = {
+    macDmg: assetUrl(assets, INSTALLERS.macDmg),
+    macZip: assetUrl(assets, INSTALLERS.macZip),
+    winSetup: assetUrl(assets, INSTALLERS.winSetup),
+    winPortable: assetUrl(assets, INSTALLERS.winPortable),
+    linuxAppImage: assetUrl(assets, INSTALLERS.linuxAppImage),
+    linuxDeb: assetUrl(assets, INSTALLERS.linuxDeb),
+    checksums: assetUrl(assets, INSTALLERS.checksums),
+  } as const;
+  const hasAnyInstaller = Object.values(links).some(Boolean);
 
   return (
     <main className="min-h-screen bg-[#0b0f18] px-6 py-12 text-slate-100">
@@ -52,6 +94,16 @@ export default async function WalletPage() {
               {isSpanish ? "Abrir release en GitHub (Assets + checksums)" : "Open GitHub release (assets + checksums)"}
             </a>
           </p>
+          {!hasAnyInstaller ? (
+            <p className="mt-3 rounded-md border border-amber-500/40 bg-amber-950/30 px-3 py-2 text-xs text-amber-200">
+              {isSpanish
+                ? "Aun no hay assets publicados para este tag. Usa el workflow de release y vuelve a intentar."
+                : "No published assets found for this tag yet. Run the wallet release workflow and try again."}{" "}
+              <a className="underline hover:text-amber-100" href={workflowRunsUrl(repo)} rel="noopener noreferrer" target="_blank">
+                {isSpanish ? "Abrir workflow" : "Open workflow"}
+              </a>
+            </p>
+          ) : null}
         </header>
 
         <section className="rounded-xl border border-cyan-500/30 bg-cyan-950/20 p-4 text-sm text-cyan-100">
@@ -73,24 +125,22 @@ export default async function WalletPage() {
             </p>
             <ul className="mt-3 space-y-2 text-xs">
               <li>
-                <a
-                  href={downloadUrl(repo, tag, INSTALLERS.macDmg)}
-                  className="font-medium text-cyan-300 hover:text-cyan-200"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {isSpanish ? "Descargar .dmg" : "Download .dmg"}
-                </a>
+                {links.macDmg ? (
+                  <a href={links.macDmg} className="font-medium text-cyan-300 hover:text-cyan-200" rel="noopener noreferrer" target="_blank">
+                    {isSpanish ? "Descargar .dmg" : "Download .dmg"}
+                  </a>
+                ) : (
+                  <span className="text-slate-500">{isSpanish ? ".dmg pendiente de publicar" : ".dmg not published yet"}</span>
+                )}
               </li>
               <li>
-                <a
-                  href={downloadUrl(repo, tag, INSTALLERS.macZip)}
-                  className="font-medium text-cyan-300 hover:text-cyan-200"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {isSpanish ? "Descargar .zip" : "Download .zip"}
-                </a>
+                {links.macZip ? (
+                  <a href={links.macZip} className="font-medium text-cyan-300 hover:text-cyan-200" rel="noopener noreferrer" target="_blank">
+                    {isSpanish ? "Descargar .zip" : "Download .zip"}
+                  </a>
+                ) : (
+                  <span className="text-slate-500">{isSpanish ? ".zip pendiente de publicar" : ".zip not published yet"}</span>
+                )}
               </li>
               <li>
                 <a
@@ -109,24 +159,22 @@ export default async function WalletPage() {
             </p>
             <ul className="mt-3 space-y-2 text-xs">
               <li>
-                <a
-                  href={downloadUrl(repo, tag, INSTALLERS.winSetup)}
-                  className="font-medium text-cyan-300 hover:text-cyan-200"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {isSpanish ? "Descargar instalador (Setup)" : "Download installer (Setup)"}
-                </a>
+                {links.winSetup ? (
+                  <a href={links.winSetup} className="font-medium text-cyan-300 hover:text-cyan-200" rel="noopener noreferrer" target="_blank">
+                    {isSpanish ? "Descargar instalador (Setup)" : "Download installer (Setup)"}
+                  </a>
+                ) : (
+                  <span className="text-slate-500">{isSpanish ? "Setup pendiente de publicar" : "Setup not published yet"}</span>
+                )}
               </li>
               <li>
-                <a
-                  href={downloadUrl(repo, tag, INSTALLERS.winPortable)}
-                  className="font-medium text-cyan-300 hover:text-cyan-200"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {isSpanish ? "Descargar portable .exe" : "Download portable .exe"}
-                </a>
+                {links.winPortable ? (
+                  <a href={links.winPortable} className="font-medium text-cyan-300 hover:text-cyan-200" rel="noopener noreferrer" target="_blank">
+                    {isSpanish ? "Descargar portable .exe" : "Download portable .exe"}
+                  </a>
+                ) : (
+                  <span className="text-slate-500">{isSpanish ? "Portable pendiente de publicar" : "Portable not published yet"}</span>
+                )}
               </li>
               <li>
                 <a
@@ -145,24 +193,22 @@ export default async function WalletPage() {
             </p>
             <ul className="mt-3 space-y-2 text-xs">
               <li>
-                <a
-                  href={downloadUrl(repo, tag, INSTALLERS.linuxAppImage)}
-                  className="font-medium text-cyan-300 hover:text-cyan-200"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {isSpanish ? "Descargar AppImage" : "Download AppImage"}
-                </a>
+                {links.linuxAppImage ? (
+                  <a href={links.linuxAppImage} className="font-medium text-cyan-300 hover:text-cyan-200" rel="noopener noreferrer" target="_blank">
+                    {isSpanish ? "Descargar AppImage" : "Download AppImage"}
+                  </a>
+                ) : (
+                  <span className="text-slate-500">{isSpanish ? "AppImage pendiente de publicar" : "AppImage not published yet"}</span>
+                )}
               </li>
               <li>
-                <a
-                  href={downloadUrl(repo, tag, INSTALLERS.linuxDeb)}
-                  className="font-medium text-cyan-300 hover:text-cyan-200"
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {isSpanish ? "Descargar .deb" : "Download .deb"}
-                </a>
+                {links.linuxDeb ? (
+                  <a href={links.linuxDeb} className="font-medium text-cyan-300 hover:text-cyan-200" rel="noopener noreferrer" target="_blank">
+                    {isSpanish ? "Descargar .deb" : "Download .deb"}
+                  </a>
+                ) : (
+                  <span className="text-slate-500">{isSpanish ? ".deb pendiente de publicar" : ".deb not published yet"}</span>
+                )}
               </li>
               <li>
                 <a
@@ -186,14 +232,13 @@ export default async function WalletPage() {
               : "Download checksums.txt from the same release and compare the installer hash before opening it."}
           </p>
           <p className="mt-2">
-            <a
-              href={downloadUrl(repo, tag, INSTALLERS.checksums)}
-              className="text-cyan-300 hover:text-cyan-200"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              checksums.txt
-            </a>
+            {links.checksums ? (
+              <a href={links.checksums} className="text-cyan-300 hover:text-cyan-200" rel="noopener noreferrer" target="_blank">
+                checksums.txt
+              </a>
+            ) : (
+              <span className="text-slate-500">checksums.txt {isSpanish ? "pendiente de publicar" : "not published yet"}</span>
+            )}
             <span className="mx-2 text-slate-600">·</span>
             <a href={releaseUrl} className="text-cyan-300 hover:text-cyan-200" rel="noopener noreferrer" target="_blank">
               {isSpanish ? "Todos los assets" : "All assets"}
