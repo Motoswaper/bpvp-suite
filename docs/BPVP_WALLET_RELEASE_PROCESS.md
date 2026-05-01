@@ -16,8 +16,8 @@ Workflow:
 
 Triggers:
 
-- Manual run (`workflow_dispatch`)
-- Tag push: `bpvp-wallet-v*`
+- Tag push: `bpvp-wallet-v*` — **this is what publishes installers** to the GitHub Release.
+- Manual run (`workflow_dispatch`) — builds installers as workflow artifacts only; the **publish** step runs on **tag** events so ad-hoc runs do not attach binaries to a release.
 
 ## How to publish a new installer release
 
@@ -59,3 +59,23 @@ The release workflow now generates SHA256 checksum files per OS and publishes:
 - merged `checksums.txt`
 
 Users can verify installers against published hashes before installation.
+
+## If the release only shows “Source code (zip/tar.gz)”
+
+Older workflow versions used `action-gh-release` with a broad glob; **filenames with spaces** (for example `BPVP Wallet-0.1.0-arm64.dmg`) often did not upload, so GitHub only showed the default source archives.
+
+After fixing `.github/workflows/bpvp-wallet-release.yml`, publish again:
+
+1. Merge the workflow fix to `main`.
+2. Bump the tag and push (example patch):
+
+```bash
+git tag -d bpvp-wallet-v0.1.1 2>/dev/null || true
+git push origin :refs/tags/bpvp-wallet-v0.1.1 2>/dev/null || true
+git tag bpvp-wallet-v0.1.1
+git push origin bpvp-wallet-v0.1.1
+```
+
+3. Update `NEXT_PUBLIC_BPVP_WALLET_TAG` (or the default in `dashboard/app/wallet/page.tsx`) if you change the tag string.
+
+Optional: delete the empty **GitHub Release** for the old tag in the UI (keep the git tag or delete it if you no longer want that version public).

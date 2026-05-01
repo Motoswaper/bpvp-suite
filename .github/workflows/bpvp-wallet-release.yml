@@ -83,20 +83,47 @@ jobs:
     name: Publish GitHub Release
     runs-on: ubuntu-latest
     needs: [build-wallet]
-    if: startsWith(github.ref, 'refs/tags/bpvp-wallet-v')
+    if: github.ref_type == 'tag' && startsWith(github.ref_name, 'bpvp-wallet-v')
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: release-assets
 
-      - name: Build merged checksums
+      # action-gh-release globs often miss paths with spaces ("BPVP Wallet ...").
+      # Flatten installers into upload/ and publish with gh CLI (handles spaces).
+      - name: Stage installers and merged checksums
         run: |
-          mkdir -p release-assets/checksums
-          find release-assets -type f -name "checksums-*.txt" -exec cp {} release-assets/checksums/ \;
-          cat release-assets/checksums/checksums-*.txt > release-assets/checksums.txt
+          set -euo pipefail
+          mkdir -p upload
+          find release-assets -type f \( \
+            -name "*.dmg" -o -name "*.exe" -o -name "*.AppImage" -o -name "*.deb" -o \
+            -name "*.zip" -o -name "*.tar.gz" \
+          \) ! -name "*.blockmap" -print0 | while IFS= read -r -d '' f; do
+            base="$(basename "$f")"
+            cp "$f" "upload/$base"
+          done
+          : > upload/checksums.txt
+          find release-assets -type f -name "checksums-*.txt" ! -name "checksums.txt" | sort | while IFS= read -r f; do
+            cat "$f" >> upload/checksums.txt
+          done
+          echo "Staged for release:"
+          ls -la upload
 
-      - name: Publish release assets
-        uses: softprops/action-gh-release@v2
-        with:
-          files: release-assets/**/*
+      - name: Create or update GitHub Release with assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="${{ github.ref_name }}"
+          REPO="${{ github.repository }}"
+          if ! gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
+            gh release create "$TAG" --repo "$REPO" \
+              --title "BPVP Wallet ${TAG}" \
+              --notes "Desktop wallet for **Signet / Testnet** only. Verify SHA256 using \`checksums.txt\` before opening installers."
+          fi
+          if [ "$(find upload -maxdepth 1 -type f | wc -l)" -eq 0 ]; then
+            echo "No files in upload/ — failing so the release is not left empty."
+            exit 1
+          fi
+          find upload -maxdepth 1 -type f -print0 | xargs -0 gh release upload "$TAG" --repo "$REPO" --clobber
