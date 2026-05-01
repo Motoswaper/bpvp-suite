@@ -43,11 +43,17 @@ echo "[4/6] Native-only bridge hardening gate..."
 
 echo "[5/6] Verifying local secret file permissions when present..."
 if [ -f "$ROOT_DIR/.run/local-secrets.env" ]; then
-  perms="$(stat -f '%Sp' "$ROOT_DIR/.run/local-secrets.env" 2>/dev/null || true)"
-  case "$perms" in
-    -rw-------*) : ;;
+  # macOS: stat -f '%OLp'; Linux (GitHub Actions): stat -c '%a'
+  octal=""
+  if octal="$(stat -f '%OLp' "$ROOT_DIR/.run/local-secrets.env" 2>/dev/null)"; then
+    :
+  else
+    octal="$(stat -c '%a' "$ROOT_DIR/.run/local-secrets.env" 2>/dev/null || true)"
+  fi
+  case "$octal" in
+    600|0600) : ;;
     *)
-      echo "FAIL: .run/local-secrets.env must be 600 (got $perms)."
+      echo "FAIL: .run/local-secrets.env must be mode 600 (got ${octal:-unknown})."
       exit 1
       ;;
   esac
