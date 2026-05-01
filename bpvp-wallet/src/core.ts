@@ -46,7 +46,11 @@ function ensurePassphrase(passphrase: string): string {
 }
 
 function deriveKey(passphrase: string, saltHex: string, n = 32768, r = 8, p = 1): Buffer {
-  return scryptSync(passphrase, Buffer.from(saltHex, "hex"), 32, { N: n, r, p });
+  // Node 24 can throw ERR_CRYPTO_INVALID_SCRYPT_PARAMS with the default maxmem
+  // even for valid N/r/p. Set an explicit safe ceiling above the required memory.
+  const requiredBytes = 128 * n * r;
+  const maxmem = Math.max(64 * 1024 * 1024, requiredBytes + 1024 * 1024);
+  return scryptSync(passphrase, Buffer.from(saltHex, "hex"), 32, { N: n, r, p, maxmem });
 }
 
 function encryptSeed(seedHex: string, passphrase: string): Omit<VaultFile, "version" | "network"> {
