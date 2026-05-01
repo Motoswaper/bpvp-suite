@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
+import { getPublicSiteUrl } from "@/lib/siteUrl";
 
 export default function robots(): MetadataRoute.Robots {
+  const origin = getPublicSiteUrl();
   return {
     rules: [
       {
@@ -8,6 +10,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/"
       }
     ],
-    sitemap: "https://testnet.btc-defi.com/sitemap.xml"
+    sitemap: `${origin}/sitemap.xml`
   };
 }

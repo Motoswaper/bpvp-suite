@@ -2,11 +2,12 @@ import "@/styles/globals.css";
 import { DeploymentBanner } from "@/components/layout/DeploymentBanner";
 import { GlobalFooter } from "@/components/layout/GlobalFooter";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { getPublicSiteUrl } from "@/lib/siteUrl";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { ReactNode } from "react";
 
-const siteUrl = "https://testnet.btc-defi.com";
+const siteUrl = getPublicSiteUrl();
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
