@@ -42,8 +42,10 @@ echo "[4/6] Native-only bridge hardening gate..."
 "$ROOT_DIR/scripts/native-only-gate.sh"
 
 echo "[5/6] Verifying local secret file permissions when present..."
-if [ -f "$ROOT_DIR/.run/local-secrets.env" ]; then
-  # macOS: stat -f '%OLp'; Linux (GitHub Actions): stat -c '%a'
+# Hosted CI never ships .run/ from git (.gitignore); skip mode check to avoid
+# false failures if a prior step or cache leaves a secrets file with loose perms.
+if [ "${GITHUB_ACTIONS:-}" != "true" ] && [ -f "$ROOT_DIR/.run/local-secrets.env" ]; then
+  # macOS: stat -f '%OLp'; Linux: stat -c '%a'
   octal=""
   if octal="$(stat -f '%OLp' "$ROOT_DIR/.run/local-secrets.env" 2>/dev/null)"; then
     :

@@ -5,6 +5,10 @@ on:
     branches: [main, master]
   pull_request:
 
+# Opt into Node 24 for JS actions before the June 2026 runner default.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 permissions:
   contents: read
   security-events: write
@@ -100,7 +104,7 @@ jobs:
       # Upload can fail on forks or when Code Scanning is not enabled for the repo.
       - name: Upload SARIF
         continue-on-error: true
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy-results.sarif
 
