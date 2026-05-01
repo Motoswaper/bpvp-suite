@@ -1,4 +1,4 @@
-# AXE Market Suite v1.0.0-rc1
+# BPVP Suite v1.0.0-rc1
 
 ## Highlights
 

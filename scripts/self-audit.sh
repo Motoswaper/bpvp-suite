@@ -13,7 +13,7 @@ log() {
   echo "$1" | tee -a "$REPORT"
 }
 
-log "== AXE Self Audit =="
+log "== BPVP Self Audit =="
 log "timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
 log "[1/6] Start full suite"
@@ -29,9 +29,9 @@ log "[4/6] Journal integrity verification"
 (cd "$BACKEND_DIR" && make verify-journal) >>"$REPORT" 2>&1
 
 log "[5/6] Core API sanity"
-ENGINE_STATUS="$(curl -fsS http://localhost:18080/status)"
-INDEXER_STATUS="$(curl -fsS http://localhost:18081/status)"
-WATCHER_STATUS="$(curl -fsS http://localhost:18082/status)"
+ENGINE_STATUS="$(curl -fsS http://localhost:28080/status)"
+INDEXER_STATUS="$(curl -fsS http://localhost:28081/status)"
+WATCHER_STATUS="$(curl -fsS http://localhost:28082/status)"
 echo "$ENGINE_STATUS" | tee -a "$REPORT" >/dev/null
 echo "$INDEXER_STATUS" | tee -a "$REPORT" >/dev/null
 echo "$WATCHER_STATUS" | tee -a "$REPORT" >/dev/null

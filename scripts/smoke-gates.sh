@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
 set -eu
 
-BASE_ENGINE="${BASE_ENGINE:-http://localhost:18080}"
-BASE_INDEXER="${BASE_INDEXER:-http://localhost:18081}"
-BASE_WATCHER="${BASE_WATCHER:-http://localhost:18082}"
+BASE_ENGINE="${BASE_ENGINE:-http://localhost:28080}"
+BASE_INDEXER="${BASE_INDEXER:-http://localhost:28081}"
+BASE_WATCHER="${BASE_WATCHER:-http://localhost:28082}"
 
-echo "== AXE Smoke Gates =="
+echo "== BPVP Smoke Gates =="
 
 echo "[1/7] Engine health"
 curl -fsS "$BASE_ENGINE/health" >/dev/null

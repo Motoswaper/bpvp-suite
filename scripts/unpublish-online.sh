@@ -3,7 +3,7 @@ set -eu
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 RUN_DIR="$ROOT_DIR/.run"
-CF_CONTAINER="axe-cloudflared"
+CF_CONTAINER="bpvp-cloudflared"
 
 echo "[1/2] Stopping Cloudflare tunnel..."
 docker rm -f "$CF_CONTAINER" >/dev/null 2>&1 || true

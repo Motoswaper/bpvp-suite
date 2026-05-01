@@ -5,21 +5,21 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 RUN_DIR="$ROOT_DIR/.run"
 CF_LOG="$RUN_DIR/cloudflared.log"
 CF_URL_FILE="$RUN_DIR/cloudflared.url"
-CF_CONTAINER="axe-cloudflared"
+CF_CONTAINER="bpvp-cloudflared"
 
 mkdir -p "$RUN_DIR"
 
-echo "[1/4] Starting local AXE suite..."
+echo "[1/4] Starting local BPVP suite..."
 "$ROOT_DIR/scripts/start-suite.sh" >/dev/null
 
-echo "[2/4] Waiting for dashboard (localhost:3000)..."
+echo "[2/4] Waiting for dashboard (localhost:3100)..."
 for i in $(seq 1 30); do
-  if curl -fsS -I "http://localhost:3000" >/dev/null 2>&1; then
+  if curl -fsS -I "http://localhost:3100" >/dev/null 2>&1; then
     break
   fi
   sleep 1
   if [ "$i" -eq 30 ]; then
-    echo "Dashboard did not become reachable on localhost:3000"
+    echo "Dashboard did not become reachable on localhost:3100"
     exit 1
   fi
 done
@@ -27,7 +27,7 @@ done
 echo "[3/4] Starting Cloudflare tunnel container..."
 docker rm -f "$CF_CONTAINER" >/dev/null 2>&1 || true
 docker run -d --name "$CF_CONTAINER" cloudflare/cloudflared:latest \
-  tunnel --no-autoupdate --url http://host.docker.internal:3000 >/dev/null
+  tunnel --no-autoupdate --url http://host.docker.internal:3100 >/dev/null
 
 echo "[4/4] Waiting for public URL..."
 URL=""
