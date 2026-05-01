@@ -18,7 +18,12 @@
         <div class="card">
           <h2>1) Initialize Vault</h2>
           <label>Vault path <input id="vaultPath" value=".bpvp-wallet.vault" /></label>
-          <label>Passphrase <input id="passphrase" type="password" /></label>
+          <label>Passphrase
+            <input id="passphrase" type="password" placeholder="Min 12 chars (recommended: Aa1!....)" />
+          </label>
+          <p class="hint">
+            Min 12 characters. Recommended: uppercase + lowercase + number + symbol.
+          </p>
           <label>Network
             <select id="network">
               <option value="signet">signet</option>
@@ -54,6 +59,7 @@
 
       <section class="card">
         <h2>Output</h2>
+        <p class="hint">If action fails, read the first ERROR line and retry.</p>
         <pre id="output">Ready.</pre>
       </section>
     </main>
