@@ -46,6 +46,15 @@ Restart everything (Docker stack + dashboard; also removes quick/domain Cloudfla
 ./scripts/restart-suite.sh
 ```
 
+If **`Missing required secrets in .run/local-secrets.env`** appears, the file is missing lines or was emptied. Regenerate (this deletes the old file):
+
+```bash
+rm -f .run/local-secrets.env
+./scripts/prepare-local-secrets.sh
+chmod 600 .run/local-secrets.env
+./scripts/start-suite.sh
+```
+
 ## Health and readiness
 
 Engine:
