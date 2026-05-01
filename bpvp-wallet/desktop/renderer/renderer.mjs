@@ -12,7 +12,8 @@ function commonInput() {
   }
   return {
     vaultPath: $("vaultPath").value.trim(),
-    passphrase
+    passphrase,
+    addressType: $("addressType").value
   };
 }
 
