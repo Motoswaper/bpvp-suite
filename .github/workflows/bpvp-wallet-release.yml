@@ -110,6 +110,8 @@ jobs:
           echo "Staged for release:"
           ls -la upload
 
+      # gh release upload syntax: tag then files then flags. Do not put --repo/--clobber
+      # before file list (xargs used to do that and the CLI failed).
       - name: Create or update GitHub Release with assets
         env:
           GH_TOKEN: ${{ github.token }}
@@ -117,13 +119,16 @@ jobs:
           set -euo pipefail
           TAG="${{ github.ref_name }}"
           REPO="${{ github.repository }}"
-          if ! gh release view "$TAG" --repo "$REPO" >/dev/null 2>&1; then
-            gh release create "$TAG" --repo "$REPO" \
+          if ! gh --repo "$REPO" release view "$TAG" >/dev/null 2>&1; then
+            gh --repo "$REPO" release create "$TAG" \
               --title "BPVP Wallet ${TAG}" \
-              --notes "Desktop wallet for **Signet / Testnet** only. Verify SHA256 using \`checksums.txt\` before opening installers."
+              --notes "Signet/Testnet desktop wallet. Verify SHA256 using checksums.txt before install."
           fi
-          if [ "$(find upload -maxdepth 1 -type f | wc -l)" -eq 0 ]; then
+          shopt -s nullglob
+          mapfile -t assets < <(find upload -maxdepth 1 -type f | sort)
+          if [ "${#assets[@]}" -eq 0 ]; then
             echo "No files in upload/ — failing so the release is not left empty."
             exit 1
           fi
-          find upload -maxdepth 1 -type f -print0 | xargs -0 gh release upload "$TAG" --repo "$REPO" --clobber
+          printf '%s\n' "${assets[@]}"
+          gh --repo "$REPO" release upload "$TAG" "${assets[@]}" --clobber

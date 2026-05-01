@@ -79,3 +79,7 @@ git push origin bpvp-wallet-v0.1.1
 3. Update `NEXT_PUBLIC_BPVP_WALLET_TAG` (or the default in `dashboard/app/wallet/page.tsx`) if you change the tag string.
 
 Optional: delete the empty **GitHub Release** for the old tag in the UI (keep the git tag or delete it if you no longer want that version public).
+
+### If `BPVP Wallet Release` failed with `gh release upload`
+
+Older workflow runs used the wrong flag order (`--repo` / `--clobber` before file paths). After updating the workflow, publish again with a **new tag** (for example `bpvp-wallet-v0.1.2`) and push it to `main` first so Actions picks up the YAML fix.
