@@ -34,13 +34,14 @@ git push origin bpvp-wallet-v0.1.0
 
 ## Download link used by site
 
-Wallet page currently points to latest release:
+Wallet page defaults to the versioned release tag (installers + checksums):
 
-- `https://github.com/joubertlopez/bpvp-suite/releases/latest`
+- `https://github.com/Motoswaper/bpvp-suite/releases/tag/bpvp-wallet-v0.1.0`
 
-You can override with environment variable:
+Optional overrides at **dashboard** build time:
 
-- `NEXT_PUBLIC_BPVP_WALLET_RELEASE_URL`
+- `NEXT_PUBLIC_BPVP_WALLET_REPO` — default `Motoswaper/bpvp-suite`
+- `NEXT_PUBLIC_BPVP_WALLET_TAG` — default `bpvp-wallet-v0.1.0`
 
 ## Operational safeguards
 
