@@ -20,8 +20,8 @@ const (
 )
 
 type JournalEntry struct {
-	EntryHash  string              `json:"entryHash,omitempty"`
-	PrevHash   string              `json:"prevHash,omitempty"`
+	EntryHash string              `json:"entryHash,omitempty"`
+	PrevHash  string              `json:"prevHash,omitempty"`
 	Type      string              `json:"type"`
 	Action    *models.Action      `json:"action,omitempty"`
 	Event     *models.DomainEvent `json:"event,omitempty"`
@@ -45,7 +45,7 @@ func (j *Journal) Append(entry JournalEntry) error {
 	defer j.mu.Unlock()
 
 	entry.Timestamp = time.Now().UTC()
-	prev, _ := j.lastEntryHash()
+	prev, _ := j.lastEntryHashLocked()
 	entry.PrevHash = prev
 	entry.EntryHash = computeEntryHash(entry)
 	file, err := os.OpenFile(j.path, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
@@ -67,7 +67,10 @@ func (j *Journal) Append(entry JournalEntry) error {
 func (j *Journal) ReadAll() ([]JournalEntry, error) {
 	j.mu.Lock()
 	defer j.mu.Unlock()
+	return j.readAllLocked()
+}
 
+func (j *Journal) readAllLocked() ([]JournalEntry, error) {
 	file, err := os.OpenFile(j.path, os.O_CREATE|os.O_RDONLY, 0o644)
 	if err != nil {
 		return nil, err
@@ -131,7 +134,13 @@ func (j *Journal) Ready() error {
 }
 
 func (j *Journal) lastEntryHash() (string, error) {
-	entries, err := j.ReadAll()
+	j.mu.Lock()
+	defer j.mu.Unlock()
+	return j.lastEntryHashLocked()
+}
+
+func (j *Journal) lastEntryHashLocked() (string, error) {
+	entries, err := j.readAllLocked()
 	if err != nil {
 		return "", err
 	}
@@ -143,10 +152,10 @@ func (j *Journal) lastEntryHash() (string, error) {
 
 func computeEntryHash(entry JournalEntry) string {
 	payload := map[string]any{
-		"prevHash": entry.PrevHash,
-		"type": entry.Type,
-		"action": entry.Action,
-		"event": entry.Event,
+		"prevHash":  entry.PrevHash,
+		"type":      entry.Type,
+		"action":    entry.Action,
+		"event":     entry.Event,
 		"timestamp": entry.Timestamp,
 	}
 	raw, _ := json.Marshal(payload)

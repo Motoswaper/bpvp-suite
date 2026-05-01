@@ -26,9 +26,9 @@ func TestEngineReplayDeterministicStateHash(t *testing.T) {
 	first := New("test", firstRegistry, journal)
 
 	action := models.Action{
-		Module: "axe20",
-		Type:   "mint",
-		Data:   map[string]any{"to": "alice", "amount": 10.0},
+		Module: "bpvp20",
+		Type:   "transfer",
+		Data:   map[string]any{"from": "ecosystem", "to": "alice", "amount": 10.0},
 	}
 	if err := first.ApplyAction(action); err != nil {
 		t.Fatalf("apply action: %v", err)
@@ -70,7 +70,9 @@ func TestEngineReplayDeterministicStateHash(t *testing.T) {
 func newRegistryForTest() *Registry {
 	reg := NewRegistry()
 	reg.Register(axe20.New())
+	reg.RegisterAlias("axe20", "bpvp20")
 	reg.Register(axe721.New())
+	reg.RegisterAlias("axe721", "bpvp721")
 	reg.Register(market.New())
 	reg.Register(trust.New())
 	reg.Register(lend.New())
