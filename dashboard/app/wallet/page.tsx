@@ -52,6 +52,11 @@ function assetUrl(assets: ReleaseAsset[], fileName: string): string | null {
   return match?.browser_download_url ?? null;
 }
 
+function assetUrlByPredicate(assets: ReleaseAsset[], predicate: (name: string) => boolean): string | null {
+  const match = assets.find((item) => predicate(item.name));
+  return match?.browser_download_url ?? null;
+}
+
 export default async function WalletPage() {
   const store = await cookies();
   const isSpanish = String(store.get("bpvp_locale")?.value ?? "").toLowerCase() === "es";
@@ -62,12 +67,27 @@ export default async function WalletPage() {
   const releaseUrl = release?.html_url || releasePageUrl(repo, tag);
   const assets = release?.assets ?? [];
   const links = {
-    macDmg: assetUrl(assets, INSTALLERS.macDmg),
-    macZip: assetUrl(assets, INSTALLERS.macZip),
-    winSetup: assetUrl(assets, INSTALLERS.winSetup),
-    winPortable: assetUrl(assets, INSTALLERS.winPortable),
-    linuxAppImage: assetUrl(assets, INSTALLERS.linuxAppImage),
-    linuxDeb: assetUrl(assets, INSTALLERS.linuxDeb),
+    macDmg:
+      assetUrl(assets, INSTALLERS.macDmg) ||
+      assetUrlByPredicate(assets, (name) => /\.dmg$/i.test(name)),
+    macZip:
+      assetUrl(assets, INSTALLERS.macZip) ||
+      assetUrlByPredicate(assets, (name) => /-mac\.zip$/i.test(name)),
+    winSetup:
+      assetUrl(assets, INSTALLERS.winSetup) ||
+      assetUrlByPredicate(assets, (name) => /\.setup\..*\.exe$/i.test(name) || /setup.*\.exe$/i.test(name)),
+    winPortable:
+      assetUrl(assets, INSTALLERS.winPortable) ||
+      assetUrlByPredicate(
+        assets,
+        (name) => /\.exe$/i.test(name) && !(/\.setup\..*\.exe$/i.test(name) || /setup.*\.exe$/i.test(name))
+      ),
+    linuxAppImage:
+      assetUrl(assets, INSTALLERS.linuxAppImage) ||
+      assetUrlByPredicate(assets, (name) => /\.appimage$/i.test(name)),
+    linuxDeb:
+      assetUrl(assets, INSTALLERS.linuxDeb) ||
+      assetUrlByPredicate(assets, (name) => /\.deb$/i.test(name)),
     checksums: assetUrl(assets, INSTALLERS.checksums),
   } as const;
   const hasAnyInstaller = Object.values(links).some(Boolean);
