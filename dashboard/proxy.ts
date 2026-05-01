@@ -1,0 +1,96 @@
+import { NextRequest, NextResponse } from "next/server";
+
+const PUBLIC_PREFIXES = ["/login", "/wallet", "/api/auth/login"];
+const PUBLIC_EXACT_PATHS = ["/"];
+const PUBLIC_API_PREFIXES = [
+  "/api/auth/login",
+  "/api/auth/logout",
+  "/api/auth/register",
+  "/api/auth/session",
+  "/api/marketplace/public",
+  "/api/did/public"
+];
+
+function withLocaleCookie(req: NextRequest, res: NextResponse) {
+  const lang = String(req.nextUrl.searchParams.get("lang") ?? "").toLowerCase();
+  if (lang === "en" || lang === "es") {
+    res.cookies.set("bpvp_locale", lang, {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax"
+    });
+  }
+  return res;
+}
+
+function withSecurityHeaders(res: NextResponse) {
+  res.headers.set("X-Frame-Options", "DENY");
+  res.headers.set("X-Content-Type-Options", "nosniff");
+  res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  res.headers.set("Cross-Origin-Opener-Policy", "same-origin");
+  res.headers.set("Cross-Origin-Resource-Policy", "same-origin");
+  if (process.env.NODE_ENV === "production") {
+    res.headers.set(
+      "Strict-Transport-Security",
+      "max-age=63072000; includeSubDomains; preload"
+    );
+  }
+  const csp = [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    "img-src 'self' data: blob:",
+    "font-src 'self' data:",
+    "style-src 'self' 'unsafe-inline'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    "connect-src 'self'"
+  ].join("; ");
+  res.headers.set("Content-Security-Policy", csp);
+  return res;
+}
+
+function finalize(req: NextRequest, res: NextResponse) {
+  return withSecurityHeaders(withLocaleCookie(req, res));
+}
+
+export function proxy(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  if (PUBLIC_EXACT_PATHS.includes(pathname)) {
+    return finalize(req, NextResponse.next());
+  }
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return finalize(req, NextResponse.next());
+  }
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/favicon") ||
+    pathname.startsWith("/brand/") ||
+    pathname.startsWith("/icons/") ||
+    pathname.startsWith("/logos/")
+  ) {
+    return finalize(req, NextResponse.next());
+  }
+
+  const session = req.cookies.get("axe_session")?.value;
+  if (!session && pathname.startsWith("/api/")) {
+    if (PUBLIC_API_PREFIXES.some((p) => pathname.startsWith(p))) {
+      return finalize(req, NextResponse.next());
+    }
+    return finalize(
+      req,
+      NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 })
+    );
+  }
+  if (!session && !pathname.startsWith("/api/")) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    return finalize(req, NextResponse.redirect(url));
+  }
+  return finalize(req, NextResponse.next());
+}
+
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
+};

@@ -1,0 +1,16 @@
+<svg width="980" height="260" viewBox="0 0 980 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="980" height="260" rx="28" fill="#0B0F18"/>
+  <g transform="translate(48,34)">
+    <rect x="0" y="0" width="192" height="192" rx="40" fill="#141B2A"/>
+    <circle cx="96" cy="96" r="62" fill="#F7931A"/>
+    <rect x="84" y="52" width="8" height="88" rx="4" fill="#FFFFFF"/>
+    <rect x="104" y="52" width="8" height="88" rx="4" fill="#FFFFFF"/>
+    <path d="M70 72H106C121 72 131 81 131 94C131 106 123 112 111 115C127 118 136 126 136 140C136 156 124 166 106 166H70V72ZM96 110C106 110 113 104 113 96C113 88 106 84 96 84H84V110H96ZM100 154C112 154 120 148 120 138C120 129 112 122 100 122H84V154H100Z" fill="#FFFFFF"/>
+  </g>
+  <g transform="translate(280,64)">
+    <text x="0" y="72" fill="#F8FAFC" font-size="86" font-weight="800" font-family="Inter, Avenir, Segoe UI, Arial, sans-serif" letter-spacing="2">BPVP</text>
+    <text x="0" y="124" fill="#94A3B8" font-size="30" font-weight="500" font-family="Inter, Avenir, Segoe UI, Arial, sans-serif" letter-spacing="0.8">
+      Bitcoin-native DeFi Operating Layer
+    </text>
+  </g>
+</svg>

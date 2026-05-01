@@ -3,3 +3,7 @@
 @tailwind utilities;
 :root { color-scheme: dark; }
 body { margin:0; background:#05070f; color:#e4e9f5; font-family:Inter,system-ui,sans-serif; }
+
+.bpvp-i18n-es { display: none; }
+html[lang="es"] .bpvp-i18n-en { display: none; }
+html[lang="es"] .bpvp-i18n-es { display: inline; }

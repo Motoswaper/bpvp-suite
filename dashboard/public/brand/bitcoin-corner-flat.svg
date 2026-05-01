@@ -1,0 +1,30 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 120) rotate(35) scale(420)">
+      <stop offset="0" stop-color="#1F2937"/>
+      <stop offset="1" stop-color="#020617"/>
+    </radialGradient>
+    <linearGradient id="coin" x1="96" y1="64" x2="420" y2="448" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F7A928"/>
+      <stop offset="0.55" stop-color="#F7931A"/>
+      <stop offset="1" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="gloss" x1="156" y1="112" x2="300" y2="276" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="white" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="white" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="8" y="8" width="496" height="496" rx="248" fill="url(#bg)"/>
+  <rect x="8" y="8" width="496" height="496" rx="248" stroke="#334155" stroke-width="16"/>
+
+  <circle cx="256" cy="256" r="178" fill="url(#coin)"/>
+  <circle cx="256" cy="256" r="178" stroke="#FDBA74" stroke-opacity="0.65" stroke-width="10"/>
+  <ellipse cx="226" cy="190" rx="105" ry="70" fill="url(#gloss)"/>
+
+  <g transform="translate(256 258)">
+    <path d="M-84 -112H22C70 -112 104 -84 104 -42C104 -8 84 16 52 28C96 40 124 70 124 114C124 164 84 198 20 198H-84V-112ZM-10 -30C20 -30 38 -44 38 -66C38 -88 20 -102 -10 -102H-38V-30H-10ZM0 188C36 188 56 170 56 142C56 114 36 96 0 96H-38V188H0Z" fill="white"/>
+    <rect x="-28" y="-136" width="22" height="358" rx="8" fill="white"/>
+    <rect x="16" y="-136" width="22" height="358" rx="8" fill="white"/>
+  </g>
+</svg>
