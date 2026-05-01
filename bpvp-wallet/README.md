@@ -8,6 +8,8 @@ This is the BPVP wallet core CLI for secure Bitcoin testing workflows.
 - Encrypted local vault (AES-256-GCM + scrypt key derivation)
 - No automatic mainnet support
 - No seed phrase persisted in plain text
+- Passphrase minimum: 12 characters (recommended: upper+lower+number+symbol)
+- Address types supported: `p2wpkh`, `p2tr` (Taproot), `p2sh-p2wpkh`, `p2pkh`
 
 ## Quick start
 
@@ -20,7 +22,7 @@ npm run build
 Initialize encrypted vault:
 
 ```bash
-node dist/index.js init --network signet --vault .bpvp-wallet.vault --passphrase "your-long-passphrase"
+node dist/index.js init --network signet --vault .bpvp-wallet.vault --passphrase "your-long-passphrase" --address-type p2tr
 ```
 
 Create wallet seed and show mnemonic once:
@@ -32,7 +34,7 @@ node dist/index.js create --vault .bpvp-wallet.vault --passphrase "your-long-pas
 Derive address:
 
 ```bash
-node dist/index.js derive --vault .bpvp-wallet.vault --passphrase "your-long-passphrase" --index 0
+node dist/index.js derive --vault .bpvp-wallet.vault --passphrase "your-long-passphrase" --index 0 --address-type p2tr
 ```
 
 Sign challenge message:

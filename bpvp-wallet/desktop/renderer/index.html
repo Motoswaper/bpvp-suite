@@ -18,11 +18,24 @@
         <div class="card">
           <h2>1) Initialize Vault</h2>
           <label>Vault path <input id="vaultPath" value=".bpvp-wallet.vault" /></label>
-          <label>Passphrase <input id="passphrase" type="password" /></label>
+          <label>Passphrase
+            <input id="passphrase" type="password" placeholder="Min 12 chars (recommended: Aa1!....)" />
+          </label>
+          <p class="hint">
+            Min 12 characters. Recommended: uppercase + lowercase + number + symbol.
+          </p>
           <label>Network
             <select id="network">
               <option value="signet">signet</option>
               <option value="testnet">testnet</option>
+            </select>
+          </label>
+          <label>Default address type
+            <select id="addressType">
+              <option value="p2wpkh">p2wpkh (SegWit, tb1q...)</option>
+              <option value="p2tr">p2tr Taproot (tb1p...)</option>
+              <option value="p2sh-p2wpkh">p2sh-p2wpkh (2...)</option>
+              <option value="p2pkh">p2pkh legacy (m/n...)</option>
             </select>
           </label>
           <button id="btnInit">Initialize</button>
@@ -37,6 +50,7 @@
         <div class="card">
           <h2>3) Derive Address</h2>
           <label>Index <input id="index" value="0" /></label>
+          <p class="hint">Uses selected address type above.</p>
           <button id="btnDerive">Derive</button>
         </div>
 
@@ -54,6 +68,7 @@
 
       <section class="card">
         <h2>Output</h2>
+        <p class="hint">If action fails, read the first ERROR line and retry.</p>
         <pre id="output">Ready.</pre>
       </section>
     </main>

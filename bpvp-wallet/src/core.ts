@@ -11,12 +11,17 @@ import { z } from "zod";
 
 const bip32 = BIP32Factory(ecc);
 const ECPair = ECPairFactory(ecc);
+bitcoin.initEccLib(ecc);
 
 export type WalletNetwork = "signet" | "testnet";
+export type AddressType = "p2wpkh" | "p2tr" | "p2sh-p2wpkh" | "p2pkh";
 
 const VaultSchema = z.object({
   version: z.literal(1),
   network: z.union([z.literal("signet"), z.literal("testnet")]),
+  defaultAddressType: z
+    .union([z.literal("p2wpkh"), z.literal("p2tr"), z.literal("p2sh-p2wpkh"), z.literal("p2pkh")])
+    .optional(),
   kdf: z.object({
     algorithm: z.literal("scrypt"),
     saltHex: z.string().min(16),
@@ -45,8 +50,25 @@ function ensurePassphrase(passphrase: string): string {
   return passphrase;
 }
 
+function ensureAddressType(addressType: string | undefined): AddressType {
+  const value = (addressType || "p2wpkh").toLowerCase();
+  switch (value) {
+    case "p2wpkh":
+    case "p2tr":
+    case "p2sh-p2wpkh":
+    case "p2pkh":
+      return value;
+    default:
+      fail("Address type must be one of: p2wpkh, p2tr, p2sh-p2wpkh, p2pkh.");
+  }
+}
+
 function deriveKey(passphrase: string, saltHex: string, n = 32768, r = 8, p = 1): Buffer {
-  return scryptSync(passphrase, Buffer.from(saltHex, "hex"), 32, { N: n, r, p });
+  // Node 24 can throw ERR_CRYPTO_INVALID_SCRYPT_PARAMS with the default maxmem
+  // even for valid N/r/p. Set an explicit safe ceiling above the required memory.
+  const requiredBytes = 128 * n * r;
+  const maxmem = Math.max(64 * 1024 * 1024, requiredBytes + 1024 * 1024);
+  return scryptSync(passphrase, Buffer.from(saltHex, "hex"), 32, { N: n, r, p, maxmem });
 }
 
 function encryptSeed(seedHex: string, passphrase: string): Omit<VaultFile, "version" | "network"> {
@@ -103,25 +125,71 @@ function networkToBitcoin(_network: WalletNetwork) {
   return bitcoin.networks.testnet;
 }
 
-function deriveAddressInternal(seedHex: string, network: WalletNetwork, index: number) {
+function purposeForAddressType(addressType: AddressType): number {
+  switch (addressType) {
+    case "p2pkh":
+      return 44;
+    case "p2sh-p2wpkh":
+      return 49;
+    case "p2wpkh":
+      return 84;
+    case "p2tr":
+      return 86;
+  }
+}
+
+function deriveAddressInternal(seedHex: string, network: WalletNetwork, index: number, addressType: AddressType) {
   const seed = Buffer.from(seedHex, "hex");
   const root = bip32.fromSeed(seed, networkToBitcoin(network));
-  const child = root.derivePath(`m/84'/1'/0'/0/${index}`);
+  const purpose = purposeForAddressType(addressType);
+  const child = root.derivePath(`m/${purpose}'/1'/0'/0/${index}`);
   if (!child.privateKey) fail("Could not derive private key.");
-  const payment = bitcoin.payments.p2wpkh({
-    pubkey: Buffer.from(child.publicKey),
-    network: networkToBitcoin(network)
-  });
+  let payment: { address?: string };
+  switch (addressType) {
+    case "p2wpkh":
+      payment = bitcoin.payments.p2wpkh({
+        pubkey: Buffer.from(child.publicKey),
+        network: networkToBitcoin(network)
+      });
+      break;
+    case "p2sh-p2wpkh": {
+      const redeem = bitcoin.payments.p2wpkh({
+        pubkey: Buffer.from(child.publicKey),
+        network: networkToBitcoin(network)
+      });
+      payment = bitcoin.payments.p2sh({ redeem, network: networkToBitcoin(network) });
+      break;
+    }
+    case "p2pkh":
+      payment = bitcoin.payments.p2pkh({
+        pubkey: Buffer.from(child.publicKey),
+        network: networkToBitcoin(network)
+      });
+      break;
+    case "p2tr":
+      payment = bitcoin.payments.p2tr({
+        internalPubkey: Buffer.from(child.publicKey.slice(1, 33)),
+        network: networkToBitcoin(network)
+      });
+      break;
+  }
   if (!payment.address) fail("Could not derive address.");
   return {
+    addressType,
     address: payment.address,
     privateKey: child.privateKey
   };
 }
 
-export function initVault(input: { network: WalletNetwork; vaultPath: string; passphrase: string }) {
+export function initVault(input: {
+  network: WalletNetwork;
+  vaultPath: string;
+  passphrase: string;
+  defaultAddressType?: AddressType;
+}) {
   const { network, vaultPath } = input;
   const passphrase = ensurePassphrase(input.passphrase);
+  const defaultAddressType = ensureAddressType(input.defaultAddressType);
   if (network !== "signet" && network !== "testnet") {
     fail("Only signet or testnet allowed.");
   }
@@ -131,9 +199,10 @@ export function initVault(input: { network: WalletNetwork; vaultPath: string; pa
   saveVault(vaultPath, {
     version: 1,
     network,
+    defaultAddressType,
     ...encrypted
   });
-  return { vaultPath, network };
+  return { vaultPath, network, defaultAddressType };
 }
 
 export function createWalletSeed(input: {
@@ -157,27 +226,35 @@ export function createWalletSeed(input: {
   };
 }
 
-export function deriveWalletAddress(input: { vaultPath: string; passphrase: string; index: number }) {
+export function deriveWalletAddress(input: {
+  vaultPath: string;
+  passphrase: string;
+  index: number;
+  addressType?: AddressType;
+}) {
   const passphrase = ensurePassphrase(input.passphrase);
   if (!Number.isInteger(input.index) || input.index < 0) fail("Index must be a non-negative integer.");
   const vault = loadVault(input.vaultPath);
+  const addressType = ensureAddressType(input.addressType ?? vault.defaultAddressType);
   const seedHex = decryptSeed(vault, passphrase);
-  const { address } = deriveAddressInternal(seedHex, vault.network, input.index);
-  return { network: vault.network, index: input.index, address };
+  const { address } = deriveAddressInternal(seedHex, vault.network, input.index, addressType);
+  return { network: vault.network, addressType, index: input.index, address };
 }
 
 export function signWalletMessage(input: {
   vaultPath: string;
   passphrase: string;
   index: number;
+  addressType?: AddressType;
   message: string;
 }) {
   const passphrase = ensurePassphrase(input.passphrase);
   if (!input.message) fail("Message is required.");
   if (!Number.isInteger(input.index) || input.index < 0) fail("Index must be a non-negative integer.");
   const vault = loadVault(input.vaultPath);
+  const addressType = ensureAddressType(input.addressType ?? vault.defaultAddressType);
   const seedHex = decryptSeed(vault, passphrase);
-  const { address, privateKey } = deriveAddressInternal(seedHex, vault.network, input.index);
+  const { address, privateKey } = deriveAddressInternal(seedHex, vault.network, input.index, addressType);
   const keyPair = ECPair.fromPrivateKey(privateKey, {
     network: networkToBitcoin(vault.network),
     compressed: true
@@ -186,10 +263,15 @@ export function signWalletMessage(input: {
   const signature = bitcoinMessage
     .sign(input.message, Buffer.from(keyPair.privateKey), keyPair.compressed)
     .toString("base64");
-  return { network: vault.network, index: input.index, address, message: input.message, signature };
+  return { network: vault.network, addressType, index: input.index, address, message: input.message, signature };
 }
 
 export function vaultStatus(input: { vaultPath: string }) {
   const vault = loadVault(input.vaultPath);
-  return { version: vault.version, network: vault.network, encryption: vault.cipher.algorithm };
+  return {
+    version: vault.version,
+    network: vault.network,
+    defaultAddressType: ensureAddressType(vault.defaultAddressType),
+    encryption: vault.cipher.algorithm
+  };
 }

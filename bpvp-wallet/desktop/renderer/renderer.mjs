@@ -6,20 +6,29 @@ const setOut = (v) => {
 };
 
 function commonInput() {
+  const passphrase = $("passphrase").value;
+  if (!passphrase || passphrase.length < 12) {
+    throw new Error("Passphrase must be at least 12 characters.");
+  }
   return {
     vaultPath: $("vaultPath").value.trim(),
-    passphrase: $("passphrase").value
+    passphrase,
+    addressType: $("addressType").value
   };
 }
 
 async function run(action, payload) {
-  setOut("Running...");
-  const res = await window.bpvpWallet[action](payload);
-  if (!res?.ok) {
-    setOut(`ERROR: ${res?.error || "unknown error"}`);
-    return;
+  setOut("Running... please wait");
+  try {
+    const res = await window.bpvpWallet[action](payload);
+    if (!res?.ok) {
+      setOut(`ERROR: ${res?.error || "unknown error"}`);
+      return;
+    }
+    setOut(res.data);
+  } catch (err) {
+    setOut(`ERROR: ${err?.message || "unknown error"}`);
   }
-  setOut(res.data);
 }
 
 $("btnInit").addEventListener("click", async () => {
