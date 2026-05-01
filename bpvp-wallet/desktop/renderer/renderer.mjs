@@ -4,6 +4,7 @@ const out = $("output");
 const setOut = (v) => {
   out.textContent = typeof v === "string" ? v : JSON.stringify(v, null, 2);
 };
+const api = window.bpvpWallet;
 
 function commonInput() {
   const passphrase = $("passphrase").value;
@@ -20,7 +21,16 @@ function commonInput() {
 async function run(action, payload) {
   setOut("Running... please wait");
   try {
-    const res = await window.bpvpWallet[action](payload);
+    if (!api) {
+      setOut("ERROR: Wallet bridge not loaded. Restart desktop app (npm run desktop:start).");
+      return;
+    }
+    const fn = api[action];
+    if (typeof fn !== "function") {
+      setOut(`ERROR: Unsupported wallet action: ${action}`);
+      return;
+    }
+    const res = await fn(payload);
     if (!res?.ok) {
       setOut(`ERROR: ${res?.error || "unknown error"}`);
       return;
@@ -65,3 +75,7 @@ $("btnStatus").addEventListener("click", async () => {
     vaultPath: $("vaultPath").value.trim()
   });
 });
+
+if (!api) {
+  setOut("Bridge unavailable. Close this window and run: npm run desktop:start");
+}
