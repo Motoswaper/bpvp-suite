@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 
 const DEFAULT_REPO = "Motoswaper/bpvp-suite";
-const DEFAULT_TAG = "bpvp-wallet-v0.1.1";
+const DEFAULT_TAG = "bpvp-wallet-v0.1.2";
 
 /** electron-builder artifact names for v0.1.0 (CI: mac arm64, win x64, linux x64). */
 const INSTALLERS = {

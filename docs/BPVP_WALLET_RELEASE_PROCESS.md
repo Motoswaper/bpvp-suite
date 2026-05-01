@@ -36,12 +36,12 @@ git push origin bpvp-wallet-v0.1.0
 
 Wallet page defaults to the versioned release tag (installers + checksums):
 
-- `https://github.com/Motoswaper/bpvp-suite/releases/tag/bpvp-wallet-v0.1.1`
+- `https://github.com/Motoswaper/bpvp-suite/releases/tag/bpvp-wallet-v0.1.2`
 
 Optional overrides at **dashboard** build time:
 
 - `NEXT_PUBLIC_BPVP_WALLET_REPO` — default `Motoswaper/bpvp-suite`
-- `NEXT_PUBLIC_BPVP_WALLET_TAG` — default `bpvp-wallet-v0.1.1`
+- `NEXT_PUBLIC_BPVP_WALLET_TAG` — default `bpvp-wallet-v0.1.2`
 
 ## Operational safeguards
 
@@ -70,10 +70,10 @@ After fixing `.github/workflows/bpvp-wallet-release.yml`, publish again:
 2. Bump the tag and push (example patch):
 
 ```bash
-git tag -d bpvp-wallet-v0.1.1 2>/dev/null || true
-git push origin :refs/tags/bpvp-wallet-v0.1.1 2>/dev/null || true
-git tag bpvp-wallet-v0.1.1
-git push origin bpvp-wallet-v0.1.1
+git tag -d bpvp-wallet-v0.1.3 2>/dev/null || true
+git push origin :refs/tags/bpvp-wallet-v0.1.3 2>/dev/null || true
+git tag bpvp-wallet-v0.1.3
+git push origin bpvp-wallet-v0.1.3
 ```
 
 3. Update `NEXT_PUBLIC_BPVP_WALLET_TAG` (or the default in `dashboard/app/wallet/page.tsx`) if you change the tag string.
