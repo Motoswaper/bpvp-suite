@@ -21,7 +21,9 @@ function createWindow() {
       preload: path.join(__dirname, "preload.mjs"),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true
+      // Keep preload bridge stable in desktop beta; sandboxed preload can
+      // intermittently block contextBridge exposure in some local setups.
+      sandbox: false
     }
   });
   win.loadFile(path.join(__dirname, "renderer", "index.html"));
