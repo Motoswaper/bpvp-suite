@@ -6,18 +6,20 @@ For unattended **LaunchAgent** / **npm** reliability, keep this checkout **outsi
 
 ## Service lifecycle
 
-Start all backend services:
+Start backend via Compose **only** if you already export `AXE_API_KEY`, `AXE_HMAC_SECRET`, and use project `bpvp` + env file (see `start-suite.sh`). For normal local work, use **`./scripts/start-suite.sh`** instead.
+
+Raw compose (advanced):
 
 ```bash
 cd backend
-docker compose up --build
+docker compose -p bpvp --env-file ../.run/local-secrets.env up --build -d
 ```
 
-Stop all backend services:
+Stop that stack:
 
 ```bash
 cd backend
-docker compose down --remove-orphans
+docker compose -p bpvp --env-file ../.run/local-secrets.env down --remove-orphans
 ```
 
 Start full local suite (backend + dashboard):
@@ -36,6 +38,12 @@ Stop suite:
 
 ```bash
 ./scripts/stop-suite.sh
+```
+
+Restart everything (Docker stack + dashboard; also removes quick/domain Cloudflare tunnel containers — run your publish script again after):
+
+```bash
+./scripts/restart-suite.sh
 ```
 
 ## Health and readiness
