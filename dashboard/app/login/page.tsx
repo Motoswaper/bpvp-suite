@@ -22,50 +22,79 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [signingIn, setSigningIn] = useState(false);
-  const [checkingSession, setCheckingSession] = useState(true);
+  const [sessionRecoveryLinks, setSessionRecoveryLinks] = useState(false);
 
   useEffect(() => {
     const AUTO_REDIRECT_KEY = "bpvp_login_auto_redirect_once";
+    const REDIRECT_TS_KEY = "bpvp_auth_redirect_ts";
+    const LOOP_WINDOW_MS = 12_000;
+
     setIsSpanish(document.cookie.includes("bpvp_locale=es"));
     const url = new URL(window.location.href);
     const forceLogin = url.searchParams.get("force") === "1";
     const registerError = url.searchParams.get("registerError");
     if (registerError) {
+      setSessionRecoveryLinks(false);
       setError(registerError);
       url.searchParams.delete("registerError");
       window.history.replaceState({}, "", url.toString());
     }
     if (forceLogin) {
       window.sessionStorage.removeItem(AUTO_REDIRECT_KEY);
-      setCheckingSession(false);
+      window.sessionStorage.removeItem(REDIRECT_TS_KEY);
       return;
     }
     let active = true;
-    const watchdog = window.setTimeout(() => {
-      // Absolute failsafe: never keep user blocked indefinitely in checking state.
-      if (active) setCheckingSession(false);
-    }, 6000);
     (async () => {
+      const spanish = document.cookie.includes("bpvp_locale=es");
       try {
         const res = await fetchWithTimeout("/api/auth/session", { cache: "no-store" }, 5000);
         if (!active) return;
-        if (res.ok) {
-          const alreadyTried = window.sessionStorage.getItem(AUTO_REDIRECT_KEY) === "1";
-          if (!alreadyTried) {
-            window.sessionStorage.setItem(AUTO_REDIRECT_KEY, "1");
-            window.location.href = "/market";
-            return;
-          }
+        if (!res.ok) {
+          window.sessionStorage.removeItem(AUTO_REDIRECT_KEY);
+          window.sessionStorage.removeItem(REDIRECT_TS_KEY);
+          if (active) setSessionRecoveryLinks(false);
+          return;
         }
+
+        const now = Date.now();
+        const lastRedirect = Number(window.sessionStorage.getItem(REDIRECT_TS_KEY) || "0");
+        if (lastRedirect && now - lastRedirect < LOOP_WINDOW_MS) {
+          window.sessionStorage.removeItem(REDIRECT_TS_KEY);
+          window.sessionStorage.removeItem(AUTO_REDIRECT_KEY);
+          setSessionRecoveryLinks(true);
+          setError(
+            spanish
+              ? "Detectamos un bucle rapido login ↔ dashboard. Suele pasar si la cookie de sesion no persiste (HTTP vs HTTPS, dominio distinto, o SameSite). Prueba abrir /market en la misma pestaña, o entra con ?force=1 para quedarte aqui y volver a iniciar sesion."
+              : "Detected a fast login ↔ dashboard loop. Usually the session cookie is not persisting (HTTP vs HTTPS, different host, or SameSite). Try opening /market in this tab, or use ?force=1 to stay here and sign in again."
+          );
+          return;
+        }
+
+        const alreadyTried = window.sessionStorage.getItem(AUTO_REDIRECT_KEY) === "1";
+        if (!alreadyTried) {
+          window.sessionStorage.setItem(REDIRECT_TS_KEY, String(now));
+          window.sessionStorage.setItem(AUTO_REDIRECT_KEY, "1");
+          window.location.href = "/market";
+          return;
+        }
+
+        window.sessionStorage.removeItem(AUTO_REDIRECT_KEY);
+        window.sessionStorage.removeItem(REDIRECT_TS_KEY);
+        setSessionRecoveryLinks(true);
+        setError(
+          spanish
+            ? "Tu sesion parece activa pero volviste a login (posible bucle o bloqueo de cookie). Abre /market manualmente, o cierra sesion desde el dashboard y entra de nuevo. Para quedarte en esta pantalla usa ?force=1."
+            : "You appear signed in but landed on login again (redirect loop or cookie blocked). Open /market manually, or sign out from the dashboard and sign in again. To stay on this screen use ?force=1."
+        );
       } catch {
-        /* network / tunnel blip — still show login form */
+        window.sessionStorage.removeItem(AUTO_REDIRECT_KEY);
+        window.sessionStorage.removeItem(REDIRECT_TS_KEY);
+        if (active) setSessionRecoveryLinks(false);
       }
-      window.sessionStorage.removeItem(AUTO_REDIRECT_KEY);
-      if (active) setCheckingSession(false);
     })();
     return () => {
       active = false;
-      window.clearTimeout(watchdog);
     };
   }, []);
 
@@ -73,6 +102,7 @@ export default function LoginPage() {
     e.preventDefault();
     setSigningIn(true);
     setError("");
+    setSessionRecoveryLinks(false);
     setInfo("");
     try {
       const res = await fetchWithTimeout("/api/auth/login", {
@@ -87,20 +117,11 @@ export default function LoginPage() {
       }
       setInfo(isSpanish ? "Sesion creada. Redirigiendo..." : "Session created. Redirecting...");
       window.sessionStorage.removeItem("bpvp_login_auto_redirect_once");
+      window.sessionStorage.removeItem("bpvp_auth_redirect_ts");
       window.location.href = "/market";
     } finally {
       setSigningIn(false);
     }
-  }
-
-  if (checkingSession) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-[#05070f]">
-        <div className="rounded-xl border border-slate-800 bg-[#101523] px-5 py-4 text-sm text-slate-300">
-          {isSpanish ? "Verificando sesion..." : "Checking session..."}
-        </div>
-      </main>
-    );
   }
 
   return (
@@ -166,6 +187,22 @@ export default function LoginPage() {
       </div>
       <div className="fixed bottom-4 left-4 right-4 mx-auto max-w-3xl">
         {error ? <p className="rounded-md border border-rose-800 bg-rose-950/50 p-3 text-sm text-rose-300">{error}</p> : null}
+        {sessionRecoveryLinks ? (
+          <div className="mt-2 flex flex-wrap gap-2">
+            <a
+              href="/market"
+              className="rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700"
+            >
+              {isSpanish ? "Abrir /market" : "Open /market"}
+            </a>
+            <a
+              href="/login?force=1"
+              className="rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700"
+            >
+              {isSpanish ? "Quedarse en login (?force=1)" : "Stay on login (?force=1)"}
+            </a>
+          </div>
+        ) : null}
         {info ? <p className="mt-2 rounded-md border border-slate-700 bg-slate-900/60 p-3 text-sm text-emerald-300">{info}</p> : null}
       </div>
     </main>

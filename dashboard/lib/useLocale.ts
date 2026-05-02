@@ -17,7 +17,8 @@ function readLocaleFromBrowser(): Locale {
 export function useLocale() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [locale, setLocale] = useState<Locale>(() => readLocaleFromBrowser());
+  // Keep first client render aligned with SSR output to avoid hydration mismatch.
+  const [locale, setLocale] = useState<Locale>("en");
 
   useEffect(() => {
     const next = readLocaleFromBrowser();
