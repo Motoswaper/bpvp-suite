@@ -1,0 +1,24 @@
+name: ZAP Baseline DAST
+
+on:
+  schedule:
+    - cron: "45 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  zap-baseline:
+    name: Scan public surface with ZAP
+    runs-on: ubuntu-latest
+    steps:
+      - name: ZAP baseline scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: "https://testnet.btc-defi.com"
+          fail_action: false
+          allow_issue_writing: false
+          cmd_options: "-a"
+
