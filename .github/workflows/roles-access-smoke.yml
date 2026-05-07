@@ -10,6 +10,10 @@ on:
   schedule:
     - cron: "20 5 * * 1"
 
+# Opt into Node 24 for JS actions (see GitHub Actions runner changelog).
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
 permissions:
   contents: read
 
@@ -24,7 +28,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install dashboard dependencies
         working-directory: dashboard
@@ -32,54 +36,7 @@ jobs:
 
       - name: Build dashboard
         working-directory: dashboard
-        env:
-          ENGINE_URL: "http://127.0.0.1:28080"
-          AXE_API_KEY: "roles-smoke-ci-key"
-          AXE_HMAC_SECRET: "roles-smoke-ci-hmac-not-for-production"
         run: npm run build
-
-      # Dashboard proxies engine actions to ENGINE_URL; without a listener the smoke test can see upstream 401/502.
-      - name: Start stub AXE engine for smoke
-        run: |
-          mkdir -p .run
-          cat > .run/stub-axe-engine.cjs <<'EOF'
-          const http = require("http");
-          http
-            .createServer((req, res) => {
-              const path = req.url.split("?")[0];
-              if (req.method === "POST" && path === "/actions") {
-                req.on("data", () => {});
-                req.on("end", () => {
-                  res.writeHead(200, { "Content-Type": "application/json" });
-                  res.end(JSON.stringify({ ok: true, stubEngine: true }));
-                });
-                return;
-              }
-              res.writeHead(404);
-              res.end();
-            })
-            .listen(28080, "0.0.0.0", () => {
-              process.stdout.write("stub engine listening on 28080 (0.0.0.0)\n");
-            });
-          EOF
-          nohup node .run/stub-axe-engine.cjs > .run/stub-axe-engine.log 2>&1 &
-          for i in $(seq 1 25); do
-            code="000"
-            curl_ec=1
-            set +e
-            code="$(curl -sS --connect-timeout 2 --max-time 5 -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:28080/actions \
-              -H "Content-Type: application/json" -d "{}")"
-            curl_ec=$?
-            set -e
-            if [[ "${curl_ec}" -eq 0 && "${code}" == "200" ]]; then
-              echo "Stub AXE engine is up"
-              exit 0
-            fi
-            sleep 1
-          done
-          echo "Stub engine failed to start"
-          cat .run/stub-axe-engine.log || true
-          exit 1
 
       - name: Start dashboard locally
         env:
@@ -87,10 +44,8 @@ jobs:
           NODE_ENV: "production"
           BPVP_SESSION_COOKIE_SECURE: "false"
           BPVP_ALLOW_PUBLIC_REGISTER: "true"
+          BPVP_ROLES_SMOKE_SKIP_ENGINE: "true"
           DASHBOARD_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
-          ENGINE_URL: "http://127.0.0.1:28080"
-          AXE_API_KEY: "roles-smoke-ci-key"
-          AXE_HMAC_SECRET: "roles-smoke-ci-hmac-not-for-production"
         run: |
           mkdir -p .run
           nohup npm --prefix dashboard run start > .run/roles-smoke-dashboard.log 2>&1 &
@@ -139,9 +94,6 @@ jobs:
           if [[ -f .run/roles-smoke-dashboard.log ]]; then
             cp .run/roles-smoke-dashboard.log artifact-staging-roles-smoke/dashboard-startup.log
           fi
-          if [[ -f .run/stub-axe-engine.log ]]; then
-            cp .run/stub-axe-engine.log artifact-staging-roles-smoke/stub-axe-engine.log
-          fi
           ls -la artifact-staging-roles-smoke || true
 
       - name: Upload roles smoke artifacts
@@ -151,4 +103,3 @@ jobs:
           name: roles-smoke-artifacts
           path: artifact-staging-roles-smoke/
           if-no-files-found: warn
-
