@@ -67,7 +67,7 @@ jobs:
           node-version: "20"
 
       - name: Install deps
-        run: npm install
+        run: npm install --include=dev
 
       - name: Type check
         run: npx tsc --noEmit
@@ -136,7 +136,7 @@ jobs:
 
       - name: Install dashboard deps
         working-directory: dashboard
-        run: npm install
+        run: npm install --include=dev
 
       - name: Ensure scripts are executable
         run: chmod +x ./scripts/*.sh
