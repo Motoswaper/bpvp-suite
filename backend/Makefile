@@ -7,7 +7,7 @@ run-indexer:
 run-watcher:
 	go run ./cmd/axe-watcher
 verify-journal:
-	docker run --rm -v "$$PWD":/app -w /app golang:1.24 sh -lc "/usr/local/go/bin/go run ./cmd/axe-verify-journal"
+	docker run --rm -v "$$PWD":/app -w /app golang:1.25 sh -lc "/usr/local/go/bin/go run ./cmd/axe-verify-journal"
 build:
 	go build ./...
 test:
