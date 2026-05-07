@@ -53,7 +53,12 @@ http_status() {
   local cookies_out="${4:-}"
   local body="${5:-}"
   local url="${BASE_URL}${path}"
-  local args=(-sS -o /dev/null -w "%{http_code}" -X "${method}" "${url}" -H "Origin: ${BASE_URL}" -H "Referer: ${BASE_URL}/")
+  local args=(
+    -sS --connect-timeout 8 --max-time 30
+    -o /dev/null -w "%{http_code}"
+    -X "${method}" "${url}"
+    -H "Origin: ${BASE_URL}" -H "Referer: ${BASE_URL}/"
+  )
   if [[ -n "${cookies_in}" ]]; then
     args+=(-b "${cookies_in}")
   fi
@@ -63,12 +68,22 @@ http_status() {
   if [[ -n "${body}" ]]; then
     args+=(-H "content-type: application/json" --data "${body}")
   fi
-  curl "${args[@]}"
+  local code curl_ec
+  set +e
+  code="$(curl "${args[@]}" 2>/dev/null)"
+  curl_ec=$?
+  set -e
+  if [[ "${curl_ec}" -ne 0 ]]; then
+    # e.g. 7 = connection refused; avoid leaking raw curl exit as GitHub Actions job exit code
+    echo "conn_fail_${curl_ec}"
+    return 0
+  fi
+  echo "${code}"
 }
 
 section "Health check"
 status="$(http_status GET "/" "" "")"
-[[ "${status}" == "200" ]] && pass "Base URL reachable (${BASE_URL})" || fail "Base URL not reachable: ${status}"
+[[ "${status}" == "200" ]] && pass "Base URL reachable (${BASE_URL})" || fail "Base URL not reachable (${BASE_URL}): ${status} (conn_fail_* = curl could not connect; fix server or wait for port)"
 
 section "Admin login"
 status="$(http_status POST "/api/auth/login" "" "${ADMIN_COOKIES}" "{\"username\":\"${ADMIN_USER}\",\"password\":\"${ADMIN_PASSWORD}\"}")"
