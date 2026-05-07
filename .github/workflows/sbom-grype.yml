@@ -27,10 +27,17 @@ jobs:
           format: spdx-json
           output-file: sbom.spdx.json
 
-      - name: Scan SBOM with Grype
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-spdx
+          path: sbom.spdx.json
+          if-no-files-found: error
+
+      - name: Scan repository with Grype
         uses: anchore/scan-action@v6
         with:
-          sbom: sbom.spdx.json
+          path: .
           fail-build: false
           severity-cutoff: high
           output-format: sarif
