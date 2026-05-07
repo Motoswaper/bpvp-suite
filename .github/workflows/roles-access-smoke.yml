@@ -37,7 +37,7 @@ jobs:
       - name: Start dashboard locally
         env:
           PORT: "3100"
-          NODE_ENV: "production"
+          NODE_ENV: "development"
           BPVP_ALLOW_PUBLIC_REGISTER: "true"
           DASHBOARD_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
         run: |
