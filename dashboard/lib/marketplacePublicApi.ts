@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHash, timingSafeEqual } from "crypto";
+import { timingSafeEqual } from "crypto";
 import { checkRateLimit, getClientIp } from "@/lib/security";
 
 function resolveAllowedOrigin(req: NextRequest) {
@@ -40,8 +40,9 @@ export function marketplaceRateLimit(req: NextRequest, key: string, max = 120) {
 }
 
 function safeEq(a: string, b: string): boolean {
-  const left = createHash("sha256").update(a).digest();
-  const right = createHash("sha256").update(b).digest();
+  const left = Buffer.from(a, "utf8");
+  const right = Buffer.from(b, "utf8");
+  if (left.length !== right.length) return false;
   return timingSafeEqual(left, right);
 }
 

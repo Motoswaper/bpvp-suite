@@ -1,10 +1,10 @@
-import { createHash, createHmac, timingSafeEqual } from "crypto";
+import { createHash, createHmac, randomBytes, scryptSync, timingSafeEqual } from "crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { cookies as readCookies } from "next/headers";
 import { NextRequest } from "next/server";
 
-export type UserRole = "admin" | "trader" | "risk" | "viewer";
+export type UserRole = "admin" | "trader" | "risk" | "viewer" | "operator";
 
 export type AuthUser = {
   username: string;
@@ -47,6 +47,48 @@ function shaHex(value: string): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
+const SCRYPT_PARAMS = {
+  N: 1 << 14,
+  r: 8,
+  p: 1,
+  keylen: 32
+} as const;
+
+function hashPassword(password: string): string {
+  const salt = randomBytes(16);
+  const key = scryptSync(password, salt, SCRYPT_PARAMS.keylen, {
+    N: SCRYPT_PARAMS.N,
+    r: SCRYPT_PARAMS.r,
+    p: SCRYPT_PARAMS.p
+  });
+  return [
+    "scrypt",
+    String(SCRYPT_PARAMS.N),
+    String(SCRYPT_PARAMS.r),
+    String(SCRYPT_PARAMS.p),
+    salt.toString("base64url"),
+    key.toString("base64url")
+  ].join("$");
+}
+
+function verifyPassword(password: string, storedHash: string): boolean {
+  const parts = String(storedHash || "").split("$");
+  if (parts.length === 6 && parts[0] === "scrypt") {
+    const N = Number(parts[1]);
+    const r = Number(parts[2]);
+    const p = Number(parts[3]);
+    const salt = Buffer.from(parts[4], "base64url");
+    const expected = Buffer.from(parts[5], "base64url");
+    if (!Number.isFinite(N) || !Number.isFinite(r) || !Number.isFinite(p) || expected.length === 0) {
+      return false;
+    }
+    const derived = scryptSync(password, salt, expected.length, { N, r, p });
+    return timingSafeEqual(derived, expected);
+  }
+  // Legacy compatibility for previously stored SHA-256 password hashes.
+  return safeEqHex(shaHex(password), storedHash);
+}
+
 function safeEq(a: string, b: string): boolean {
   return timingSafeEqual(sha(a), sha(b));
 }
@@ -87,7 +129,7 @@ export function parseUsersConfig(): AuthUser[] {
         .map((u) => ({
           username: String(u.username ?? "").trim(),
           password: u.password ? String(u.password) : undefined,
-          passwordHash: u.passwordHash ? String(u.passwordHash) : (u.password ? shaHex(String(u.password)) : undefined),
+          passwordHash: u.passwordHash ? String(u.passwordHash) : (u.password ? hashPassword(String(u.password)) : undefined),
           role: (u.role as UserRole) || "viewer",
           otpSecret: u.otpSecret ? String(u.otpSecret) : undefined,
           enabled: u.enabled !== false
@@ -107,7 +149,7 @@ export function parseUsersConfig(): AuthUser[] {
     {
       username: "admin",
       password: fallbackPassword || undefined,
-      passwordHash: fallbackPassword ? shaHex(fallbackPassword) : undefined,
+      passwordHash: fallbackPassword ? hashPassword(fallbackPassword) : undefined,
       role: "admin"
     }
   ];
@@ -134,7 +176,7 @@ function sanitizeUsers(users: AuthUser[]): AuthUser[] {
   return users
     .map((u) => ({
       username: String(u.username || "").trim(),
-      passwordHash: u.passwordHash ? String(u.passwordHash) : (u.password ? shaHex(String(u.password)) : undefined),
+      passwordHash: u.passwordHash ? String(u.passwordHash) : (u.password ? hashPassword(String(u.password)) : undefined),
       role: normalizeRole(u.role),
       otpSecret: u.otpSecret ? String(u.otpSecret) : undefined,
       enabled: u.enabled !== false,
@@ -205,8 +247,8 @@ export function upsertUser(input: {
     enabled: input.enabled !== false,
     otpSecret: input.otpSecret ? String(input.otpSecret) : existing?.otpSecret,
     passwordHash: input.password
-      ? shaHex(input.password)
-      : existing?.passwordHash ?? (existing?.password ? shaHex(existing.password) : undefined),
+      ? hashPassword(input.password)
+      : existing?.passwordHash ?? (existing?.password ? hashPassword(existing.password) : undefined),
     createdAt: existing?.createdAt || now,
     updatedAt: now
   };
@@ -295,7 +337,7 @@ export function authenticateUser(input: { username: string; password: string; ot
   if (!match) return { ok: false as const, reason: "invalid_credentials" };
   if (match.enabled === false) return { ok: false as const, reason: "user_disabled" };
   const expectedHash = match.passwordHash || (match.password ? shaHex(match.password) : "");
-  if (!expectedHash || !safeEqHex(shaHex(input.password), expectedHash)) {
+  if (!expectedHash || !verifyPassword(input.password, expectedHash)) {
     return { ok: false as const, reason: "invalid_credentials" };
   }
   if (match.otpSecret) {
