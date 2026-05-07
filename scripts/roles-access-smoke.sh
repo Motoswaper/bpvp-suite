@@ -82,6 +82,9 @@ section "Operator login and access check"
 status="$(http_status POST "/api/auth/login" "" "${OP_COOKIES}" "{\"username\":\"${OPERATOR_USER}\",\"password\":\"${OPERATOR_PASSWORD}\"}")"
 [[ "${status}" == "200" ]] && pass "Operator login OK" || fail "Operator login failed (${status})"
 
+status="$(http_status GET "/api/auth/session" "${OP_COOKIES}" "")"
+[[ "${status}" == "200" ]] && pass "Operator session active" || fail "Operator session check failed (${status})"
+
 status="$(http_status POST "/api/engine/action" "${OP_COOKIES}" "" "{\"module\":\"otc\",\"type\":\"rfq_create\",\"data\":{}}")"
 if [[ "${status}" == "401" || "${status}" == "403" ]]; then
   fail "Operator denied engine action (${status})"
