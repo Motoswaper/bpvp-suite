@@ -34,6 +34,44 @@ jobs:
         working-directory: dashboard
         run: npm run build
 
+      # Dashboard proxies engine actions to ENGINE_URL; without a listener the smoke test can see upstream 401/502.
+      - name: Start stub AXE engine for smoke
+        run: |
+          mkdir -p .run
+          cat > .run/stub-axe-engine.cjs <<'EOF'
+          const http = require("http");
+          http
+            .createServer((req, res) => {
+              const path = req.url.split("?")[0];
+              if (req.method === "POST" && path === "/actions") {
+                req.on("data", () => {});
+                req.on("end", () => {
+                  res.writeHead(200, { "Content-Type": "application/json" });
+                  res.end(JSON.stringify({ ok: true, stubEngine: true }));
+                });
+                return;
+              }
+              res.writeHead(404);
+              res.end();
+            })
+            .listen(28080, "127.0.0.1", () => {
+              process.stdout.write("stub engine listening on 28080\n");
+            });
+          EOF
+          nohup node .run/stub-axe-engine.cjs > .run/stub-axe-engine.log 2>&1 &
+          for i in $(seq 1 20); do
+            code="$(curl -sS -o /dev/null -w "%{http_code}" -X POST http://127.0.0.1:28080/actions \
+              -H "Content-Type: application/json" -d "{}")"
+            if [[ "${code}" == "200" ]]; then
+              echo "Stub AXE engine is up"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Stub engine failed to start"
+          cat .run/stub-axe-engine.log || true
+          exit 1
+
       - name: Start dashboard locally
         env:
           PORT: "3100"
@@ -41,6 +79,9 @@ jobs:
           BPVP_SESSION_COOKIE_SECURE: "false"
           BPVP_ALLOW_PUBLIC_REGISTER: "true"
           DASHBOARD_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
+          ENGINE_URL: "http://127.0.0.1:28080"
+          AXE_API_KEY: "roles-smoke-ci-key"
+          AXE_HMAC_SECRET: "roles-smoke-ci-hmac-not-for-production"
         run: |
           mkdir -p .run
           nohup npm --prefix dashboard run start > .run/roles-smoke-dashboard.log 2>&1 &
@@ -83,6 +124,9 @@ jobs:
           done
           if [[ -f .run/roles-smoke-dashboard.log ]]; then
             cp .run/roles-smoke-dashboard.log artifact-staging-roles-smoke/dashboard-startup.log
+          fi
+          if [[ -f .run/stub-axe-engine.log ]]; then
+            cp .run/stub-axe-engine.log artifact-staging-roles-smoke/stub-axe-engine.log
           fi
           ls -la artifact-staging-roles-smoke || true
 
