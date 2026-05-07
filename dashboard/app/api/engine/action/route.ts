@@ -4,13 +4,18 @@ import { canAccess, getSessionFromRequest, type UserRole } from "@/lib/auth";
 import { checkRateLimit, getClientIp, isSameOriginRequest } from "@/lib/security";
 import { writeSecurityEvent } from "@/lib/securityAudit";
 
-const engineBase = process.env.ENGINE_URL ?? "http://localhost:28080";
-const apiKey = process.env.AXE_API_KEY ?? "";
-const hmacSecret = process.env.AXE_HMAC_SECRET ?? "";
-
 const ALLOWED_MODULES = new Set(["bpvp20", "bpvp721", "market", "trust", "lend", "settle", "otc"]);
 
-function signRequest(method: string, path: string, timestamp: string, body: string) {
+/** Read per-request; avoid static `process.env.FOO` at module scope (Next may inline build-time values). */
+function engineUpstreamConfig() {
+  const env = process.env;
+  const engineBase = env["ENGINE_URL"]?.trim() || "http://127.0.0.1:28080";
+  const apiKey = env["AXE_API_KEY"]?.trim() ?? "";
+  const hmacSecret = env["AXE_HMAC_SECRET"]?.trim() ?? "";
+  return { engineBase, apiKey, hmacSecret };
+}
+
+function signRequest(hmacSecret: string, method: string, path: string, timestamp: string, body: string) {
   return crypto.createHmac("sha256", hmacSecret).update(`${method}|${path}|${timestamp}|${body}`).digest("hex");
 }
 
@@ -119,6 +124,7 @@ export async function POST(req: NextRequest) {
       action: type,
       details: { module: targetModule }
     });
+    const { engineBase, apiKey, hmacSecret } = engineUpstreamConfig();
     if (!apiKey || !hmacSecret) {
       await writeSecurityEvent({
         category: "action",
@@ -146,7 +152,7 @@ export async function POST(req: NextRequest) {
     };
     headers["X-AXE-API-Key"] = apiKey;
     headers["X-AXE-Timestamp"] = timestamp;
-    headers["X-AXE-Signature"] = signRequest("POST", path, timestamp, body);
+    headers["X-AXE-Signature"] = signRequest(hmacSecret, "POST", path, timestamp, body);
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 12000);

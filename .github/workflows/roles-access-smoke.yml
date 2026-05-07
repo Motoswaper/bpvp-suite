@@ -32,6 +32,10 @@ jobs:
 
       - name: Build dashboard
         working-directory: dashboard
+        env:
+          ENGINE_URL: "http://127.0.0.1:28080"
+          AXE_API_KEY: "roles-smoke-ci-key"
+          AXE_HMAC_SECRET: "roles-smoke-ci-hmac-not-for-production"
         run: npm run build
 
       # Dashboard proxies engine actions to ENGINE_URL; without a listener the smoke test can see upstream 401/502.
@@ -54,8 +58,8 @@ jobs:
               res.writeHead(404);
               res.end();
             })
-            .listen(28080, "127.0.0.1", () => {
-              process.stdout.write("stub engine listening on 28080\n");
+            .listen(28080, "0.0.0.0", () => {
+              process.stdout.write("stub engine listening on 28080 (0.0.0.0)\n");
             });
           EOF
           nohup node .run/stub-axe-engine.cjs > .run/stub-axe-engine.log 2>&1 &
