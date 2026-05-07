@@ -150,6 +150,7 @@ function normalizeRole(role: string | undefined): UserRole {
     case "trader":
     case "risk":
     case "viewer":
+    case "operator":
       return role;
     default:
       return "viewer";
