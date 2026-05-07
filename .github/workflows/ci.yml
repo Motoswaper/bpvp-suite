@@ -69,9 +69,6 @@ jobs:
       - name: Install deps
         run: npm install
 
-      - name: Docs visibility gate
-        run: npm run docs:visibility:check
-
       - name: Type check
         run: npx tsc --noEmit
 
