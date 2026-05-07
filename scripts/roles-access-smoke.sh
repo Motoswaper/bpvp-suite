@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# RBAC smoke test against a running dashboard (BASE_URL).
+# Operator "engine action" calls the dashboard proxy → real AXE engine at ENGINE_URL (default http://localhost:28080).
+# For CI, the workflow starts a stub engine on :28080. Locally, start the backend or expect non-401 failures from upstream.
 set -euo pipefail
 
 BASE_URL="${BASE_URL:-http://127.0.0.1:3100}"
