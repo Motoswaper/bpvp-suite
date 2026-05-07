@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { canAccess, getSessionFromRequest } from "@/lib/auth";
+import { canAccess, getSessionFromRequest, type UserRole } from "@/lib/auth";
 import { checkRateLimit, getClientIp, isSameOriginRequest } from "@/lib/security";
 import { writeSecurityEvent } from "@/lib/securityAudit";
 
@@ -20,16 +20,19 @@ type Body = {
   data?: Record<string, unknown>;
 };
 
-function canExecuteAction(module: string, type: string, role: "admin" | "trader" | "risk" | "viewer") {
+function canExecuteAction(module: string, type: string, role: UserRole) {
   if (role === "admin") return true;
   if (module === "otc") {
     const traderAllowed = new Set(["rfq_create", "quote_submit", "quote_accept"]);
     const riskAllowed = new Set(["trade_settle", "rfq_cancel"]);
+    if (role === "operator") {
+      return traderAllowed.has(type) || riskAllowed.has(type);
+    }
     if (role === "trader" && traderAllowed.has(type)) return true;
     if (role === "risk" && riskAllowed.has(type)) return true;
     return false;
   }
-  return role === "trader" || role === "risk";
+  return role === "trader" || role === "risk" || role === "operator";
 }
 
 export async function POST(req: NextRequest) {
@@ -57,7 +60,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "too many requests" }, { status: 429 });
     }
     const session = getSessionFromRequest(req);
-    if (!session || !canAccess(session, ["admin", "trader", "risk"])) {
+    if (!session || !canAccess(session, ["admin", "trader", "risk", "operator"])) {
       await writeSecurityEvent({
         category: "action",
         outcome: "denied",
