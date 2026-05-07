@@ -41,6 +41,7 @@ jobs:
           BPVP_ALLOW_PUBLIC_REGISTER: "true"
           DASHBOARD_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
         run: |
+          mkdir -p .run
           nohup npm --prefix dashboard run start > .run/roles-smoke-dashboard.log 2>&1 &
           for i in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:3100 >/dev/null 2>&1; then
