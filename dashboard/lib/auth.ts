@@ -290,13 +290,21 @@ export async function getSessionFromServerCookies() {
   return verifySessionToken(token);
 }
 
+/** Secure cookies require HTTPS; allow HTTP smoke tests and local prod runs via BPVP_SESSION_COOKIE_SECURE=false */
+function sessionCookieSecure(): boolean {
+  const raw = process.env.BPVP_SESSION_COOKIE_SECURE?.trim().toLowerCase();
+  if (raw === "false" || raw === "0") return false;
+  if (raw === "true" || raw === "1") return true;
+  return process.env.NODE_ENV === "production";
+}
+
 export function buildSessionCookie(token: string) {
   return {
     name: SESSION_COOKIE,
     value: token,
     options: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: sessionCookieSecure(),
       sameSite: "strict" as const,
       path: "/",
       maxAge: SESSION_MAX_AGE_SECONDS

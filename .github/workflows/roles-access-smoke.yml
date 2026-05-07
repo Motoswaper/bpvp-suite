@@ -37,7 +37,8 @@ jobs:
       - name: Start dashboard locally
         env:
           PORT: "3100"
-          NODE_ENV: "development"
+          NODE_ENV: "production"
+          BPVP_SESSION_COOKIE_SECURE: "false"
           BPVP_ALLOW_PUBLIC_REGISTER: "true"
           DASHBOARD_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
         run: |
@@ -72,19 +73,24 @@ jobs:
           ADMIN_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
         run: ./scripts/roles-access-smoke.sh
 
-      - name: Upload role smoke report
+      - name: Stage smoke artifacts for upload
         if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: roles-smoke-report
-          path: .run/roles-smoke-*.txt
-          if-no-files-found: warn
+        run: |
+          mkdir -p artifact-staging-roles-smoke
+          shopt -s nullglob
+          for f in .run/roles-smoke-*.txt; do
+            cp "$f" artifact-staging-roles-smoke/
+          done
+          if [[ -f .run/roles-smoke-dashboard.log ]]; then
+            cp .run/roles-smoke-dashboard.log artifact-staging-roles-smoke/dashboard-startup.log
+          fi
+          ls -la artifact-staging-roles-smoke || true
 
-      - name: Upload dashboard startup log
+      - name: Upload roles smoke artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: roles-smoke-dashboard-log
-          path: .run/roles-smoke-dashboard.log
+          name: roles-smoke-artifacts
+          path: artifact-staging-roles-smoke/
           if-no-files-found: warn
 
