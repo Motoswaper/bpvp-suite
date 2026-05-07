@@ -24,6 +24,15 @@ jobs:
       - name: Ensure script is executable
         run: chmod +x ./scripts/roles-access-smoke.sh
 
+      - name: Validate required secret
+        env:
+          ADMIN_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
+        run: |
+          if [ -z "${ADMIN_PASSWORD}" ]; then
+            echo "ERROR: BPVP_ADMIN_PASSWORD secret is empty or unavailable in this workflow context."
+            exit 1
+          fi
+
       - name: Run roles smoke
         env:
           BASE_URL: ${{ inputs.base_url || 'https://testnet.btc-defi.com' }}

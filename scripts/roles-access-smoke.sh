@@ -9,12 +9,6 @@ OPERATOR_PASSWORD="${OPERATOR_PASSWORD:-op-$(date +%s)-$(openssl rand -hex 3)}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-if [[ -z "${ADMIN_PASSWORD}" ]]; then
-  echo "ERROR: ADMIN_PASSWORD is required."
-  echo "Usage: ADMIN_PASSWORD='<admin password>' BASE_URL='http://127.0.0.1:3100' ./scripts/roles-access-smoke.sh"
-  exit 1
-fi
-
 WORK_DIR="$(mktemp -d)"
 ADMIN_COOKIES="${WORK_DIR}/admin.cookies"
 OP_COOKIES="${WORK_DIR}/operator.cookies"
@@ -22,6 +16,13 @@ VIEWER_COOKIES="${WORK_DIR}/viewer.cookies"
 REPORT_DIR="${REPO_ROOT}/.run"
 mkdir -p "${REPORT_DIR}"
 REPORT_FILE="${REPORT_DIR}/roles-smoke-$(date +%Y%m%d-%H%M%S).txt"
+
+if [[ -z "${ADMIN_PASSWORD}" ]]; then
+  echo "FAIL: ADMIN_PASSWORD is required." | tee -a "${REPORT_FILE}"
+  echo "Usage: ADMIN_PASSWORD='<admin password>' BASE_URL='http://127.0.0.1:3100' ./scripts/roles-access-smoke.sh" | tee -a "${REPORT_FILE}"
+  echo "Report: ${REPORT_FILE}" | tee -a "${REPORT_FILE}"
+  exit 1
+fi
 
 cleanup() {
   rm -rf "${WORK_DIR}"
