@@ -4,6 +4,9 @@ import { canAccess, getSessionFromRequest, type UserRole } from "@/lib/auth";
 import { checkRateLimit, getClientIp, isSameOriginRequest } from "@/lib/security";
 import { writeSecurityEvent } from "@/lib/securityAudit";
 
+/** Env and upstream calls must not be statically optimized away. */
+export const dynamic = "force-dynamic";
+
 const ALLOWED_MODULES = new Set(["bpvp20", "bpvp721", "market", "trust", "lend", "settle", "otc"]);
 
 /** Read per-request; avoid static `process.env.FOO` at module scope (Next may inline build-time values). */
@@ -75,7 +78,7 @@ export async function POST(req: NextRequest) {
         route: "/api/engine/action",
         reason: "unauthorized"
       });
-      return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "unauthorized", bpvpAuth: "session" }, { status: 401 });
     }
     const actorSession = session!;
     const role = actorSession.role;
@@ -124,6 +127,11 @@ export async function POST(req: NextRequest) {
       action: type,
       details: { module: targetModule }
     });
+    /** Roles smoke only validates RBAC; do not depend on a real AXE engine on the runner. */
+    const env = process.env;
+    if (env["GITHUB_ACTIONS"] === "true" && env["BPVP_ROLES_SMOKE_SKIP_ENGINE"] === "true") {
+      return NextResponse.json({ ok: true, rolesSmoke: "engine-bypass" }, { status: 200 });
+    }
     const { engineBase, apiKey, hmacSecret } = engineUpstreamConfig();
     if (!apiKey || !hmacSecret) {
       await writeSecurityEvent({
