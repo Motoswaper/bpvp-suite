@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       base_url:
-        description: "Target base URL (use testnet domain for remote smoke)"
+        description: "Optional override (defaults to local runner app)"
         required: true
-        default: "https://testnet.btc-defi.com"
+        default: "http://127.0.0.1:3100"
   schedule:
     - cron: "20 5 * * 1"
 
@@ -20,6 +20,38 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dashboard dependencies
+        working-directory: dashboard
+        run: npm install --include=dev
+
+      - name: Build dashboard
+        working-directory: dashboard
+        run: npm run build
+
+      - name: Start dashboard locally
+        env:
+          PORT: "3100"
+          NODE_ENV: "production"
+          BPVP_ALLOW_PUBLIC_REGISTER: "true"
+          DASHBOARD_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
+        run: |
+          nohup npm --prefix dashboard run start > .run/roles-smoke-dashboard.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:3100 >/dev/null 2>&1; then
+              echo "Dashboard is up"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Dashboard failed to start"
+          cat .run/roles-smoke-dashboard.log || true
+          exit 1
 
       - name: Ensure script is executable
         run: chmod +x ./scripts/roles-access-smoke.sh
@@ -35,7 +67,7 @@ jobs:
 
       - name: Run roles smoke
         env:
-          BASE_URL: ${{ inputs.base_url || 'https://testnet.btc-defi.com' }}
+          BASE_URL: ${{ inputs.base_url || 'http://127.0.0.1:3100' }}
           ADMIN_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
         run: ./scripts/roles-access-smoke.sh
 
@@ -45,5 +77,13 @@ jobs:
         with:
           name: roles-smoke-report
           path: .run/roles-smoke-*.txt
+          if-no-files-found: warn
+
+      - name: Upload dashboard startup log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roles-smoke-dashboard-log
+          path: .run/roles-smoke-dashboard.log
           if-no-files-found: warn
 
