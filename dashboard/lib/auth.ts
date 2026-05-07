@@ -39,14 +39,6 @@ type WalletChallenge = {
 
 const walletChallenges = new Map<string, WalletChallenge>();
 
-function sha(value: string): Buffer {
-  return createHash("sha256").update(value).digest();
-}
-
-function shaHex(value: string): string {
-  return createHash("sha256").update(value).digest("hex");
-}
-
 const SCRYPT_PARAMS = {
   N: 1 << 14,
   r: 8,
@@ -85,21 +77,13 @@ function verifyPassword(password: string, storedHash: string): boolean {
     const derived = scryptSync(password, salt, expected.length, { N, r, p });
     return timingSafeEqual(derived, expected);
   }
-  // Legacy compatibility for previously stored SHA-256 password hashes.
-  return safeEqHex(shaHex(password), storedHash);
+  return false;
 }
 
 function safeEq(a: string, b: string): boolean {
-  return timingSafeEqual(sha(a), sha(b));
-}
-
-/** Compare two lowercase hex strings (e.g. SHA-256 digests) in constant time. */
-function safeEqHex(a: string, b: string): boolean {
-  const left = Buffer.from(String(a).toLowerCase(), "hex");
-  const right = Buffer.from(String(b).toLowerCase(), "hex");
-  if (left.length !== right.length || left.length === 0) {
-    return false;
-  }
+  const left = Buffer.from(String(a), "utf8");
+  const right = Buffer.from(String(b), "utf8");
+  if (left.length !== right.length) return false;
   return timingSafeEqual(left, right);
 }
 
@@ -336,8 +320,14 @@ export function authenticateUser(input: { username: string; password: string; ot
   const match = users.find((u) => u.username.toLowerCase() === username);
   if (!match) return { ok: false as const, reason: "invalid_credentials" };
   if (match.enabled === false) return { ok: false as const, reason: "user_disabled" };
-  const expectedHash = match.passwordHash || (match.password ? shaHex(match.password) : "");
-  if (!expectedHash || !verifyPassword(input.password, expectedHash)) {
+  const expectedHash = match.passwordHash || "";
+  const passwordOk =
+    expectedHash.length > 0
+      ? verifyPassword(input.password, expectedHash)
+      : match.password
+        ? safeEq(input.password, match.password)
+        : false;
+  if (!passwordOk) {
     return { ok: false as const, reason: "invalid_credentials" };
   }
   if (match.otpSecret) {
