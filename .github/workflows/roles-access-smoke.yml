@@ -1,0 +1,40 @@
+name: Roles Access Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Target base URL (use testnet domain for remote smoke)"
+        required: true
+        default: "https://testnet.btc-defi.com"
+  schedule:
+    - cron: "20 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  roles-smoke:
+    name: Validate role access controls
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure script is executable
+        run: chmod +x ./scripts/roles-access-smoke.sh
+
+      - name: Run roles smoke
+        env:
+          BASE_URL: ${{ inputs.base_url || 'https://testnet.btc-defi.com' }}
+          ADMIN_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
+        run: ./scripts/roles-access-smoke.sh
+
+      - name: Upload role smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: roles-smoke-report
+          path: .run/roles-smoke-*.txt
+          if-no-files-found: warn
+
