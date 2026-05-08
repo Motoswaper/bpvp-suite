@@ -1,4 +1,4 @@
-name: ZAP Baseline DAST
+name: INFO - ZAP Baseline DAST
 
 on:
   schedule:
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   zap-baseline:
-    name: Scan public surface with ZAP
+    name: INFO - Scan public surface with ZAP
     runs-on: ubuntu-latest
     steps:
       - name: ZAP baseline scan
