@@ -45,16 +45,19 @@ export function isSameOriginRequest(req: NextRequest) {
   }
 
   const xfProto = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const originHost = originUrl.hostname.toLowerCase();
+  const originProto = originUrl.protocol.replace(":", "").toLowerCase();
   let proto = xfProto?.replace(/:$/, "").toLowerCase();
   if (!proto) {
     try {
-      proto = new URL(req.url).protocol.replace(":", "").toLowerCase() || "https";
+      proto = new URL(req.url).protocol.replace(":", "").toLowerCase();
     } catch {
-      proto = "https";
+      proto = "";
+    }
+    if (!proto) {
+      proto = originProto;
     }
   }
-  const originHost = originUrl.hostname.toLowerCase();
-  const originProto = originUrl.protocol.replace(":", "").toLowerCase();
   if (originProto !== proto) return false;
 
   const forwardedHostParts: string[] = [];
@@ -68,7 +71,14 @@ export function isSameOriginRequest(req: NextRequest) {
   const hostHeader = req.headers.get("host")?.split(",")[0]?.trim();
   if (hostHeader) forwardedHostParts.push(hostHeader);
 
-  const originHostnameMatches = forwardedHostParts.some((raw) => hostnameFromForwardedHost(raw) === originHost);
+  const localAliases = new Set(["localhost", "127.0.0.1", "::1"]);
+  const originIsLocal = localAliases.has(originHost);
+  const originHostnameMatches = forwardedHostParts.some((raw) => {
+    const h = hostnameFromForwardedHost(raw);
+    if (h === originHost) return true;
+    if (originIsLocal && localAliases.has(h)) return true;
+    return false;
+  });
   if (originHostnameMatches) return true;
 
   for (const raw of forwardedHostParts) {

@@ -52,11 +52,12 @@ http_status() {
   local cookies_out="${4:-}"
   local body="${5:-}"
   local url="${BASE_URL}${path}"
+  # Do not send Origin/Referer: isSameOriginRequest treats missing Origin as allowed; fake Origin + wrong
+  # inferred proto on the server (e.g. relative req.url) caused 403 and looked like "401" in older logs.
   local args=(
     -sS --connect-timeout 8 --max-time 30
     -o /dev/null -w "%{http_code}"
     -X "${method}" "${url}"
-    -H "Origin: ${BASE_URL}" -H "Referer: ${BASE_URL}/"
   )
   if [[ -n "${cookies_in}" ]]; then
     args+=(-b "${cookies_in}")
