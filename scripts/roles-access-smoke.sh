@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # RBAC smoke test against a running dashboard (BASE_URL).
-# Operator "engine action" hits the dashboard proxy. In GitHub Actions, BPVP_ROLES_SMOKE_SKIP_ENGINE skips the real engine (RBAC-only check).
-# Locally you need the AXE engine (ENGINE_URL) or you may see upstream 401/503.
+# RBAC checks use GET /api/engine/action/authorize (no AXE engine required).
 set -euo pipefail
 
 BASE_URL="${BASE_URL:-http://127.0.0.1:3100}"
@@ -103,7 +102,7 @@ status="$(http_status POST "/api/auth/login" "" "${OP_COOKIES}" "{\"username\":\
 status="$(http_status GET "/api/auth/session" "${OP_COOKIES}" "")"
 [[ "${status}" == "200" ]] && pass "Operator session active" || fail "Operator session check failed (${status})"
 
-status="$(http_status POST "/api/engine/action/authorize" "${OP_COOKIES}" "" "{\"module\":\"otc\",\"type\":\"rfq_create\"}")"
+status="$(http_status GET "/api/engine/action/authorize?module=otc&type=rfq_create" "${OP_COOKIES}" "")"
 if [[ "${status}" == "401" || "${status}" == "403" ]]; then
   fail "Operator denied engine action (${status})"
 else
@@ -114,7 +113,7 @@ section "Viewer registration and access check"
 status="$(http_status POST "/api/auth/register" "" "${VIEWER_COOKIES}" "{}")"
 [[ "${status}" == "200" ]] && pass "Viewer registration/login flow OK" || fail "Viewer registration failed (${status})"
 
-status="$(http_status POST "/api/engine/action/authorize" "${VIEWER_COOKIES}" "" "{\"module\":\"otc\",\"type\":\"rfq_create\"}")"
+status="$(http_status GET "/api/engine/action/authorize?module=otc&type=rfq_create" "${VIEWER_COOKIES}" "")"
 if [[ "${status}" == "401" || "${status}" == "403" ]]; then
   pass "Viewer correctly blocked from engine action (${status})"
 else
