@@ -41,6 +41,11 @@ npm run dev
 
 Module-level and launch documentation lives under `docs/`.
 
+CI policy and gate classification:
+
+- `docs/CI_GATES.md`
+- `docs/RELEASE_READINESS.md`
+
 Additional package-level readmes:
 
 - `bpvp-wallet/README.md`
