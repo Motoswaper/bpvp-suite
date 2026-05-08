@@ -46,6 +46,7 @@ CI policy and gate classification:
 - `docs/CI_GATES.md`
 - `docs/RELEASE_READINESS.md`
 - `docs/POST_RELEASE_VERIFICATION.md`
+- `docs/OPS_DAILY_REPORT.md`
 
 Additional package-level readmes:
 
