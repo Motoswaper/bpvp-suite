@@ -26,10 +26,10 @@ jobs:
       BPVP_ROLES_SMOKE_SKIP_ENGINE: "true"
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
 
@@ -100,7 +100,7 @@ jobs:
 
       - name: Upload roles smoke artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: roles-smoke-artifacts
           path: artifact-staging-roles-smoke/
