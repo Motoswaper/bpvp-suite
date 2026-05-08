@@ -47,6 +47,14 @@ async function handleAuthorize(req: NextRequest, targetModule: string, type: str
 
   const session = getSessionFromRequest(req);
   if (!session || !canAccess(session, ["admin", "trader", "risk", "operator"])) {
+    const debug =
+      process.env.GITHUB_ACTIONS === "true"
+        ? {
+            hasSessionCookie: Boolean(req.cookies.get("axe_session")?.value),
+            role: session?.role ?? null,
+            username: session?.username ?? null
+          }
+        : undefined;
     await writeSecurityEvent({
       category: "action",
       outcome: "denied",
@@ -56,7 +64,7 @@ async function handleAuthorize(req: NextRequest, targetModule: string, type: str
       route: "/api/engine/action/authorize",
       reason: "unauthorized"
     });
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "unauthorized", debug }, { status: 401 });
   }
 
   if (!targetModule || !type) {
