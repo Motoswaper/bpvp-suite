@@ -114,7 +114,7 @@ export function parseUsersConfig(): AuthUser[] {
           username: String(u.username ?? "").trim(),
           password: u.password ? String(u.password) : undefined,
           passwordHash: u.passwordHash ? String(u.passwordHash) : (u.password ? hashPassword(String(u.password)) : undefined),
-          role: (u.role as UserRole) || "viewer",
+          role: normalizeUserRole(u.role as string | undefined),
           otpSecret: u.otpSecret ? String(u.otpSecret) : undefined,
           enabled: u.enabled !== false
         }))
@@ -144,14 +144,15 @@ type StoredUsersDoc = {
   updatedAt: string;
 };
 
-function normalizeRole(role: string | undefined): UserRole {
-  switch (role) {
+export function normalizeUserRole(role: string | undefined): UserRole {
+  const r = String(role ?? "").trim().toLowerCase();
+  switch (r) {
     case "admin":
     case "trader":
     case "risk":
     case "viewer":
     case "operator":
-      return role;
+      return r;
     default:
       return "viewer";
   }
@@ -162,7 +163,7 @@ function sanitizeUsers(users: AuthUser[]): AuthUser[] {
     .map((u) => ({
       username: String(u.username || "").trim(),
       passwordHash: u.passwordHash ? String(u.passwordHash) : (u.password ? hashPassword(String(u.password)) : undefined),
-      role: normalizeRole(u.role),
+      role: normalizeUserRole(u.role),
       otpSecret: u.otpSecret ? String(u.otpSecret) : undefined,
       enabled: u.enabled !== false,
       createdAt: u.createdAt || new Date().toISOString(),
@@ -271,8 +272,9 @@ export function verifySessionToken(token: string | undefined): SessionClaims | n
   if (!safeEq(sig, expected)) return null;
   try {
     const payload = JSON.parse(fromB64Url(encoded)) as SessionClaims;
-    if (!payload.username || !payload.role || !payload.exp) return null;
+    if (!payload.username || payload.role == null || !payload.exp) return null;
     if (payload.exp < Math.floor(Date.now() / 1000)) return null;
+    payload.role = normalizeUserRole(String(payload.role));
     return payload;
   } catch {
     return null;
@@ -355,7 +357,9 @@ export function authenticateUser(input: { username: string; password: string; ot
 }
 
 export function canAccess(session: SessionClaims | null, allowed: UserRole[]) {
-  return Boolean(session && allowed.includes(session.role));
+  if (!session) return false;
+  const role = normalizeUserRole(String(session.role));
+  return allowed.includes(role);
 }
 
 export function issueWalletChallenge(username: string) {
