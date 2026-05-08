@@ -84,7 +84,6 @@ const requiredAny = [
 ];
 
 const optionalSignals = [
-  { label: "Windows portable zip", test: (n) => n.toLowerCase().includes("portable") && n.endsWith(".exe") },
   { label: "macOS zip", test: (n) => n.endsWith(".zip") && !n.startsWith("Source code") },
   { label: "Linux tar.gz", test: (n) => n.endsWith(".tar.gz") && !n.startsWith("Source code") }
 ];
