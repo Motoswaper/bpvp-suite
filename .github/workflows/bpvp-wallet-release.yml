@@ -53,7 +53,6 @@ jobs:
 
       - name: Package Linux
         if: runner.os == 'Linux'
-        continue-on-error: true
         run: npm run package:linux
 
       - name: Package macOS
