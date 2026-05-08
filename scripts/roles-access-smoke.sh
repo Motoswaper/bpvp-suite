@@ -105,7 +105,8 @@ status="$(http_status GET "/api/auth/session" "${OP_COOKIES}" "")"
 
 status="$(http_status GET "/api/engine/action/authorize?module=otc&type=rfq_create" "${OP_COOKIES}" "")"
 if [[ "${status}" == "401" || "${status}" == "403" ]]; then
-  fail "Operator denied engine action (${status})"
+  body="$(curl -sS --connect-timeout 8 --max-time 30 -b "${OP_COOKIES}" "${BASE_URL}/api/engine/action/authorize?module=otc&type=rfq_create" 2>/dev/null || true)"
+  fail "Operator denied engine action (${status}) body=${body}"
 else
   pass "Operator not denied on engine action (${status})"
 fi
@@ -118,7 +119,8 @@ status="$(http_status GET "/api/engine/action/authorize?module=otc&type=rfq_crea
 if [[ "${status}" == "401" || "${status}" == "403" ]]; then
   pass "Viewer correctly blocked from engine action (${status})"
 else
-  fail "Viewer should be blocked, got (${status})"
+  body="$(curl -sS --connect-timeout 8 --max-time 30 -b "${VIEWER_COOKIES}" "${BASE_URL}/api/engine/action/authorize?module=otc&type=rfq_create" 2>/dev/null || true)"
+  fail "Viewer should be blocked, got (${status}) body=${body}"
 fi
 
 section "Operator denied admin endpoint"
