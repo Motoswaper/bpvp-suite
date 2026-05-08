@@ -1,4 +1,4 @@
-name: SBOM and Vulnerability Scan
+name: INFO - SBOM and Vulnerability Scan
 
 on:
   push:
@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   sbom-scan:
-    name: Generate SBOM and scan
+    name: INFO - Generate SBOM and scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -1,4 +1,4 @@
-name: Gitleaks Secret Scan
+name: INFO - Gitleaks Secret Scan
 
 on:
   push:
@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   gitleaks:
-    name: Detect leaked secrets
+    name: INFO - Detect leaked secrets
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

@@ -1,4 +1,4 @@
-name: Roles Access Smoke
+name: REQUIRED - Roles Access Smoke
 
 on:
   workflow_dispatch:
@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   roles-smoke:
-    name: Validate role access controls
+    name: REQUIRED - Validate role access controls
     runs-on: ubuntu-latest
     # Next may inline process.env at `npm run build`; must be set here so the bypass survives the bundle.
     env:
