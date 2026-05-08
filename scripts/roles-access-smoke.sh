@@ -103,6 +103,12 @@ status="$(http_status POST "/api/auth/login" "" "${OP_COOKIES}" "{\"username\":\
 status="$(http_status GET "/api/auth/session" "${OP_COOKIES}" "")"
 [[ "${status}" == "200" ]] && pass "Operator session active" || fail "Operator session check failed (${status})"
 
+session_body="$(curl -sS --connect-timeout 8 --max-time 30 -b "${OP_COOKIES}" "${BASE_URL}/api/auth/session" 2>/dev/null || true)"
+if ! echo "${session_body}" | grep -qE '"role"[[:space:]]*:[[:space:]]*"operator"'; then
+  fail "Operator session JSON missing role operator (got: ${session_body})"
+fi
+pass "Operator session role is operator"
+
 status="$(http_status GET "/api/engine/action/authorize?module=otc&type=rfq_create" "${OP_COOKIES}" "")"
 if [[ "${status}" == "401" || "${status}" == "403" ]]; then
   fail "Operator denied engine action (${status})"

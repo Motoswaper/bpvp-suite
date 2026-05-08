@@ -47,6 +47,8 @@ jobs:
           NODE_ENV: "production"
           BPVP_SESSION_COOKIE_SECURE: "false"
           BPVP_ALLOW_PUBLIC_REGISTER: "true"
+          # One absolute path for all Next workers (avoid cwd drift vs ../.run)
+          BPVP_AUTH_USER_STORE: ${{ github.workspace }}/.run/auth-users.json
           DASHBOARD_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
         run: |
           mkdir -p .run

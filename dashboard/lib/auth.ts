@@ -29,7 +29,13 @@ export type SessionClaims = {
 
 const SESSION_COOKIE = "axe_session";
 const SESSION_MAX_AGE_SECONDS = 60 * 60 * 8;
-const USER_STORE_PATH = process.env.BPVP_AUTH_USER_STORE || path.resolve(process.cwd(), "..", ".run", "auth-users.json");
+
+/** Resolve at call time so CI can set BPVP_AUTH_USER_STORE and Next never bakes a wrong cwd into the bundle. */
+function getUserStorePath() {
+  const raw = process.env["BPVP_AUTH_USER_STORE"]?.trim();
+  if (raw) return raw;
+  return path.resolve(process.cwd(), "..", ".run", "auth-users.json");
+}
 
 type WalletChallenge = {
   nonce: string;
@@ -173,14 +179,15 @@ function sanitizeUsers(users: AuthUser[]): AuthUser[] {
 }
 
 function ensureStoreDir() {
-  const dir = path.dirname(USER_STORE_PATH);
+  const dir = path.dirname(getUserStorePath());
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true, mode: 0o700 });
 }
 
 function readUsersFromStore(): AuthUser[] {
   try {
-    if (!existsSync(USER_STORE_PATH)) return [];
-    const raw = readFileSync(USER_STORE_PATH, "utf8");
+    const storePath = getUserStorePath();
+    if (!existsSync(storePath)) return [];
+    const raw = readFileSync(storePath, "utf8");
     const parsed = JSON.parse(raw) as StoredUsersDoc;
     if (!Array.isArray(parsed.users)) return [];
     return sanitizeUsers(parsed.users);
@@ -200,7 +207,7 @@ function writeUsersToStore(users: AuthUser[]) {
     users: sanitized,
     updatedAt: new Date().toISOString()
   };
-  writeFileSync(USER_STORE_PATH, JSON.stringify(doc, null, 2), { encoding: "utf8", mode: 0o600 });
+  writeFileSync(getUserStorePath(), JSON.stringify(doc, null, 2), { encoding: "utf8", mode: 0o600 });
 }
 
 export function listUsersSafe() {
