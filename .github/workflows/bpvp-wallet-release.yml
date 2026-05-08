@@ -25,10 +25,10 @@ jobs:
         working-directory: bpvp-wallet
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
           cache: "npm"
@@ -61,7 +61,7 @@ jobs:
         run: npm run package:mac
 
       - name: Upload wallet artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: bpvp-wallet-${{ runner.os }}
           path: bpvp-wallet/release/**
@@ -72,7 +72,7 @@ jobs:
           node -e "const fs=require('fs');const path=require('path');const crypto=require('crypto');const root=path.join(process.cwd(),'release');const out=path.join(root,'checksums-'+process.env.RUNNER_OS+'.txt');if(!fs.existsSync(root)){console.log('release directory missing; skipping checksums');process.exit(0);}const files=[];const walk=(d)=>{for(const e of fs.readdirSync(d,{withFileTypes:true})){const p=path.join(d,e.name);if(e.isDirectory())walk(p);else if(!e.name.endsWith('.blockmap'))files.push(p);}};walk(root);if(files.length===0){console.log('no release files found; skipping checksums');process.exit(0);}files.sort();const lines=files.map((f)=>{const h=crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');const rel='./'+path.relative(root,f).split(path.sep).join('/');return h+'  '+rel;});fs.writeFileSync(out,lines.join('\n')+'\n');console.log('wrote '+out+' with '+lines.length+' entries');"
 
       - name: Upload checksums artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: bpvp-wallet-checksums-${{ runner.os }}
           path: bpvp-wallet/release/checksums-${{ runner.os }}.txt
