@@ -127,9 +127,12 @@ export async function POST(req: NextRequest) {
       action: type,
       details: { module: targetModule }
     });
-    /** Roles smoke only validates RBAC; do not depend on a real AXE engine on the runner. */
+    /** Roles smoke: skip AXE upstream when CI sets BPVP_ROLES_SMOKE_SKIP_ENGINE (must be present at `next build` too; see workflow job env). */
     const env = process.env;
-    if (env["GITHUB_ACTIONS"] === "true" && env["BPVP_ROLES_SMOKE_SKIP_ENGINE"] === "true") {
+    const skipEngine =
+      env["BPVP_ROLES_SMOKE_SKIP_ENGINE"] === "true" &&
+      (env["GITHUB_ACTIONS"] === "true" || env["CI"] === "true");
+    if (skipEngine) {
       return NextResponse.json({ ok: true, rolesSmoke: "engine-bypass" }, { status: 200 });
     }
     const { engineBase, apiKey, hmacSecret } = engineUpstreamConfig();

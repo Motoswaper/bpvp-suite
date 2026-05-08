@@ -21,6 +21,9 @@ jobs:
   roles-smoke:
     name: Validate role access controls
     runs-on: ubuntu-latest
+    # Next may inline process.env at `npm run build`; must be set here so the bypass survives the bundle.
+    env:
+      BPVP_ROLES_SMOKE_SKIP_ENGINE: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,7 +47,6 @@ jobs:
           NODE_ENV: "production"
           BPVP_SESSION_COOKIE_SECURE: "false"
           BPVP_ALLOW_PUBLIC_REGISTER: "true"
-          BPVP_ROLES_SMOKE_SKIP_ENGINE: "true"
           DASHBOARD_PASSWORD: ${{ secrets.BPVP_ADMIN_PASSWORD }}
         run: |
           mkdir -p .run
