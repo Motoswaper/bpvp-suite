@@ -103,9 +103,21 @@ jobs:
             cp "$f" "upload/$base"
           done
           : > upload/checksums.txt
-          find release-assets -type f -name "checksums-*.txt" ! -name "checksums.txt" | sort | while IFS= read -r f; do
+          found_checksums=0
+          while IFS= read -r f; do
+            found_checksums=1
             cat "$f" >> upload/checksums.txt
-          done
+          done < <(find release-assets -type f -name "checksums-*.txt" ! -name "checksums.txt" | sort)
+          if [ "${found_checksums}" -eq 0 ]; then
+            echo "No per-OS checksum artifacts found; generating checksums.txt from upload/"
+            node -e "const fs=require('fs');const path=require('path');const crypto=require('crypto');const root=path.resolve('upload');const files=fs.readdirSync(root).filter((f)=>fs.statSync(path.join(root,f)).isFile()&&f!=='checksums.txt').sort();const lines=files.map((f)=>{const h=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,f))).digest('hex');return h+'  ./'+f;});fs.writeFileSync(path.join(root,'checksums.txt'),lines.join('\n')+'\n');"
+          fi
+          # Hard gate: do not publish incomplete releases.
+          ls upload/*.exe >/dev/null 2>&1 || { echo "Missing Windows .exe asset"; exit 1; }
+          ls upload/*.dmg >/dev/null 2>&1 || { echo "Missing macOS .dmg asset"; exit 1; }
+          ls upload/*.AppImage >/dev/null 2>&1 || { echo "Missing Linux .AppImage asset"; exit 1; }
+          ls upload/*.deb >/dev/null 2>&1 || { echo "Missing Linux .deb asset"; exit 1; }
+          [ -s upload/checksums.txt ] || { echo "Missing checksums.txt"; exit 1; }
           echo "Staged for release:"
           ls -la upload
 
