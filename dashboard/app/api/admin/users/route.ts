@@ -4,8 +4,8 @@ import { checkRateLimit, getClientIp, isSameOriginRequest } from "@/lib/security
 import { writeSecurityEvent } from "@/lib/securityAudit";
 
 function parseRole(role: unknown): UserRole {
-  const r = String(role ?? "viewer");
-  if (r === "admin" || r === "trader" || r === "risk" || r === "viewer") return r;
+  const r = String(role ?? "viewer").trim().toLowerCase();
+  if (r === "admin" || r === "trader" || r === "risk" || r === "viewer" || r === "operator") return r;
   return "viewer";
 }
 
