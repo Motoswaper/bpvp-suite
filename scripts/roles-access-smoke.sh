@@ -103,7 +103,7 @@ status="$(http_status POST "/api/auth/login" "" "${OP_COOKIES}" "{\"username\":\
 status="$(http_status GET "/api/auth/session" "${OP_COOKIES}" "")"
 [[ "${status}" == "200" ]] && pass "Operator session active" || fail "Operator session check failed (${status})"
 
-status="$(http_status POST "/api/engine/action" "${OP_COOKIES}" "" "{\"module\":\"otc\",\"type\":\"rfq_create\",\"data\":{}}")"
+status="$(http_status POST "/api/engine/action/authorize" "${OP_COOKIES}" "" "{\"module\":\"otc\",\"type\":\"rfq_create\"}")"
 if [[ "${status}" == "401" || "${status}" == "403" ]]; then
   fail "Operator denied engine action (${status})"
 else
@@ -114,7 +114,7 @@ section "Viewer registration and access check"
 status="$(http_status POST "/api/auth/register" "" "${VIEWER_COOKIES}" "{}")"
 [[ "${status}" == "200" ]] && pass "Viewer registration/login flow OK" || fail "Viewer registration failed (${status})"
 
-status="$(http_status POST "/api/engine/action" "${VIEWER_COOKIES}" "" "{\"module\":\"otc\",\"type\":\"rfq_create\",\"data\":{}}")"
+status="$(http_status POST "/api/engine/action/authorize" "${VIEWER_COOKIES}" "" "{\"module\":\"otc\",\"type\":\"rfq_create\"}")"
 if [[ "${status}" == "401" || "${status}" == "403" ]]; then
   pass "Viewer correctly blocked from engine action (${status})"
 else
