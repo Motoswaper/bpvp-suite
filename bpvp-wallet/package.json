@@ -1,6 +1,6 @@
 {
   "name": "bpvp-wallet",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "BPVP Wallet desktop beta for Signet/Testnet",
   "author": "BPVP",
   "private": true,
