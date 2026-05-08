@@ -30,7 +30,8 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
-          node-version: "24"
+          # Electron/electron-builder packaging is currently more stable on Node 22 in CI.
+          node-version: "22"
           cache: "npm"
           cache-dependency-path: bpvp-wallet/package-lock.json
 
