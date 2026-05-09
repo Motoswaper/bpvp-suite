@@ -39,6 +39,7 @@ npm run dev
 - Audit scope, cadence, and policy are documented in `docs/AUDIT_SECURITY_POLICY.md`.
 - Security incident severity SLAs are documented in `docs/SECURITY_INCIDENT_RESPONSE_POLICY.md`.
 - Risk-to-control mapping is documented in `docs/AUDIT_COVERAGE_MATRIX.md`.
+- Keyless provenance signing baseline is automated in `INFO - Provenance Signing`.
 
 ## Documentation
 

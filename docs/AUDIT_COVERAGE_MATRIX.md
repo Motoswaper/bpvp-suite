@@ -16,7 +16,7 @@ This matrix maps major risk categories to automated controls currently in place 
 | Public availability regression | Smoke checks | `INFO - Public Site Smoke` | Covered |
 | Browser hardening headers/CSP | Header smoke checks | `INFO - Security Headers Smoke` | Covered |
 | RBAC regression | Role smoke checks | `REQUIRED - Roles Access Smoke` | Covered (required gate) |
-| Supply-chain posture | Scorecards | `INFO - OSSF Scorecards` | Covered |
+| Supply-chain posture | Scorecards + keyless manifest signing | `INFO - OSSF Scorecards`, `INFO - Provenance Signing` | Covered |
 | Overall audit observability | Consolidated report | `INFO - Audit Weekly Report` | Covered |
 
 ## Operational Gates
@@ -28,5 +28,5 @@ This matrix maps major risk categories to automated controls currently in place 
 
 1. Authenticated DAST/fuzz testing against protected endpoints.
 2. Runtime anomaly detection policy tied to incident auto-escalation.
-3. Signed provenance verification for all release artifacts in CI.
+3. Expand signed provenance verification from manifest-level to full release artifact set in CI.
 4. Periodic threat-model refresh artifacts tied to roadmap changes.
