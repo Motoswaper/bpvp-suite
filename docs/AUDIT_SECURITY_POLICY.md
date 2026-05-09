@@ -40,6 +40,7 @@ BPVP uses a layered audit model:
 - `INFO - OSV Dependency Scan` (cross-ecosystem dependency vulnerability signal).
 - `INFO - Checkov IaC Scan` (configuration and IaC misconfiguration checks).
 - `INFO - GitHub Actions Security Lint` (workflow-level security lint via zizmor).
+- `INFO - Provenance Signing` (keyless OIDC signing and verification of an audit manifest).
 
 ## 3) Scope and coverage
 

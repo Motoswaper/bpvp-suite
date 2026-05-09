@@ -1,0 +1,70 @@
+name: INFO - Provenance Signing
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+  schedule:
+    - cron: "45 4 * * 2"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
+jobs:
+  provenance:
+    name: INFO - Generate and verify keyless provenance signature
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
+      - name: Build provenance manifest
+        run: |
+          mkdir -p .run
+          {
+            echo "repo=${GITHUB_REPOSITORY}"
+            echo "sha=${GITHUB_SHA}"
+            echo "ref=${GITHUB_REF}"
+            echo "timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+            sha256sum README.md
+            sha256sum docs/AUDIT_SECURITY_POLICY.md
+            sha256sum docs/AUDIT_COVERAGE_MATRIX.md
+          } > .run/provenance-manifest.txt
+
+      - name: Keyless sign provenance manifest
+        continue-on-error: true
+        run: |
+          cosign sign-blob \
+            --yes \
+            --output-signature .run/provenance-manifest.sig \
+            --output-certificate .run/provenance-manifest.pem \
+            .run/provenance-manifest.txt
+
+      - name: Verify provenance signature
+        continue-on-error: true
+        run: |
+          cosign verify-blob \
+            --certificate .run/provenance-manifest.pem \
+            --signature .run/provenance-manifest.sig \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity-regexp "https://github.com/${GITHUB_REPOSITORY}/.github/workflows/provenance-signing.yml@.*" \
+            .run/provenance-manifest.txt
+
+      - name: Upload provenance artifacts
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: provenance-signing-artifacts
+          path: |
+            .run/provenance-manifest.txt
+            .run/provenance-manifest.sig
+            .run/provenance-manifest.pem
+          if-no-files-found: warn
