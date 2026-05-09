@@ -6,88 +6,83 @@ import { AgentReadonlyPanel } from "@/components/docs/AgentReadonlyPanel";
 import { getSessionFromServerCookies } from "@/lib/auth";
 import { cookies } from "next/headers";
 
+/** Keys match files under repo root `docs/` (see dashboard path.join below). */
 const docsMapAdmin = {
-  system_synopsis: {
-    title: { en: "System Synopsis", es: "Sinopsis del Sistema" },
-    file: "SYSTEM_SYNOPSIS_BPVP.md"
+  public_read_only_access: {
+    title: { en: "Public read-only access", es: "Acceso publico de solo lectura" },
+    file: "PUBLIC_READ_ONLY_ACCESS.md"
   },
-  "protocol-spec-v1": {
-    title: { en: "Protocol Spec v1", es: "Especificacion de Protocolo v1" },
-    file: "protocol-spec-v1.md"
-  },
-  module_qa_session: {
-    title: { en: "Module Q&A Session", es: "Sesion Q&A De Modulos" },
-    file: "MODULE_QA_SESSION_BPVP.md"
-  },
-  tokenomics_bpvp: {
-    title: { en: "Tokenomics BPVP", es: "Tokenomics BPVP" },
-    file: "TOKENOMICS_BPVP.md"
-  },
-  fee_policy_public: {
-    title: { en: "Fee Policy", es: "Politica de Fees" },
-    file: "FEE_POLICY_CLIENT_BPVP.md"
-  },
-  pricing_bpvp: {
-    title: { en: "Pricing", es: "Precios" },
-    file: "PRICING_BPVP.md"
+  canonical_workspace: {
+    title: { en: "Canonical workspace", es: "Workspace canonico" },
+    file: "CANONICAL_WORKSPACE.md"
   },
   operations: {
-    title: { en: "Operations Runbook", es: "Runbook Operativo" },
+    title: { en: "Operations runbook", es: "Runbook operativo" },
     file: "operations.md"
   },
-  possible_business_model: {
-    title: { en: "Possible Business Model", es: "Posible Modelo de Negocio" },
-    file: "POSSIBLE_BUSINESS_MODEL.md"
+  audit_security_policy: {
+    title: { en: "Audit & security policy", es: "Politica de auditoria y seguridad" },
+    file: "AUDIT_SECURITY_POLICY.md"
   },
-  mainnet_launch_checklist: {
-    title: { en: "Mainnet Launch Checklist", es: "Checklist Lanzamiento Mainnet" },
-    file: "MAINNET_LAUNCH_CHECKLIST.md"
+  audit_coverage_matrix: {
+    title: { en: "Audit coverage matrix", es: "Matriz de cobertura de auditoria" },
+    file: "AUDIT_COVERAGE_MATRIX.md"
   },
-  prod_ready: {
-    title: { en: "Prod Ready", es: "Listo para Produccion" },
-    file: "PROD_READY.md"
+  security_incident_response: {
+    title: { en: "Security incident response", es: "Respuesta a incidentes de seguridad" },
+    file: "SECURITY_INCIDENT_RESPONSE_POLICY.md"
+  },
+  security_incident_template: {
+    title: { en: "Security incident template", es: "Plantilla de incidente de seguridad" },
+    file: "SECURITY_INCIDENT_TEMPLATE.md"
+  },
+  wallet_release_process: {
+    title: { en: "BPVP Wallet release process", es: "Proceso de release BPVP Wallet" },
+    file: "BPVP_WALLET_RELEASE_PROCESS.md"
+  },
+  wallet_signet: {
+    title: { en: "Wallet Signet implementation", es: "Implementacion Wallet Signet" },
+    file: "BPVP_WALLET_SIGNET_IMPLEMENTATION.md"
+  },
+  release_notes_rc1: {
+    title: { en: "Release notes (RC1)", es: "Notas de release (RC1)" },
+    file: "release-notes-rc1.md"
   },
   release_checklist: {
-    title: { en: "Release Checklist", es: "Checklist de Release" },
+    title: { en: "Release checklist", es: "Checklist de release" },
     file: "release-checklist.md"
   }
 } as const;
 
 const docsMapViewer = {
-  system_synopsis: {
-    title: { en: "System Synopsis", es: "Sinopsis del Sistema" },
-    file: "SYSTEM_SYNOPSIS_BPVP.md"
+  public_read_only_access: {
+    title: { en: "Public read-only access", es: "Acceso publico de solo lectura" },
+    file: "PUBLIC_READ_ONLY_ACCESS.md"
   },
-  "protocol-spec-v1": {
-    title: { en: "Protocol Spec v1", es: "Especificacion de Protocolo v1" },
-    file: "protocol-spec-v1.md"
+  canonical_workspace: {
+    title: { en: "Canonical workspace", es: "Workspace canonico" },
+    file: "CANONICAL_WORKSPACE.md"
   },
-  module_qa_session: {
-    title: { en: "Module Q&A Session", es: "Sesion Q&A De Modulos" },
-    file: "MODULE_QA_SESSION_BPVP.md"
+  operations: {
+    title: { en: "Operations runbook", es: "Runbook operativo" },
+    file: "operations.md"
   },
-  tokenomics_bpvp: {
-    title: { en: "Tokenomics BPVP", es: "Tokenomics BPVP" },
-    file: "TOKENOMICS_BPVP.md"
-  },
-  fee_policy_public: {
-    title: { en: "Fee Policy", es: "Politica de Fees" },
-    file: "FEE_POLICY_CLIENT_BPVP.md"
-  },
-  pricing_bpvp: {
-    title: { en: "Pricing", es: "Precios" },
-    file: "PRICING_BPVP.md"
+  release_checklist: {
+    title: { en: "Release checklist", es: "Checklist de release" },
+    file: "release-checklist.md"
   }
 } as const;
 
 type DocMap = typeof docsMapAdmin | typeof docsMapViewer;
 
 function getDocKey(raw: string | undefined, docsMap: DocMap): keyof DocMap {
-  if (!raw) return "system_synopsis";
+  const keys = Object.keys(docsMap) as Array<keyof DocMap>;
+  const fallback = keys[0];
+  if (!raw) return fallback;
   if (Object.prototype.hasOwnProperty.call(docsMap, raw)) {
     return raw as keyof DocMap;
   }
-  return "system_synopsis";
+  return fallback;
 }
 
 export default async function DocsPage({
@@ -139,8 +134,8 @@ export default async function DocsPage({
         }
         whatToTry={
           locale === "es"
-            ? "Empieza por Sinopsis del Sistema, luego revisa el Protocolo y ejecuta checks relacionados en los modulos del producto."
-            : "Start with System Synopsis, then review Protocol Spec and execute related checks in product modules."
+            ? "Empieza por Acceso publico / Workspace canonico u Operaciones; los documentos de auditoria y seguridad estan disponibles para admins."
+            : "Start with Public read-only access, Canonical workspace, or Operations; audit and security packs are available to admins."
         }
         walletHint={
           locale === "es"
