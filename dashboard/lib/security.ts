@@ -44,21 +44,8 @@ export function isSameOriginRequest(req: NextRequest) {
     return false;
   }
 
-  const xfProto = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
   const originHost = originUrl.hostname.toLowerCase();
   const originProto = originUrl.protocol.replace(":", "").toLowerCase();
-  let proto = xfProto?.replace(/:$/, "").toLowerCase();
-  if (!proto) {
-    try {
-      proto = new URL(req.url).protocol.replace(":", "").toLowerCase();
-    } catch {
-      proto = "";
-    }
-    if (!proto) {
-      proto = originProto;
-    }
-  }
-  if (originProto !== proto) return false;
 
   const forwardedHostParts: string[] = [];
   const xf = req.headers.get("x-forwarded-host");
@@ -70,6 +57,40 @@ export function isSameOriginRequest(req: NextRequest) {
   }
   const hostHeader = req.headers.get("host")?.split(",")[0]?.trim();
   if (hostHeader) forwardedHostParts.push(hostHeader);
+
+  const xfProto = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  let proto = xfProto?.replace(/:$/, "").toLowerCase() ?? "";
+  if (!proto) {
+    try {
+      proto = new URL(req.url).protocol.replace(":", "").toLowerCase();
+    } catch {
+      proto = "";
+    }
+  }
+  if (!proto) proto = originProto;
+
+  /**
+   * Cloudflare Tunnel (and similar): browser sends Origin https://public-host while Next.js sees
+   * http://127.0.0.1 upstream. Match via x-forwarded-host, or Referer when forwarded-host is absent.
+   */
+  if (originProto !== proto) {
+    const forwardedMatchesOriginHost = forwardedHostParts.some((raw) => hostnameFromForwardedHost(raw) === originHost);
+    const tunnelHttpsToHttp = originProto === "https" && proto === "http";
+    let hostOk = forwardedMatchesOriginHost;
+    if (!hostOk && tunnelHttpsToHttp) {
+      const ref = req.headers.get("referer");
+      if (ref) {
+        try {
+          hostOk = new URL(ref).hostname.toLowerCase() === originHost;
+        } catch {
+          hostOk = false;
+        }
+      }
+    }
+    if (!(tunnelHttpsToHttp && hostOk)) {
+      return false;
+    }
+  }
 
   const localAliases = new Set(["localhost", "127.0.0.1", "::1"]);
   const originIsLocal = localAliases.has(originHost);
