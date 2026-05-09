@@ -100,7 +100,7 @@ jobs:
 
       - name: Upload roles smoke artifacts
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: roles-smoke-artifacts
           path: artifact-staging-roles-smoke/

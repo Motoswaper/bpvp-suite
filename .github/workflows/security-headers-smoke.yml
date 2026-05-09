@@ -33,7 +33,7 @@ jobs:
 
       - name: Upload headers smoke report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: security-headers-smoke-report
           path: .run/security-headers-smoke-*.txt
