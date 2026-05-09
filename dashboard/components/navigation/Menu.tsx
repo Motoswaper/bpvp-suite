@@ -41,7 +41,11 @@ export async function Menu() {
   return (
     <nav className="space-y-2">
       {items.map(([label, href]) => (
-        <Link key={href} href={href} className="block rounded-md px-3 py-2 text-sm text-slate-300 hover:bg-slate-800">
+        <Link
+          key={href}
+          href={href}
+          className="block rounded-md px-3 py-2 text-sm text-bpvp-muted transition hover:bg-bpvp-hover hover:text-bpvp-ink"
+        >
           {isSpanish ? ES_LABEL_MAP[label] ?? label : label}
         </Link>
       ))}

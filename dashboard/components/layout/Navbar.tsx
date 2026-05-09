@@ -45,9 +45,9 @@ export function Navbar({ title }: { title: string }) {
       <div className="flex justify-end">
         <a
           href={quickHref}
-          className="inline-flex items-center gap-2 rounded-md border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-100 hover:border-slate-600 hover:bg-slate-900"
+          className="inline-flex items-center gap-2 rounded-md border border-bpvp-border bg-bpvp-input/90 px-3 py-1.5 text-xs font-medium text-bpvp-ink hover:border-bpvp-border-strong hover:bg-bpvp-hover"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 text-cyan-300">
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 text-orange-600 dark:text-cyan-300">
             <path
               fill="currentColor"
               d={
@@ -60,7 +60,7 @@ export function Navbar({ title }: { title: string }) {
           <span>{quickLabel}</span>
         </a>
       </div>
-      <section className="relative overflow-hidden rounded-xl border border-slate-800 bg-[#101523]">
+      <section className="relative overflow-hidden rounded-xl border border-bpvp-border bg-bpvp-card">
         <img
           src="/brand/hero-banner.png"
           alt={isSpanish ? "Banner del modulo" : "Module banner"}
