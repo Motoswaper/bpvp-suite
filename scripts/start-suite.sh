@@ -97,14 +97,14 @@ if ! command -v curl >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "[1/3] Starting backend stack (engine/indexer/watcher)..."
+echo "[1/4] Starting backend stack (engine/indexer/watcher/bitcoin-core)..."
 if [ "$BUILD_ON_START" = "true" ]; then
   docker compose -p "$COMPOSE_PROJECT_NAME" --env-file "$SECRETS_FILE" -f "$BACKEND_DIR/docker-compose.yml" up -d --build
 else
   docker compose -p "$COMPOSE_PROJECT_NAME" --env-file "$SECRETS_FILE" -f "$BACKEND_DIR/docker-compose.yml" up -d
 fi
 
-echo "[2/3] Starting dashboard..."
+echo "[2/4] Starting dashboard..."
 if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
   echo "Dashboard already running (pid $(cat "$PID_FILE"))."
 else

@@ -6,18 +6,20 @@ For unattended **LaunchAgent** / **npm** reliability, keep this checkout **outsi
 
 ## Service lifecycle
 
-Start all backend services:
+Start backend via Compose **only** if you already export `AXE_API_KEY`, `AXE_HMAC_SECRET`, and use project `bpvp` + env file (see `start-suite.sh`). For normal local work, use **`./scripts/start-suite.sh`** instead.
+
+Raw compose (advanced):
 
 ```bash
 cd backend
-docker compose up --build
+docker compose -p bpvp --env-file ../.run/local-secrets.env up --build -d
 ```
 
-Stop all backend services:
+Stop that stack:
 
 ```bash
 cd backend
-docker compose down --remove-orphans
+docker compose -p bpvp --env-file ../.run/local-secrets.env down --remove-orphans
 ```
 
 Start full local suite (backend + dashboard):
@@ -36,6 +38,21 @@ Stop suite:
 
 ```bash
 ./scripts/stop-suite.sh
+```
+
+Restart everything (Docker stack + dashboard; also removes quick/domain Cloudflare tunnel containers — run your publish script again after):
+
+```bash
+./scripts/restart-suite.sh
+```
+
+If **`Missing required secrets in .run/local-secrets.env`** appears, the file is missing lines or was emptied. Regenerate (this deletes the old file):
+
+```bash
+rm -f .run/local-secrets.env
+./scripts/prepare-local-secrets.sh
+chmod 600 .run/local-secrets.env
+./scripts/start-suite.sh
 ```
 
 ## Health and readiness
@@ -101,29 +118,65 @@ docker compose restart axe-engine
    - `/metrics` still emits request counters
    - `/events` and `/actions` flow resumes
 
-## Fixed domain publishing (named Cloudflare tunnel)
+## Expose the dashboard (Cloudflare tunnel)
 
-Quick tunnel URLs are temporary. For a stable domain:
+**Always do this in order:** local stack first, tunnel second. The dashboard must answer on **`http://127.0.0.1:3100`** before any tunnel makes sense.
 
-1. Create a named tunnel in Cloudflare Zero Trust.
-2. Export your tunnel token in shell:
+### 0) One-time: working directory and secrets
 
 ```bash
-export CF_TUNNEL_TOKEN=<your-token>
-export CF_HOSTNAME=demo.yourdomain.com
+cd /path/to/bpvp-suite    # real path; symlinks resolve with scripts’ cd -P
+./scripts/start-suite.sh   # or ./scripts/restart-suite.sh — creates .run/local-secrets.env if missing
 ```
 
-3. Start domain publishing:
+If secrets are broken, see **“Missing required secrets”** earlier in this file.
+
+### 1) Quick public URL (temporary `*.trycloudflare.com`)
+
+Starts suite (if needed), waits for **:3100**, then runs a **quick** tunnel (container `bpvp-cloudflared`):
 
 ```bash
+./scripts/publish-online.sh
+```
+
+It prints **PUBLIC URL** and saves it to `.run/cloudflared.url`.  
+Stop: `./scripts/stop-suite.sh` (also removes tunnel containers) or `docker rm -f bpvp-cloudflared`.
+
+### 2) Fixed hostname (e.g. `testnet.btc-defi.com`)
+
+Requires a **named tunnel** in [Cloudflare Zero Trust](https://one.dash.cloudflare.com/) and a **Public hostname** on that tunnel pointing at your origin (the connector must reach the Mac; the repo uses **`http://host.docker.internal:3100`** inside Docker).
+
+**Option A — all-in-one (RPC suite + tunnel recreate)** — needs `backend/.env.rpc` for `start-suite-rpc.sh`:
+
+```bash
+export CF_TUNNEL_TOKEN='<paste tunnel token from Cloudflare>'
+export CF_HOSTNAME=testnet.btc-defi.com
 ./scripts/publish-domain.sh
 ```
 
-4. Stop domain publishing:
+**Option B — suite already running** (mock or RPC already up; only (re)start tunnel):
 
 ```bash
-./scripts/unpublish-domain.sh
+export CF_TUNNEL_TOKEN='<paste tunnel token>'
+export CF_HOSTNAME=testnet.btc-defi.com
+# After ./scripts/stop-suite.sh removed the tunnel container, force recreate:
+BPVP_TUNNEL_RECREATE=1 ./scripts/start-cloudflared-domain.sh
+# If the container already exists and is stopped:
+# ./scripts/start-cloudflared-domain.sh
 ```
+
+Container name: **`bpvp-cloudflared-domain`**. Logs: `docker logs -f bpvp-cloudflared-domain`.
+
+**DNS:** `testnet.btc-defi.com` must be the hostname configured on the tunnel in Cloudflare (CNAME/proxy as Cloudflare shows).
+
+Stop tunnel + suite cleanup: `./scripts/stop-suite.sh` or `./scripts/unpublish-domain.sh` where applicable.
+
+### 3) Checklist if you see **502 Bad Gateway**
+
+1. `curl -sI http://127.0.0.1:3100/login` — must not fail.  
+2. `docker ps` — tunnel container running.  
+3. `docker logs --tail 80 bpvp-cloudflared-domain` (or `bpvp-cloudflared`) — look for connection errors to **3100**.  
+4. Mac awake; Docker Desktop running.
 
 ## Auto-recovery (watchdog, macOS)
 
