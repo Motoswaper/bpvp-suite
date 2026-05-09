@@ -1,0 +1,52 @@
+name: INFO - Public Site Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Public dashboard base URL (https, no trailing slash)"
+        required: true
+        default: "https://testnet.btc-defi.com"
+  schedule:
+    # Weekly, offset from roles-smoke and ZAP to spread runner load
+    - cron: "25 6 * * 1"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  public-site-smoke:
+    name: INFO - Probe public dashboard availability
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run public site smoke
+        env:
+          # workflow_dispatch: github.event.inputs; schedule: empty -> default
+          PUBLIC_SITE_SMOKE_URL: ${{ github.event.inputs.base_url || 'https://testnet.btc-defi.com' }}
+        run: |
+          chmod +x ./scripts/public-site-smoke.sh
+          ./scripts/public-site-smoke.sh
+
+      - name: Stage smoke report
+        if: always()
+        run: |
+          mkdir -p artifact-staging-public-smoke
+          shopt -s nullglob
+          for f in .run/public-site-smoke-*.txt; do
+            cp "$f" artifact-staging-public-smoke/
+          done
+          ls -la artifact-staging-public-smoke || true
+
+      - name: Upload public smoke report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: public-site-smoke-report
+          path: artifact-staging-public-smoke/
+          if-no-files-found: warn
