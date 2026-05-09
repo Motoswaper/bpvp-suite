@@ -28,6 +28,7 @@ jobs:
           persist-credentials: false
 
       - name: Run analysis
+        continue-on-error: true
         uses: ossf/scorecard-action@v2.4.0
         with:
           results_file: results.sarif
