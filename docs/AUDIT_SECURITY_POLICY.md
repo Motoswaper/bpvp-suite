@@ -36,6 +36,10 @@ BPVP uses a layered audit model:
 - `INFO - Dependency Review` (PR dependency risk deltas).
 - `INFO - OSSF Scorecards` (supply-chain and repo security posture).
 - `INFO - Audit Weekly Report` (single executive summary of latest REQUIRED/INFO outcomes).
+- `INFO - Semgrep SAST` (complementary static analysis focused on common appsec patterns).
+- `INFO - OSV Dependency Scan` (cross-ecosystem dependency vulnerability signal).
+- `INFO - Checkov IaC Scan` (configuration and IaC misconfiguration checks).
+- `INFO - GitHub Actions Security Lint` (workflow-level security lint via zizmor).
 
 ## 3) Scope and coverage
 
@@ -84,3 +88,4 @@ BPVP will continue improving automated coverage by:
 - Expanding authenticated security tests.
 - Tightening dependency and supply-chain provenance controls.
 - Improving signal quality and reducing false positives in CI.
+- Maintaining a risk-to-control map in `docs/AUDIT_COVERAGE_MATRIX.md`.
