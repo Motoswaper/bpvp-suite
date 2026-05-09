@@ -7,6 +7,7 @@ const PUBLIC_API_PREFIXES = [
   "/api/auth/logout",
   "/api/auth/register",
   "/api/auth/session",
+  "/api/public",
   "/api/marketplace/public",
   "/api/did/public"
 ];
