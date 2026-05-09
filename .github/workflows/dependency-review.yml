@@ -1,0 +1,32 @@
+name: INFO - Dependency Review
+
+on:
+  pull_request:
+    branches: [main, master]
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+permissions:
+  contents: read
+  # Required when comment-summary-in-pr is enabled.
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    name: INFO - Scan dependency changes in PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Dependency review
+        continue-on-error: true
+        uses: actions/dependency-review-action@v4
+        with:
+          fail-on-severity: high
+          comment-summary-in-pr: always
+
+      - name: Dependency review fallback note
+        if: always()
+        run: echo "Dependency Review ran in non-blocking mode (repo support may vary)."

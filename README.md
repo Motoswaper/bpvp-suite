@@ -36,6 +36,7 @@ npm run dev
 - Code scanning and dependency automation are enabled through GitHub workflows.
 - Container scanning is executed in CI through Trivy SARIF uploads.
 - Authentication uses signed sessions and role-based access controls.
+- Audit scope, cadence, and policy are documented in `docs/AUDIT_SECURITY_POLICY.md`.
 
 ## Documentation
 
