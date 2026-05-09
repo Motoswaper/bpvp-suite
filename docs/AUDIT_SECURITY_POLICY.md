@@ -32,6 +32,7 @@ BPVP uses a layered audit model:
 - `INFO - Container Security Scan` (Trivy image scanning).
 - `INFO - ZAP Baseline DAST` (public HTTP surface baseline probing).
 - `INFO - Public Site Smoke` (public availability sanity checks).
+- `INFO - Security Headers Smoke` (public browser hardening headers and CSP checks).
 - `INFO - Dependency Review` (PR dependency risk deltas).
 - `INFO - OSSF Scorecards` (supply-chain and repo security posture).
 
