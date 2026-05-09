@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cookies } from "next/headers";
 
 export default async function LoginBasicPage({
@@ -9,15 +10,35 @@ export default async function LoginBasicPage({
   const isSpanish = String(store.get("bpvp_locale")?.value ?? "").toLowerCase() === "es";
   const loginError = searchParams?.loginError ? String(searchParams.loginError) : "";
   const registerError = searchParams?.registerError ? String(searchParams.registerError) : "";
+  const homeHref = isSpanish ? "/?lang=es" : "/?lang=en";
+  const loginJsonHref = isSpanish ? "/login?lang=es" : "/login?lang=en";
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-bpvp-page px-4 text-bpvp-ink">
+    <main className="flex min-h-screen flex-col bg-bpvp-page text-bpvp-ink">
+      <div className="mx-auto flex w-full max-w-3xl shrink-0 flex-wrap items-center justify-between gap-3 px-4 pt-6 pb-2">
+        <Link
+          href={homeHref}
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-orange-500/50 bg-bpvp-card px-4 py-2.5 text-sm font-semibold text-bpvp-ink shadow-sm hover:bg-bpvp-hover"
+        >
+          <span aria-hidden className="text-lg">
+            ←
+          </span>
+          {isSpanish ? "Volver al inicio" : "Back to home"}
+        </Link>
+        <Link href={loginJsonHref} className="text-xs font-medium text-bpvp-muted underline-offset-4 hover:text-bpvp-ink hover:underline">
+          {isSpanish ? "Login estandar (SPA)" : "Standard login (SPA)"}
+        </Link>
+      </div>
+
+      <div className="flex flex-1 items-center justify-center px-4 pb-16">
       <div className="grid w-full max-w-3xl gap-4 md:grid-cols-2">
         <section className="space-y-4 rounded-xl border border-bpvp-border bg-bpvp-card p-6 shadow-sm">
           <img
-            src="/brand/bpvp-hand-logo.png"
+            src="/brand/bitcoin-corner-photo.jpg"
             alt="BPVP Suite logo"
-            className="h-auto max-h-52 w-full rounded-md border border-bpvp-border bg-bpvp-page object-contain p-2"
+            width={280}
+            height={160}
+            className="mx-auto h-auto max-h-52 w-full max-w-[280px] rounded-xl border-2 border-orange-400/50 bg-bpvp-input object-contain p-2 shadow-md"
           />
           <h1 className="text-xl font-semibold">
             {isSpanish ? "Inicia sesion (modo compatible)" : "Sign in (compatibility mode)"}
@@ -81,6 +102,7 @@ export default async function LoginBasicPage({
             <p className="rounded-md border border-rose-500/40 bg-rose-950/40 p-3 text-sm text-rose-200">{registerError}</p>
           ) : null}
         </section>
+      </div>
       </div>
     </main>
   );

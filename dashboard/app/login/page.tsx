@@ -1,6 +1,5 @@
 "use client";
 
-import { BrandLogo } from "@/components/brand/BrandLogo";
 import { FormEvent, useEffect, useState } from "react";
 
 const REQUEST_TIMEOUT_MS = 7000;
@@ -125,11 +124,38 @@ export default function LoginPage() {
     }
   }
 
+  const homeHref = isSpanish ? "/?lang=es" : "/?lang=en";
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-bpvp-page px-4 text-bpvp-ink">
+    <main className="flex min-h-screen flex-col bg-bpvp-page text-bpvp-ink">
+      <div className="mx-auto flex w-full max-w-3xl shrink-0 flex-wrap items-center justify-between gap-3 px-4 pt-6 pb-2">
+        <a
+          href={homeHref}
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-orange-500/50 bg-bpvp-card px-4 py-2.5 text-sm font-semibold text-bpvp-ink shadow-sm hover:bg-bpvp-hover"
+        >
+          <span aria-hidden className="text-lg">
+            ←
+          </span>
+          {isSpanish ? "Volver al inicio" : "Back to home"}
+        </a>
+        <a href={isSpanish ? "/login-basic?lang=es" : "/login-basic?lang=en"} className="text-xs font-medium text-bpvp-muted underline-offset-4 hover:text-bpvp-ink hover:underline">
+          {isSpanish ? "Modo compatible (formulario HTML)" : "Compatibility mode (HTML form)"}
+        </a>
+      </div>
+
+      <div className="flex flex-1 items-center justify-center px-4 pb-16">
       <div className="grid w-full max-w-3xl gap-4 md:grid-cols-2">
         <section className="space-y-4 rounded-xl border border-bpvp-border bg-bpvp-card p-6 shadow-sm">
-          <BrandLogo variant="login" alt="BPVP Suite logo" />
+          <div className="flex flex-col items-center gap-2">
+            <img
+              src="/brand/bitcoin-corner-photo.jpg"
+              alt="BPVP Suite"
+              width={280}
+              height={160}
+              className="mx-auto h-auto max-h-52 w-full max-w-[280px] rounded-xl border-2 border-orange-400/50 bg-bpvp-input object-contain p-2 shadow-md"
+              loading="eager"
+            />
+          </div>
           <h1 className="text-xl font-semibold">{isSpanish ? "Inicia sesion con usuario tester existente" : "Sign in with existing tester user"}</h1>
           <p className="text-xs text-bpvp-muted">
             {isSpanish
@@ -209,6 +235,7 @@ export default function LoginPage() {
         {info ? (
           <p className="mt-2 rounded-md border border-emerald-600/40 bg-emerald-950/30 p-3 text-sm text-emerald-200">{info}</p>
         ) : null}
+      </div>
       </div>
     </main>
   );
