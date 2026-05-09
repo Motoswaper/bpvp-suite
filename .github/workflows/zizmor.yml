@@ -1,0 +1,36 @@
+name: INFO - GitHub Actions Security Lint
+
+on:
+  pull_request:
+    branches: [main, master]
+    paths:
+      - ".github/workflows/**"
+  push:
+    branches: [main, master]
+    paths:
+      - ".github/workflows/**"
+  schedule:
+    - cron: "35 4 * * 2"
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  zizmor:
+    name: INFO - Lint workflow security posture
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run zizmor
+        continue-on-error: true
+        uses: zizmorcore/zizmor-action@v0.1.2
+        with:
+          advanced-security: false
