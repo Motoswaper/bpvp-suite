@@ -109,6 +109,35 @@ else
   warn "GET /robots.txt expected 200, got ${robots_code}"
 fi
 
+overview_code="$(http_code "${BASE_URL}/api/public/overview" 0)"
+log "Signal: GET /api/public/overview -> ${overview_code}"
+overview_body=""
+if [[ "${overview_code}" == "200" ]]; then
+  set +e
+  overview_body="$("${CURL_BASE[@]}" -fsS "${BASE_URL}/api/public/overview" 2>/dev/null)"
+  ob_ec=$?
+  set -e
+  if [[ "${ob_ec}" -ne 0 || -z "${overview_body}" ]]; then
+    warn "GET /api/public/overview 200 but empty or unreadable body"
+  elif printf "%s" "${overview_body}" | grep -qE '"ok"[[:space:]]*:[[:space:]]*true'; then
+    if printf "%s" "${overview_body}" | grep -qE '"mode"[[:space:]]*:[[:space:]]*"public_read_only"'; then
+      pass "GET /api/public/overview -> 200 with ok:true and mode public_read_only"
+    else
+      warn "GET /api/public/overview -> 200 ok:true but mode not public_read_only (verify deployment)"
+    fi
+  else
+    warn "GET /api/public/overview -> 200 but body missing ok:true"
+  fi
+elif [[ "${overview_code}" == "404" ]]; then
+  warn "GET /api/public/overview -> 404 (dashboard not deployed with this route yet)"
+elif [[ "${overview_code}" == "401" || "${overview_code}" == "403" ]]; then
+  warn "GET /api/public/overview -> ${overview_code} (deploy latest main or allow this path on edge/WAF; expect 200 JSON when live)"
+elif [[ "${overview_code}" == "000" ]]; then
+  warn "GET /api/public/overview unreachable"
+else
+  warn "GET /api/public/overview unexpected status ${overview_code}"
+fi
+
 log ""
 log "== Summary =="
 log "PASS: ${PASS_COUNT}"

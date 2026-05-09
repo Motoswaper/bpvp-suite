@@ -12,6 +12,8 @@ Bitcoin-native DeFi operating layer with modular services for market workflows, 
 - `docs/`: Product, architecture, launch, and governance documentation
 - `scripts/`: Operational scripts (health checks, deployment helpers, audits)
 
+**Workspace:** use exactly one local checkout; full paths and freeze steps are in [`docs/CANONICAL_WORKSPACE.md`](docs/CANONICAL_WORKSPACE.md). To bring **local suite + Cloudflare tunnel** online with one command after saving your tunnel token, run `./scripts/online-testnet.sh` from that checkout (see that doc).
+
 ## Quick Start
 
 ### Backend
