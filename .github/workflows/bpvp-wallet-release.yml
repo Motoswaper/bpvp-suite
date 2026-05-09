@@ -11,6 +11,7 @@ env:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   build-wallet:
@@ -98,6 +99,9 @@ jobs:
     needs: [build-wallet]
     if: always() && startsWith(github.ref, 'refs/tags/bpvp-wallet-v')
     steps:
+      - name: Install cosign
+        uses: sigstore/cosign-installer@v3
+
       - name: Download artifacts
         uses: actions/download-artifact@v5
         with:
@@ -126,12 +130,25 @@ jobs:
             echo "No per-OS checksum artifacts found; generating checksums.txt from upload/"
             node -e "const fs=require('fs');const path=require('path');const crypto=require('crypto');const root=path.resolve('upload');const files=fs.readdirSync(root).filter((f)=>fs.statSync(path.join(root,f)).isFile()&&f!=='checksums.txt').sort();const lines=files.map((f)=>{const h=crypto.createHash('sha256').update(fs.readFileSync(path.join(root,f))).digest('hex');return h+'  ./'+f;});fs.writeFileSync(path.join(root,'checksums.txt'),lines.join('\n')+'\n');"
           fi
+          cosign sign-blob \
+            --yes \
+            --output-signature upload/checksums.txt.sig \
+            --output-certificate upload/checksums.txt.pem \
+            upload/checksums.txt
+          cosign verify-blob \
+            --certificate upload/checksums.txt.pem \
+            --signature upload/checksums.txt.sig \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --certificate-identity-regexp "https://github.com/${GITHUB_REPOSITORY}/.github/workflows/bpvp-wallet-release.yml@.*" \
+            upload/checksums.txt
           # Hard gate: do not publish incomplete releases.
           ls upload/*.exe >/dev/null 2>&1 || { echo "Missing Windows .exe asset"; exit 1; }
           ls upload/*.dmg >/dev/null 2>&1 || { echo "Missing macOS .dmg asset"; exit 1; }
           ls upload/*.AppImage >/dev/null 2>&1 || { echo "Missing Linux .AppImage asset"; exit 1; }
           ls upload/*.deb >/dev/null 2>&1 || { echo "Missing Linux .deb asset"; exit 1; }
           [ -s upload/checksums.txt ] || { echo "Missing checksums.txt"; exit 1; }
+          [ -s upload/checksums.txt.sig ] || { echo "Missing checksums.txt.sig"; exit 1; }
+          [ -s upload/checksums.txt.pem ] || { echo "Missing checksums.txt.pem"; exit 1; }
           echo "Staged for release:"
           ls -la upload
 
