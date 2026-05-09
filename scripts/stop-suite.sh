@@ -11,10 +11,15 @@ CF_CONTAINER="bpvp-cloudflared"
 CF_DOMAIN_CONTAINER="bpvp-cloudflared-domain"
 
 echo "[1/2] Stopping backend stack..."
+# docker-compose.yml uses ${AXE_API_KEY:?…} / ${AXE_HMAC_SECRET:?…}; Compose still
+# interpolates those for `down`. Placeholders satisfy parsing even if .run secrets
+# are missing or empty (e.g. after a bad edit).
 if [ -f "$SECRETS_FILE" ]; then
-  docker compose -p "$COMPOSE_PROJECT_NAME" --env-file "$SECRETS_FILE" -f "$BACKEND_DIR/docker-compose.yml" down --remove-orphans || true
+  AXE_API_KEY="${AXE_API_KEY:-__compose_down__}" AXE_HMAC_SECRET="${AXE_HMAC_SECRET:-__compose_down__}" \
+    docker compose -p "$COMPOSE_PROJECT_NAME" --env-file "$SECRETS_FILE" -f "$BACKEND_DIR/docker-compose.yml" down --remove-orphans || true
 else
-  docker compose -p "$COMPOSE_PROJECT_NAME" -f "$BACKEND_DIR/docker-compose.yml" down --remove-orphans || true
+  AXE_API_KEY="${AXE_API_KEY:-__compose_down__}" AXE_HMAC_SECRET="${AXE_HMAC_SECRET:-__compose_down__}" \
+    docker compose -p "$COMPOSE_PROJECT_NAME" -f "$BACKEND_DIR/docker-compose.yml" down --remove-orphans || true
 fi
 
 echo "[2/2] Stopping dashboard..."
