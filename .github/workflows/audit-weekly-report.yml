@@ -1,0 +1,42 @@
+name: INFO - Audit Weekly Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to summarize"
+        required: true
+        default: "main"
+  schedule:
+    - cron: "55 6 * * 1"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit-weekly-report:
+    name: INFO - Summarize audit workflows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run weekly audit report
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AUDIT_REPORT_BRANCH: ${{ github.event.inputs.branch || 'main' }}
+        run: |
+          chmod +x ./scripts/audit-weekly-report.sh
+          ./scripts/audit-weekly-report.sh
+
+      - name: Upload audit weekly report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: audit-weekly-report
+          path: .run/audit-weekly-report-*.txt
+          if-no-files-found: warn
