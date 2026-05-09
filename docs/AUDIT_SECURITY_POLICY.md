@@ -35,6 +35,7 @@ BPVP uses a layered audit model:
 - `INFO - Security Headers Smoke` (public browser hardening headers and CSP checks).
 - `INFO - Dependency Review` (PR dependency risk deltas).
 - `INFO - OSSF Scorecards` (supply-chain and repo security posture).
+- `INFO - Audit Weekly Report` (single executive summary of latest REQUIRED/INFO outcomes).
 
 ## 3) Scope and coverage
 
