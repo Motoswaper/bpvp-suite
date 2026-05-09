@@ -1,3 +1,4 @@
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { cookies, headers } from "next/headers";
 import { TestnetGuestAccess } from "@/components/auth/TestnetGuestAccess";
 import { getSessionFromServerCookies } from "@/lib/auth";
@@ -10,7 +11,6 @@ type Copy = {
   brandName: string;
   brandTagline: string;
   title: string;
-  bannerAlt: string;
   panelTitle: string;
   chartBtc: string;
   chartBpvp: string;
@@ -50,8 +50,7 @@ const COPY: Record<Locale, Copy> = {
     badge: "BPVP Testnet Access",
     brandName: "BPVP Suite",
     brandTagline: "Bitcoin-Native DeFi Operating Layer",
-    title: "BPVP: Bitcoin-Native DeFi Operating Layer",
-    bannerAlt: "Modular infrastructure for decentralized finance on Bitcoin",
+    title: "BPVP: Operating Layer + Modular Infrastructure",
     panelTitle: "Market Signal Snapshot",
     chartBtc: "Bitcoin Price",
     chartBpvp: "BPVP Price",
@@ -70,13 +69,14 @@ const COPY: Record<Locale, Copy> = {
     footerContact: "Institutional contact: ops@btc-defi.com | security@btc-defi.com",
     footerDisclaimer: "All metrics and workflows are for controlled validation unless explicitly designated for production.",
     intro:
-      "Welcome to BPVP. This is a live testnet entrance where teams can experience, validate, and demonstrate institutional Bitcoin DeFi workflows in one unified system.",
+      "Welcome to BPVP. This live testnet entrance lets teams validate Bitcoin DeFi operations in a controlled environment before production.",
     definitionA:
-      "BPVP is a Bitcoin-native DeFi system layer focused on coordinated state, market operations, settlement, and risk workflows around BTC assets. In practical terms, BPVP seeks to make BTC DeFi operable with institutional-grade controls: observable modules, deterministic actions, and verifiable execution paths across token, market, trust, lending, and settlement flows.",
+      "BPVP is a Bitcoin-native DeFi operating layer delivered as modular infrastructure. It coordinates shared state, market execution, identity, trust, lending, and settlement around BTC-focused workflows.",
     definitionB:
-      "What makes BPVP special is the combination of security, observability, and deterministic execution: every critical flow can be monitored, tested, and audited before production scale.",
+      "In practice, BPVP makes BTC DeFi operable with institutional controls: role-based access, deterministic actions, and auditable traces from module input to final state transition.",
     step1Title: "1) Existing user sign in",
-    step1Body: "Open login for users who already have username/password.",
+    step1Body:
+      "Use Profile, Download wallet, or Sign in from the top bar. Or continue with the steps in each column below.",
     step2Title: "2) Explore modules",
     step2Body: "Review market, OTC, quant, and operational views.",
     step3Title: "3) Report findings",
@@ -92,8 +92,7 @@ const COPY: Record<Locale, Copy> = {
     badge: "Acceso Testnet BPVP",
     brandName: "BPVP Suite",
     brandTagline: "Capa Operativa DeFi Nativa de Bitcoin",
-    title: "BPVP: Capa Operativa DeFi Nativa de Bitcoin",
-    bannerAlt: "Infraestructura modular para finanzas descentralizadas sobre Bitcoin",
+    title: "BPVP: Capa Operativa + Infraestructura Modular",
     panelTitle: "Panel de Senales de Mercado",
     chartBtc: "Precio Bitcoin",
     chartBpvp: "Precio BPVP",
@@ -112,13 +111,14 @@ const COPY: Record<Locale, Copy> = {
     footerContact: "Contacto institucional: ops@btc-defi.com | security@btc-defi.com",
     footerDisclaimer: "Todas las metricas y flujos son para validacion controlada salvo designacion expresa de produccion.",
     intro:
-      "Bienvenido a BPVP. Esta es una entrada activa de testnet para que equipos puedan experimentar, validar y demostrar flujos institucionales de DeFi sobre Bitcoin en un solo sistema unificado.",
+      "Bienvenido a BPVP. Esta entrada de testnet permite validar operaciones DeFi sobre Bitcoin en un entorno controlado antes de produccion.",
     definitionA:
-      "BPVP es una capa de sistema DeFi nativa de Bitcoin, enfocada en estado coordinado, operacion de mercado, liquidacion y flujos de riesgo sobre activos BTC. En la practica, BPVP busca hacer operable el DeFi sobre Bitcoin con controles de nivel institucional: modulos observables, acciones deterministicas y rutas de ejecucion verificables en token, mercado, trust, lending y settlement.",
+      "BPVP es una capa operativa DeFi nativa de Bitcoin implementada como infraestructura modular. Coordina estado compartido, ejecucion de mercado, identidad, trust, lending y settlement en flujos centrados en BTC.",
     definitionB:
-      "Lo especial de BPVP es la combinacion de seguridad, observabilidad y ejecucion deterministica: cada flujo critico puede monitorearse, probarse y auditarse antes de escalar a produccion.",
+      "En la practica, BPVP vuelve operable el DeFi sobre BTC con controles institucionales: acceso por rol, acciones deterministicas y trazas auditables desde la entrada del modulo hasta el cambio final de estado.",
     step1Title: "1) Inicio de sesion usuario existente",
-    step1Body: "Abre el login para usuarios que ya tienen usuario y password.",
+    step1Body:
+      "Usa Perfil, Descargar wallet o Iniciar sesion en la barra superior. O sigue los pasos de cada columna abajo.",
     step2Title: "2) Explora los modulos",
     step2Body: "Revisa vistas de mercado, OTC, cuantitativos y operacion.",
     step3Title: "3) Reporta hallazgos",
@@ -164,79 +164,114 @@ function inferLocale(acceptLanguage: string | null, country: string | null): Loc
   return "en";
 }
 
-export default async function HomePage({ searchParams }: { searchParams?: { lang?: string } }) {
+export default async function HomePage({
+  searchParams
+}: {
+  searchParams?: { lang?: string; restricted?: string } | Promise<{ lang?: string; restricted?: string }>;
+}) {
+  const resolvedSearchParams =
+    searchParams && typeof searchParams === "object" && "then" in searchParams
+      ? await searchParams
+      : searchParams;
   const reqHeaders = await headers();
   const cookieStore = await cookies();
   const session = await getSessionFromServerCookies();
-  const urlLang = String(searchParams?.lang ?? "").toLowerCase();
+  const restricted = String(resolvedSearchParams?.restricted ?? "").toLowerCase();
+  const urlLang = String(resolvedSearchParams?.lang ?? "").toLowerCase();
   const forcedLocale: Locale | null = urlLang === "es" || urlLang === "en" ? (urlLang as Locale) : null;
   const cookieLocaleRaw = String(cookieStore.get("bpvp_locale")?.value ?? "").toLowerCase();
   const cookieLocale: Locale | null = cookieLocaleRaw === "es" || cookieLocaleRaw === "en" ? (cookieLocaleRaw as Locale) : null;
   const locale = forcedLocale ?? cookieLocale ?? inferLocale(reqHeaders.get("accept-language"), reqHeaders.get("cf-ipcountry"));
   const isSpanish = locale === "es";
   const t = COPY[locale];
+  const sessionRole = session?.role;
+  const canOpenOps = sessionRole === "admin";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "BPVP Suite",
     url: getPublicSiteUrl(),
     description:
-      "Bitcoin-native DeFi operating layer for BTC, BTC-Fi, market workflows, lending, trust, and settlement.",
+      "BPVP Suite is a Bitcoin-native DeFi operating layer delivered as modular infrastructure for market execution, identity, trust, lending, settlement, and auditable BTC workflows.",
     sameAs: ["https://bitcoin.org"],
     keywords: "Bitcoin,BTC,DeFi,BTC-Fi,Bitcoin DeFi,BPVP"
   };
 
   return (
-    <main className="min-h-screen bg-[#0b0f18] text-slate-100">
+    <main className="min-h-screen bg-bpvp-page text-bpvp-ink">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <section className="mx-auto flex min-h-screen w-full max-w-6xl flex-col gap-6 px-6 py-12">
-        <section className="w-full overflow-hidden rounded-2xl border border-slate-800 bg-[#101523] shadow-sm">
-          <img
-            src="/brand/hero-banner.png"
-            alt={t.bannerAlt}
-            className="h-28 w-full object-cover sm:h-32 md:h-36 lg:h-40"
-            loading="eager"
-          />
-        </section>
-        <div className="flex justify-end">
-          <a
-            href={`/profile?lang=${locale}`}
-            className="inline-flex items-center gap-2 rounded-md border border-slate-700 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-slate-100 hover:border-slate-600 hover:bg-slate-900"
+        {restricted === "ops" ? (
+          <div
+            role="status"
+            className="rounded-md border border-amber-600/40 bg-amber-50/90 px-4 py-3 text-sm text-amber-950 dark:border-amber-500/35 dark:bg-amber-950/30 dark:text-amber-100"
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 text-cyan-300">
-              <path
-                fill="currentColor"
-                d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"
-              />
-            </svg>
-            <span>{isSpanish ? "Perfil (entrada de wallet)" : "Profile (wallet entry)"}</span>
-          </a>
+            {isSpanish
+              ? "La seccion Ops solo esta disponible para usuarios con rol admin. Usa el menu lateral en el dashboard o inicia sesion como admin."
+              : "The Ops area is only available to admin users. Use the sidebar inside the dashboard after signing in as admin."}
+          </div>
+        ) : null}
+        <div className="flex flex-col gap-3 rounded-xl border border-bpvp-border bg-bpvp-card px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-bpvp-muted">
+            <span className="font-semibold text-bpvp-ink">{t.brandName}</span>
+            <span className="text-bpvp-faint"> · </span>
+            <span>{t.badge}</span>
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={`/profile?lang=${locale}`}
+              className="inline-flex items-center gap-1.5 rounded-md border border-bpvp-border bg-bpvp-input/90 px-3 py-1.5 text-xs font-medium text-bpvp-ink hover:border-bpvp-border-strong hover:bg-bpvp-hover"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                width={14}
+                height={14}
+                aria-hidden="true"
+                className="h-3.5 w-3.5 shrink-0 text-orange-600 dark:text-cyan-300"
+                style={{ width: 14, height: 14 }}
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"
+                />
+              </svg>
+              {isSpanish ? "Perfil" : "Profile"}
+            </a>
+            <a
+              href={`/wallet?lang=${locale}`}
+              className="inline-flex items-center gap-1.5 rounded-md border border-bpvp-border-strong bg-bpvp-code-bg px-3 py-1.5 text-xs font-medium text-bpvp-ink hover:bg-bpvp-hover dark:border-cyan-500/50 dark:bg-cyan-500/10 dark:text-cyan-200 dark:hover:bg-cyan-500/20"
+            >
+              {t.downloadWallet}
+            </a>
+            <a
+              href={`/login-basic?lang=${locale}`}
+              className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-500"
+            >
+              {t.openLogin}
+            </a>
+          </div>
         </div>
         <section className="grid gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-          <div className="rounded-xl border border-slate-800 bg-[#101523] p-4 shadow-sm">
+          <div className="rounded-xl border border-bpvp-border bg-bpvp-card p-4 shadow-sm">
             <div className="grid items-start gap-4 sm:grid-cols-[auto_1fr]">
-              <img
-                src="/brand/bpvp-suite-logo-final.png"
-                alt={`${t.brandName} logo`}
-                className="h-auto w-full max-w-[170px] rounded-md border border-slate-700 bg-slate-950/50 p-1"
-              />
+              <BrandLogo variant="homeCard" alt={`${t.brandName} logo`} />
               <div className="space-y-3">
-                <div className="inline-flex items-center rounded-full border border-[#1FA2FF]/45 bg-[#1FA2FF]/12 px-3 py-1 text-xs font-medium text-[#7fd6ff]">
+                <div className="inline-flex items-center rounded-full border border-orange-300/70 bg-orange-50 px-3 py-1 text-xs font-medium text-orange-950 dark:border-[#1FA2FF]/45 dark:bg-[#1FA2FF]/12 dark:text-[#7fd6ff]">
                   {t.badge}
                 </div>
                 <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t.title}</h1>
-                <p className="mt-2 text-sm text-slate-300">{t.intro}</p>
-                <p className="text-xs text-slate-300 sm:text-sm">{t.definitionA}</p>
-                <p className="text-xs text-slate-400 sm:text-sm">{t.definitionB}</p>
+                <p className="mt-2 text-sm text-bpvp-muted">{t.intro}</p>
+                <p className="text-xs text-bpvp-muted sm:text-sm">{t.definitionA}</p>
+                <p className="text-xs text-bpvp-faint sm:text-sm">{t.definitionB}</p>
               </div>
             </div>
           </div>
-          <div className="rounded-xl border border-slate-800 bg-[#101523] p-4">
-            <h2 className="mb-3 text-sm font-semibold text-slate-100">
-              {t.modulesTitle} <span className="font-normal text-slate-400">({t.status})</span>
+          <div className="rounded-xl border border-bpvp-border bg-bpvp-card p-4">
+            <h2 className="mb-3 text-sm font-semibold text-bpvp-ink">
+              {t.modulesTitle} <span className="font-normal text-bpvp-faint">({t.status})</span>
             </h2>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
               {[
@@ -254,17 +289,44 @@ export default async function HomePage({ searchParams }: { searchParams?: { lang
                 { name: "Docs", path: "/docs", desc: isSpanish ? "Documentacion tecnica y runbooks." : "Technical documentation and runbooks." }
               ].map((m) => (
                 session ? (
-                  <a key={m.name} href={m.path} className="group relative rounded-md border border-slate-700 bg-slate-900/70 px-2 py-2 text-[11px] text-slate-200 hover:border-slate-600 hover:bg-slate-900">
-                    <p className="font-semibold">{m.name}</p>
-                    <div className="pointer-events-none absolute -top-2 left-1/2 z-20 hidden w-52 -translate-x-1/2 -translate-y-full rounded-md border border-slate-700 bg-black/95 p-2 text-[11px] text-slate-200 shadow-xl group-hover:block">
+                  m.name === "Ops" && !canOpenOps ? (
+                    <div
+                      key={m.name}
+                      title={
+                        isSpanish
+                          ? "Ops solo para administradores. El enlace no esta disponible con tu rol."
+                          : "Ops is admin-only. This tile is not available for your role."
+                      }
+                      className="group relative cursor-not-allowed rounded-md border border-bpvp-border bg-bpvp-input px-2 py-2 text-[11px] text-bpvp-muted opacity-75 shadow-sm"
+                    >
+                      <p className="font-semibold text-bpvp-ink">{m.name}</p>
+                      <p className="mt-1 text-[10px] text-bpvp-faint">
+                        {isSpanish ? "Solo admin" : "Admin only"}
+                      </p>
+                      <div className="pointer-events-none absolute -top-2 left-1/2 z-20 hidden w-52 -translate-x-1/2 -translate-y-full rounded-md border border-bpvp-border-strong bg-white p-2 text-[11px] leading-snug text-stone-900 shadow-lg dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:shadow-xl group-hover:block">
+                        {m.desc}
+                      </div>
+                    </div>
+                  ) : (
+                  <a
+                    key={m.name}
+                    href={m.path}
+                    className="group relative rounded-md border border-bpvp-border bg-bpvp-input px-2 py-2 text-[11px] text-bpvp-ink shadow-sm hover:border-bpvp-border-strong hover:bg-bpvp-hover hover:text-bpvp-ink"
+                  >
+                    <p className="font-semibold text-bpvp-ink">{m.name}</p>
+                    <div className="pointer-events-none absolute -top-2 left-1/2 z-20 hidden w-52 -translate-x-1/2 -translate-y-full rounded-md border border-bpvp-border-strong bg-white p-2 text-[11px] leading-snug text-stone-900 shadow-lg dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:shadow-xl group-hover:block">
                       {m.desc}
                     </div>
                   </a>
+                  )
                 ) : (
-                  <div key={m.name} className="group relative rounded-md border border-slate-700 bg-slate-900/70 px-2 py-2 text-[11px] text-slate-200 opacity-80">
-                    <p className="font-semibold">{m.name}</p>
-                    <p className="mt-1 text-[10px] text-slate-400">{t.modulesLockedHint}</p>
-                    <div className="pointer-events-none absolute -top-2 left-1/2 z-20 hidden w-52 -translate-x-1/2 -translate-y-full rounded-md border border-slate-700 bg-black/95 p-2 text-[11px] text-slate-200 shadow-xl group-hover:block">
+                  <div
+                    key={m.name}
+                    className="group relative rounded-md border border-bpvp-border bg-bpvp-input px-2 py-2 text-[11px] text-bpvp-muted opacity-90"
+                  >
+                    <p className="font-semibold text-bpvp-ink">{m.name}</p>
+                    <p className="mt-1 text-[10px] text-bpvp-faint">{t.modulesLockedHint}</p>
+                    <div className="pointer-events-none absolute -top-2 left-1/2 z-20 hidden w-52 -translate-x-1/2 -translate-y-full rounded-md border border-bpvp-border-strong bg-white p-2 text-[11px] leading-snug text-stone-900 shadow-lg dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:shadow-xl group-hover:block">
                       {m.desc}
                     </div>
                   </div>
@@ -274,35 +336,21 @@ export default async function HomePage({ searchParams }: { searchParams?: { lang
           </div>
         </section>
 
-        <section className="grid gap-4 rounded-xl border border-slate-800 bg-[#101523] p-5 sm:grid-cols-3">
+        <section className="grid gap-4 rounded-xl border border-bpvp-border bg-bpvp-card p-5 sm:grid-cols-3">
           <article className="space-y-2">
-            <h2 className="text-sm font-semibold text-slate-100">{t.step1Title}</h2>
-            <p className="text-xs text-slate-400">{t.step1Body}</p>
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <a
-                href={`/login-basic?lang=${locale}`}
-                className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-500"
-              >
-                {t.openLogin}
-              </a>
-              <a
-                href={`/wallet?lang=${locale}`}
-                className="rounded-md border border-cyan-500/50 bg-cyan-500/10 px-3 py-1.5 text-xs font-medium text-cyan-200 transition hover:bg-cyan-500/20"
-              >
-                {t.downloadWallet}
-              </a>
-            </div>
+            <h2 className="text-sm font-semibold text-bpvp-ink">{t.step1Title}</h2>
+            <p className="text-xs text-bpvp-faint">{t.step1Body}</p>
           </article>
           <article className="space-y-2">
-            <h2 className="text-sm font-semibold text-slate-100">{t.step2Title}</h2>
-            <p className="text-xs text-slate-400">{t.step2Body}</p>
+            <h2 className="text-sm font-semibold text-bpvp-ink">{t.step2Title}</h2>
+            <p className="text-xs text-bpvp-faint">{t.step2Body}</p>
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <TestnetGuestAccess idleLabel={t.enterGuest} busyLabel={t.creatingGuest} />
             </div>
           </article>
           <article className="space-y-2">
-            <h2 className="text-sm font-semibold text-slate-100">{t.step3Title}</h2>
-            <p className="text-xs text-slate-400">{t.step3Body}</p>
+            <h2 className="text-sm font-semibold text-bpvp-ink">{t.step3Title}</h2>
+            <p className="text-xs text-bpvp-faint">{t.step3Body}</p>
           </article>
         </section>
 

@@ -1,9 +1,58 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-:root { color-scheme: dark; }
-body { margin:0; background:#05070f; color:#e4e9f5; font-family:Inter,system-ui,sans-serif; }
 
-.bpvp-i18n-es { display: none; }
-html[lang="es"] .bpvp-i18n-en { display: none; }
-html[lang="es"] .bpvp-i18n-es { display: inline; }
+/*
+ * Light theme matches logo PNG background (sampled border ~rgb(245,246,247) → #f5f6f7).
+ * Night: html[data-theme="dark"] (toggle / cookie bpvp_theme).
+ */
+:root {
+  color-scheme: light;
+  --bpvp-shell: #f5f6f7;
+  --bpvp-page: #f5f6f7;
+  --bpvp-card: #f5f6f7;
+  --bpvp-card-dim: rgba(245, 246, 247, 0.96);
+  --bpvp-border: #dfe3e8;
+  --bpvp-border-strong: #c9cfd7;
+  --bpvp-ink: #1c1917;
+  --bpvp-muted: #57534e;
+  --bpvp-faint: #78716c;
+  --bpvp-input: #ffffff;
+  --bpvp-input-border: #cdd2d9;
+  --bpvp-hover: #e8eaed;
+  --bpvp-code-bg: #eef0f2;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bpvp-shell: #05070f;
+  --bpvp-page: #0b0f18;
+  --bpvp-card: #101523;
+  --bpvp-card-dim: rgba(16, 21, 35, 0.72);
+  --bpvp-border: #1e293b;
+  --bpvp-border-strong: #334155;
+  --bpvp-ink: #f1f5f9;
+  --bpvp-muted: #cbd5e1;
+  --bpvp-faint: #94a3b8;
+  --bpvp-input: #0f172a;
+  --bpvp-input-border: #334155;
+  --bpvp-hover: #1e293b;
+  --bpvp-code-bg: #0c1220;
+}
+
+body {
+  margin: 0;
+  background: var(--bpvp-page);
+  color: var(--bpvp-ink);
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.bpvp-i18n-es {
+  display: none;
+}
+html[lang="es"] .bpvp-i18n-en {
+  display: none;
+}
+html[lang="es"] .bpvp-i18n-es {
+  display: inline;
+}

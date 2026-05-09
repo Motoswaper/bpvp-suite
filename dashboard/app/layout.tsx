@@ -1,7 +1,11 @@
 import "@/styles/globals.css";
+import { StaticLocaleProvider } from "@/components/layout/LocaleGate";
+import { ThemeBoot } from "@/components/layout/ThemeBoot";
 import { DeploymentBanner } from "@/components/layout/DeploymentBanner";
 import { GlobalFooter } from "@/components/layout/GlobalFooter";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { BRAND_ASSETS } from "@/lib/brandAssets";
+import { getServerLocale } from "@/lib/serverLocale";
 import { getPublicSiteUrl } from "@/lib/siteUrl";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
@@ -16,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | BPVP Suite"
   },
   description:
-    "BPVP Suite is a Bitcoin-native DeFi operating layer for BTC, BTC-Fi, market operations, settlement, bridge orchestration, and institutional-grade controls.",
+    "BPVP Suite is a Bitcoin-native DeFi operating layer delivered as modular infrastructure for market execution, identity, trust, lending, settlement, and auditable BTC workflows.",
   keywords: [
     "Bitcoin",
     "BTC",
@@ -33,14 +37,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: "BPVP Suite | Bitcoin-Native DeFi Operating Layer",
     description:
-      "Operate BTC-Fi with auditable modules for market, trust, lending, settlement, and bridge workflows.",
+      "A Bitcoin-native DeFi operating layer delivered as modular infrastructure with auditable market, identity, trust, lending, and settlement workflows.",
     url: siteUrl,
     siteName: "BPVP Suite",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/brand/bpvp-suite-logo.svg",
+        url: BRAND_ASSETS.logo,
         width: 1200,
         height: 630,
         alt: "BPVP Suite"
@@ -51,8 +55,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "BPVP Suite | Bitcoin-Native DeFi Operating Layer",
     description:
-      "Operate BTC-Fi with auditable modules for market, trust, lending, settlement, and bridge workflows.",
-    images: ["/brand/bpvp-suite-logo.svg"]
+      "A Bitcoin-native DeFi operating layer delivered as modular infrastructure with auditable workflows.",
+    images: [BRAND_ASSETS.logo]
   },
   robots: {
     index: true,
@@ -61,16 +65,22 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
+  const locale = await getServerLocale();
   const cookieStore = await cookies();
-  const localeRaw = String(cookieStore.get("bpvp_locale")?.value ?? "").toLowerCase();
-  const locale = localeRaw === "es" ? "es" : "en";
+  const themeRaw = String(cookieStore.get("bpvp_theme")?.value ?? "").toLowerCase();
+  const theme = themeRaw === "dark" ? "dark" : "light";
 
   return (
-    <html lang={locale}>
-      <body className="min-h-screen bg-[#0b0f18]">
+    <html lang={locale} data-theme={theme} data-bpvp-locale={locale} suppressHydrationWarning>
+      <body className="min-h-screen bg-bpvp-page text-bpvp-ink antialiased">
+        <ThemeBoot />
         <DeploymentBanner />
-        <LanguageSwitcher currentLocale={locale} />
-        {children}
+        <header className="sticky top-0 z-50 border-b border-bpvp-border bg-bpvp-page/95 backdrop-blur supports-[backdrop-filter]:bg-bpvp-page/80">
+          <div className="mx-auto flex max-w-6xl items-center justify-end px-3 py-2">
+            <LanguageSwitcher currentLocale={locale} currentTheme={theme} />
+          </div>
+        </header>
+        <StaticLocaleProvider locale={locale}>{children}</StaticLocaleProvider>
         <GlobalFooter locale={locale} />
       </body>
     </html>
