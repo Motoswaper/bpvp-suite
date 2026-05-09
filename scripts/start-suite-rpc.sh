@@ -59,6 +59,7 @@ else
   fi
   (
     PORT="${PORT:-3100}" \
+    BPVP_SESSION_COOKIE_SECURE=false \
     ENGINE_URL="${ENGINE_URL:-http://localhost:28080}" \
     AXE_API_KEY="$AXE_API_KEY" \
     AXE_HMAC_SECRET="$AXE_HMAC_SECRET" \

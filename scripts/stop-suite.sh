@@ -38,3 +38,6 @@ docker rm -f "$CF_CONTAINER" >/dev/null 2>&1 || true
 docker rm -f "$CF_DOMAIN_CONTAINER" >/dev/null 2>&1 || true
 
 echo "Suite stopped."
+echo ""
+echo "Nota: el tunel Cloudflare (testnet publico) se detuvo con este script."
+echo "      Para volver a levantarlo: ./scripts/online-testnet.sh (tras start-suite)."
