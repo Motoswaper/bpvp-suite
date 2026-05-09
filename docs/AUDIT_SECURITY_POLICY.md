@@ -69,6 +69,8 @@ At least quarterly (or before major releases), BPVP should run:
 - `REQUIRED` failures: immediate stop for release progression until fixed.
 - `INFO` failures: triage and track with ownership and due date.
 - Critical/high confirmed findings: patch priority and accelerated release.
+- Incident response SLAs and workflow are defined in `docs/SECURITY_INCIDENT_RESPONSE_POLICY.md`.
+- Standard incident documentation format is defined in `docs/SECURITY_INCIDENT_TEMPLATE.md`.
 
 ## 6) Disclosure and transparency
 
