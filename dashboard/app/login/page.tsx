@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { FormEvent, useEffect, useState } from "react";
 
 const REQUEST_TIMEOUT_MS = 7000;
@@ -65,8 +66,8 @@ export default function LoginPage() {
           setSessionRecoveryLinks(true);
           setError(
             spanish
-              ? "Detectamos un bucle rapido login ↔ dashboard. Suele pasar si la cookie de sesion no persiste (HTTP vs HTTPS, dominio distinto, o SameSite). Prueba abrir /market en la misma pestaña, o entra con ?force=1 para quedarte aqui y volver a iniciar sesion."
-              : "Detected a fast login ↔ dashboard loop. Usually the session cookie is not persisting (HTTP vs HTTPS, different host, or SameSite). Try opening /market in this tab, or use ?force=1 to stay here and sign in again."
+              ? "Bucle de redireccion. Usa los enlaces de abajo o ?force=1."
+              : "Redirect loop. Use the links below or ?force=1."
           );
           return;
         }
@@ -84,8 +85,8 @@ export default function LoginPage() {
         setSessionRecoveryLinks(true);
         setError(
           spanish
-            ? "Tu sesion parece activa pero volviste a login (posible bucle o bloqueo de cookie). Abre /market manualmente, o cierra sesion desde el dashboard y entra de nuevo. Para quedarte en esta pantalla usa ?force=1."
-            : "You appear signed in but landed on login again (redirect loop or cookie blocked). Open /market manually, or sign out from the dashboard and sign in again. To stay on this screen use ?force=1."
+            ? "Sesion ambigua: abre /market o cierra sesion y vuelve a entrar. ?force=1 para quedarte aqui."
+            : "Ambiguous session: open /market or sign out and sign in again. Use ?force=1 to stay here."
         );
       } catch {
         window.sessionStorage.removeItem(AUTO_REDIRECT_KEY);
@@ -125,12 +126,12 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#05070f] px-4">
+    <main className="flex min-h-screen items-center justify-center bg-bpvp-page px-4 text-bpvp-ink">
       <div className="grid w-full max-w-3xl gap-4 md:grid-cols-2">
-        <section className="space-y-4 rounded-xl border border-slate-800 bg-[#101523] p-6">
-          <img src="/brand/bpvp-suite-logo.svg" alt="BPVP Suite logo" className="h-auto w-full rounded-md border border-slate-800 bg-slate-950/50 p-2" />
+        <section className="space-y-4 rounded-xl border border-bpvp-border bg-bpvp-card p-6 shadow-sm">
+          <BrandLogo variant="login" alt="BPVP Suite logo" />
           <h1 className="text-xl font-semibold">{isSpanish ? "Inicia sesion con usuario tester existente" : "Sign in with existing tester user"}</h1>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-bpvp-muted">
             {isSpanish
               ? "Usa esta opcion solo si ya tienes usuario y password."
               : "Use this only if you already have username and password."}
@@ -141,35 +142,35 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder={isSpanish ? "Usuario (ej. tester-7gk2p4)" : "Username (e.g. tester-7gk2p4)"}
-              className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-bpvp-border bg-bpvp-input px-3 py-2 text-sm text-bpvp-ink placeholder:text-bpvp-faint"
             />
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={isSpanish ? "Password (ej. A9v!kP2#tQ)" : "Password (e.g. A9v!kP2#tQ)"}
-              className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-bpvp-border bg-bpvp-input px-3 py-2 text-sm text-bpvp-ink placeholder:text-bpvp-faint"
             />
             <input
               type="text"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
               placeholder={isSpanish ? "Codigo OTP (solo si aplica) ej. 483920" : "OTP code (only if required) e.g. 483920"}
-              className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-bpvp-border bg-bpvp-input px-3 py-2 text-sm text-bpvp-ink placeholder:text-bpvp-faint"
             />
             <button
               type="submit"
               disabled={signingIn}
-              className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {signingIn ? (isSpanish ? "Iniciando sesion..." : "Signing in...") : isSpanish ? "Iniciar sesion" : "Sign in"}
             </button>
           </form>
         </section>
 
-        <section className="space-y-4 rounded-xl border border-slate-800 bg-[#101523] p-6">
+        <section className="space-y-4 rounded-xl border border-bpvp-border bg-bpvp-card p-6 shadow-sm">
           <h2 className="text-xl font-semibold">{isSpanish ? "Crea un nuevo usuario de prueba" : "Create a new test user"}</h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-bpvp-muted">
             {isSpanish
               ? "Recomendado para la mayoria de testers. Crea una cuenta viewer e inicia sesion automaticamente."
               : "Recommended for most testers. This creates a viewer-only account and signs in automatically."}
@@ -178,7 +179,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={signingIn}
-              className="w-full rounded-md border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-md border border-emerald-600/50 bg-emerald-600/15 px-4 py-2 text-sm font-medium text-emerald-800 hover:bg-emerald-600/25 disabled:cursor-not-allowed disabled:opacity-60 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200 dark:hover:bg-emerald-500/20"
             >
               {isSpanish ? "Crear cuenta de prueba (solo viewer)" : "Create test account (viewer only)"}
             </button>
@@ -186,24 +187,28 @@ export default function LoginPage() {
         </section>
       </div>
       <div className="fixed bottom-4 left-4 right-4 mx-auto max-w-3xl">
-        {error ? <p className="rounded-md border border-rose-800 bg-rose-950/50 p-3 text-sm text-rose-300">{error}</p> : null}
+        {error ? (
+          <p className="rounded-md border border-rose-500/40 bg-rose-950/40 p-3 text-sm text-rose-200 dark:text-rose-300">{error}</p>
+        ) : null}
         {sessionRecoveryLinks ? (
           <div className="mt-2 flex flex-wrap gap-2">
             <a
               href="/market"
-              className="rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700"
+              className="rounded-md border border-bpvp-border bg-bpvp-input px-3 py-1.5 text-xs font-medium text-bpvp-ink hover:bg-bpvp-hover"
             >
               {isSpanish ? "Abrir /market" : "Open /market"}
             </a>
             <a
               href="/login?force=1"
-              className="rounded-md border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700"
+              className="rounded-md border border-bpvp-border bg-bpvp-input px-3 py-1.5 text-xs font-medium text-bpvp-ink hover:bg-bpvp-hover"
             >
               {isSpanish ? "Quedarse en login (?force=1)" : "Stay on login (?force=1)"}
             </a>
           </div>
         ) : null}
-        {info ? <p className="mt-2 rounded-md border border-slate-700 bg-slate-900/60 p-3 text-sm text-emerald-300">{info}</p> : null}
+        {info ? (
+          <p className="mt-2 rounded-md border border-emerald-600/40 bg-emerald-950/30 p-3 text-sm text-emerald-200">{info}</p>
+        ) : null}
       </div>
     </main>
   );
