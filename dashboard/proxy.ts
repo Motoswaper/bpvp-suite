@@ -1,3 +1,4 @@
+import { BPVP_LOCALE_HEADER } from "@/lib/bpvpLocale";
 import { NextRequest, NextResponse } from "next/server";
 
 const PUBLIC_PREFIXES = ["/login", "/wallet", "/api/auth/login"];
@@ -69,13 +70,23 @@ function finalize(req: NextRequest, res: NextResponse) {
   return withSecurityHeaders(withLocaleCookie(req, res));
 }
 
+/** Forward `?lang=` into a request header so `getServerLocale()` matches on first SSR paint. */
+function nextWithLocale(req: NextRequest) {
+  const headers = new Headers(req.headers);
+  const lang = req.nextUrl.searchParams.get("lang")?.toLowerCase();
+  if (lang === "en" || lang === "es") {
+    headers.set(BPVP_LOCALE_HEADER, lang);
+  }
+  return NextResponse.next({ request: { headers } });
+}
+
 export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   if (PUBLIC_EXACT_PATHS.includes(pathname)) {
-    return finalize(req, NextResponse.next());
+    return finalize(req, nextWithLocale(req));
   }
   if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
-    return finalize(req, NextResponse.next());
+    return finalize(req, nextWithLocale(req));
   }
   if (
     pathname.startsWith("/_next") ||
@@ -84,13 +95,13 @@ export function proxy(req: NextRequest) {
     pathname.startsWith("/icons/") ||
     pathname.startsWith("/logos/")
   ) {
-    return finalize(req, NextResponse.next());
+    return finalize(req, nextWithLocale(req));
   }
 
   const session = req.cookies.get("axe_session")?.value;
   if (!session && pathname.startsWith("/api/")) {
     if (PUBLIC_API_PREFIXES.some((p) => pathname.startsWith(p))) {
-      return finalize(req, NextResponse.next());
+      return finalize(req, nextWithLocale(req));
     }
     return finalize(
       req,
@@ -102,7 +113,7 @@ export function proxy(req: NextRequest) {
     url.pathname = "/login";
     return finalize(req, NextResponse.redirect(url));
   }
-  return finalize(req, NextResponse.next());
+  return finalize(req, nextWithLocale(req));
 }
 
 export const config = {
