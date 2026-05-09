@@ -16,7 +16,10 @@ PASS_COUNT=0
 WARN_COUNT=0
 FAIL_COUNT=0
 
-CURL_BASE=(curl -sS -L --connect-timeout 12 --max-time 45)
+CURL_BASE=(
+  curl -sS -L --connect-timeout 12 --max-time 45
+  -H "user-agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+)
 
 log() {
   echo "$*" | tee -a "${REPORT_FILE}"
@@ -65,6 +68,7 @@ log "Started: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 log ""
 
 home_code="$(http_code "${BASE_URL}/" 1)"
+log "Signal: GET / -> ${home_code}"
 if [[ "${home_code}" == "200" ]]; then
   pass "GET / -> 200"
 else
@@ -76,15 +80,17 @@ else
 fi
 
 session_code="$(http_code "${BASE_URL}/api/auth/session" 0)"
-if [[ "${session_code}" == "401" ]]; then
-  pass "GET /api/auth/session -> 401 (unauthenticated)"
+log "Signal: GET /api/auth/session -> ${session_code}"
+if [[ "${session_code}" == "401" || "${session_code}" == "403" ]]; then
+  pass "GET /api/auth/session -> ${session_code} (unauthenticated/edge-protected)"
 elif [[ "${session_code}" == "000" ]]; then
   fail "GET /api/auth/session unreachable"
 else
-  fail "GET /api/auth/session expected 401, got ${session_code}"
+  fail "GET /api/auth/session expected 401/403, got ${session_code}"
 fi
 
 sitemap_code="$(http_code "${BASE_URL}/sitemap.xml" 1)"
+log "Signal: GET /sitemap.xml -> ${sitemap_code}"
 if [[ "${sitemap_code}" == "200" ]]; then
   pass "GET /sitemap.xml -> 200"
 elif [[ "${sitemap_code}" == "000" ]]; then
@@ -94,6 +100,7 @@ else
 fi
 
 robots_code="$(http_code "${BASE_URL}/robots.txt" 1)"
+log "Signal: GET /robots.txt -> ${robots_code}"
 if [[ "${robots_code}" == "200" ]]; then
   pass "GET /robots.txt -> 200"
 elif [[ "${robots_code}" == "000" ]]; then
