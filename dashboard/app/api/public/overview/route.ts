@@ -1,9 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, getClientIp } from "@/lib/security";
+import { getPublicSiteUrl } from "@/lib/siteUrl";
 
+/**
+ * Public canonical base URL for links in this JSON. Prefer Cloudflare / reverse-proxy
+ * forwarded headers so tunnel traffic does not show up as http://localhost:3100.
+ */
 function baseUrlFromRequest(req: NextRequest): string {
-  const origin = req.nextUrl.origin;
-  return origin.endsWith("/") ? origin.slice(0, -1) : origin;
+  const forwardedHost = req.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const forwardedProto = req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  if (forwardedHost) {
+    const proto = forwardedProto || "https";
+    return `${proto}://${forwardedHost}`.replace(/\/+$/, "");
+  }
+
+  const origin = req.nextUrl.origin.replace(/\/+$/, "");
+  if (/localhost|127\.0\.0\.1/i.test(origin)) {
+    return getPublicSiteUrl();
+  }
+  return origin;
 }
 
 export async function GET(req: NextRequest) {
