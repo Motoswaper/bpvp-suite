@@ -80,7 +80,9 @@ const requiredAny = [
   { label: "Linux AppImage", test: (n) => n.endsWith(".AppImage") },
   { label: "Linux deb package", test: (n) => n.endsWith(".deb") },
   { label: "macOS dmg", test: (n) => n.endsWith(".dmg") },
-  { label: "Checksums manifest", test: (n) => n === "checksums.txt" }
+  { label: "Checksums manifest", test: (n) => n === "checksums.txt" },
+  { label: "Checksums signature", test: (n) => n === "checksums.txt.sig" },
+  { label: "Checksums certificate", test: (n) => n === "checksums.txt.pem" }
 ];
 
 const optionalSignals = [
