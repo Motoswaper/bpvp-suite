@@ -24,19 +24,28 @@ function withLocaleCookie(req: NextRequest, res: NextResponse) {
 }
 
 function withSecurityHeaders(res: NextResponse) {
+  const isProduction = process.env.NODE_ENV === "production";
   res.headers.set("X-Frame-Options", "DENY");
   res.headers.set("X-Content-Type-Options", "nosniff");
   res.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   res.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   res.headers.set("Cross-Origin-Opener-Policy", "same-origin");
   res.headers.set("Cross-Origin-Resource-Policy", "same-origin");
-  if (process.env.NODE_ENV === "production") {
+  res.headers.set("Origin-Agent-Cluster", "?1");
+  res.headers.set("X-Permitted-Cross-Domain-Policies", "none");
+  if (isProduction) {
     res.headers.set(
       "Strict-Transport-Security",
       "max-age=63072000; includeSubDomains; preload"
     );
   }
-  const csp = [
+  const scriptSrc = ["script-src", "'self'", "'unsafe-inline'"];
+  if (!isProduction) {
+    // Dev tooling can require eval; keep it out of production.
+    scriptSrc.push("'unsafe-eval'");
+  }
+
+  const cspDirectives = [
     "default-src 'self'",
     "base-uri 'self'",
     "object-src 'none'",
@@ -44,9 +53,13 @@ function withSecurityHeaders(res: NextResponse) {
     "img-src 'self' data: blob:",
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+    scriptSrc.join(" "),
     "connect-src 'self'"
-  ].join("; ");
+  ];
+  if (isProduction) {
+    cspDirectives.push("upgrade-insecure-requests");
+  }
+  const csp = cspDirectives.join("; ");
   res.headers.set("Content-Security-Policy", csp);
   return res;
 }

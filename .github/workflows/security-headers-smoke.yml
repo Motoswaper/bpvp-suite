@@ -1,0 +1,40 @@
+name: INFO - Security Headers Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Public dashboard URL (https, no trailing slash)"
+        required: true
+        default: "https://testnet.btc-defi.com"
+  schedule:
+    - cron: "35 6 * * 1"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+permissions:
+  contents: read
+
+jobs:
+  security-headers-smoke:
+    name: INFO - Validate public security headers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run headers smoke
+        env:
+          SECURITY_HEADERS_SMOKE_URL: ${{ github.event.inputs.base_url || 'https://testnet.btc-defi.com' }}
+        run: |
+          chmod +x ./scripts/security-headers-smoke.sh
+          ./scripts/security-headers-smoke.sh
+
+      - name: Upload headers smoke report
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: security-headers-smoke-report
+          path: .run/security-headers-smoke-*.txt
+          if-no-files-found: warn
