@@ -40,6 +40,7 @@ npm run dev
 - Security incident severity SLAs are documented in `docs/SECURITY_INCIDENT_RESPONSE_POLICY.md`.
 - Risk-to-control mapping is documented in `docs/AUDIT_COVERAGE_MATRIX.md`.
 - Keyless provenance signing baseline is automated in `INFO - Provenance Signing`.
+- Public read-only access endpoints are documented in `docs/PUBLIC_READ_ONLY_ACCESS.md`.
 
 ## Documentation
 
