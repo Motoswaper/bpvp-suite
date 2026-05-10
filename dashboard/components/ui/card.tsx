@@ -50,8 +50,13 @@ export function Card({ title, children, className }: { title: string; children: 
   }, [isSpanish, title]);
 
   return (
-    <section className={cn("rounded-xl border border-slate-800 bg-[#101523] p-4", className)}>
-      <h3 className="mb-3 text-sm font-semibold text-slate-300">{renderedTitle}</h3>
+    <section
+      className={cn(
+        "rounded-xl border border-bpvp-border bg-bpvp-card p-4 shadow-sm",
+        className
+      )}
+    >
+      <h3 className="mb-3 text-sm font-semibold text-bpvp-ink">{renderedTitle}</h3>
       {children}
     </section>
   );

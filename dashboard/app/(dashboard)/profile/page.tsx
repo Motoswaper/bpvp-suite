@@ -547,7 +547,7 @@ export default function Page() {
         whatToTry="Confirm your tester username/role, then use the wallet linking steps below if you need signed wallet identity in tests."
         walletHint="Wallet linking exists via API endpoints today. A wallet can be attached to your session after challenge-sign-verify flow."
       />
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-bpvp-muted">
         {isSpanish
           ? "Resumen de sesion y flujo de vinculacion de wallet para tu cuenta de prueba."
           : "Session overview and wallet-link workflow for your current test account."}
@@ -555,41 +555,41 @@ export default function Page() {
 
       <Card title="Session">
         {data?.session ? (
-          <ul className="text-sm text-slate-300">
+          <ul className="text-sm text-bpvp-ink">
             <li>
-              <span className="text-slate-500">{isSpanish ? "Usuario:" : "User:"}</span> {data.session.username}
+              <span className="text-bpvp-faint">{isSpanish ? "Usuario:" : "User:"}</span> {data.session.username}
             </li>
             <li>
-              <span className="text-slate-500">{isSpanish ? "Rol:" : "Role:"}</span> {data.session.role}
+              <span className="text-bpvp-faint">{isSpanish ? "Rol:" : "Role:"}</span> {data.session.role}
             </li>
             <li>
-              <span className="text-slate-500">MFA:</span> {data.session.mfa ? (isSpanish ? "activado" : "on") : isSpanish ? "desactivado" : "off"}
+              <span className="text-bpvp-faint">MFA:</span> {data.session.mfa ? (isSpanish ? "activado" : "on") : isSpanish ? "desactivado" : "off"}
             </li>
             <li>
-              <span className="text-slate-500">{isSpanish ? "Wallet:" : "Wallet:"}</span>{" "}
+              <span className="text-bpvp-faint">{isSpanish ? "Wallet:" : "Wallet:"}</span>{" "}
               {data.session.walletAddress ? data.session.walletAddress : isSpanish ? "no vinculada" : "not linked"}
             </li>
           </ul>
         ) : (
-          <p className="text-sm text-slate-400">{err || "Loading…"}</p>
+          <p className="text-sm text-bpvp-muted">{err || "Loading…"}</p>
         )}
       </Card>
 
       <Card title={isSpanish ? "Health y Security de Wallet" : "Wallet Health & Security"}>
-        <ul className="space-y-1 text-sm text-slate-300">
+        <ul className="space-y-1 text-sm text-bpvp-ink">
           <li>
-            <span className="text-slate-500">{isSpanish ? "Vinculada:" : "Linked:"}</span>{" "}
+            <span className="text-bpvp-faint">{isSpanish ? "Vinculada:" : "Linked:"}</span>{" "}
             {walletSecurity.linked ? (isSpanish ? "si" : "yes") : isSpanish ? "no" : "no"}
           </li>
           <li>
-            <span className="text-slate-500">{isSpanish ? "Red:" : "Network:"}</span> {walletSecurity.network}
+            <span className="text-bpvp-faint">{isSpanish ? "Red:" : "Network:"}</span> {walletSecurity.network}
           </li>
           <li>
-            <span className="text-slate-500">{isSpanish ? "Metodo de validacion:" : "Validation method:"}</span>{" "}
+            <span className="text-bpvp-faint">{isSpanish ? "Metodo de validacion:" : "Validation method:"}</span>{" "}
             {walletSecurity.method}
           </li>
           <li>
-            <span className="text-slate-500">{isSpanish ? "Postura de seguridad:" : "Security posture:"}</span>{" "}
+            <span className="text-bpvp-faint">{isSpanish ? "Postura de seguridad:" : "Security posture:"}</span>{" "}
             {walletSecurity.posture}
           </li>
         </ul>
@@ -599,35 +599,35 @@ export default function Page() {
         <>
           <Card title="Engine integration (admin)">
             {data?.integration ? (
-              <ul className="space-y-1 text-sm text-slate-300">
+              <ul className="space-y-1 text-sm text-bpvp-ink">
                 <li>
-                  <span className="text-slate-500">Reachable:</span> {data.integration.engineReachable ? "yes" : "no"}
+                  <span className="text-bpvp-faint">Reachable:</span> {data.integration.engineReachable ? "yes" : "no"}
                 </li>
                 <li>
-                  <span className="text-slate-500">Custom ENGINE_URL set:</span> {data.integration.engineUrlConfigured ? "yes" : "no"}
+                  <span className="text-bpvp-faint">Custom ENGINE_URL set:</span> {data.integration.engineUrlConfigured ? "yes" : "no"}
                 </li>
                 <li>
-                  <span className="text-slate-500">Server API key:</span> {data.integration.hasServerApiKey ? "configured" : "missing"}
+                  <span className="text-bpvp-faint">Server API key:</span> {data.integration.hasServerApiKey ? "configured" : "missing"}
                 </li>
                 <li>
-                  <span className="text-slate-500">Server HMAC secret:</span> {data.integration.hasServerHmac ? "configured" : "missing"}
+                  <span className="text-bpvp-faint">Server HMAC secret:</span> {data.integration.hasServerHmac ? "configured" : "missing"}
                 </li>
                 <li>
-                  <span className="text-slate-500">Active modules:</span>{" "}
-                  <span className="font-mono text-xs text-slate-400">{(data.integration.engineModules ?? []).join(", ") || "—"}</span>
+                  <span className="text-bpvp-faint">Active modules:</span>{" "}
+                  <span className="font-mono text-xs text-bpvp-muted">{(data.integration.engineModules ?? []).join(", ") || "—"}</span>
                 </li>
               </ul>
             ) : (
-              <p className="text-sm text-slate-400">—</p>
+              <p className="text-sm text-bpvp-muted">—</p>
             )}
           </Card>
 
           <Card title="Workspace (admin)">
-            <p className="text-sm text-slate-400">
-              Default workspace label: <strong className="text-slate-200">BPVP Ops</strong>. Point{" "}
-              <code className="text-slate-300">ENGINE_URL</code>, <code className="text-slate-300">AXE_API_KEY</code>, and{" "}
-              <code className="text-slate-300">AXE_HMAC_SECRET</code> at your running suite (see{" "}
-              <code className="text-slate-300">bpvp-suite/.run/local-secrets.env</code> when using local scripts).
+            <p className="text-sm text-bpvp-muted">
+              Default workspace label: <strong className="text-bpvp-ink">BPVP Ops</strong>. Point{" "}
+              <code className="text-bpvp-ink">ENGINE_URL</code>, <code className="text-bpvp-ink">AXE_API_KEY</code>, and{" "}
+              <code className="text-bpvp-ink">AXE_HMAC_SECRET</code> at your running suite (see{" "}
+              <code className="text-bpvp-ink">bpvp-suite/.run/local-secrets.env</code> when using local scripts).
             </p>
           </Card>
         </>
@@ -726,7 +726,7 @@ export default function Page() {
             type="button"
             onClick={() => void generateBitcoinChallengeSafe()}
             disabled={btcWalletBusy}
-            className="rounded-md bg-slate-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-md bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isSpanish ? "Generar challenge BTC" : "Generate BTC challenge"}
           </button>
@@ -743,7 +743,7 @@ export default function Page() {
           <button
             type="button"
             onClick={() => void refreshSummary()}
-            className="rounded-md bg-slate-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700"
+            className="rounded-md bg-bpvp-hover px-3 py-1.5 text-xs font-medium text-bpvp-ink hover:bg-bpvp-border-strong"
           >
             {isSpanish ? "Refrescar sesion" : "Refresh session"}
           </button>
@@ -759,7 +759,7 @@ export default function Page() {
                 : "Quick mode: paste address + signature here as one block (JSON or text lines)."
             }
             rows={3}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-100"
+            className="w-full rounded-md border border-bpvp-input-border bg-bpvp-input px-3 py-2 text-xs text-bpvp-ink"
           />
           <div>
             <button
@@ -779,19 +779,19 @@ export default function Page() {
                 ? "Mensaje challenge para firmar (se copia al portapapeles)"
                 : "Challenge message to sign (auto-copied to clipboard)"
             }
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-300"
+            className="w-full rounded-md border border-bpvp-input-border bg-bpvp-input px-3 py-2 text-xs text-bpvp-ink"
           />
           <input
             value={btcAddress}
             onChange={(e) => setBtcAddress(e.target.value)}
             placeholder={isSpanish ? "Paso 2: Pega direccion BTC (ej. tb1...)" : "Step 2: Paste BTC address (e.g. tb1...)"}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-100"
+            className="w-full rounded-md border border-bpvp-input-border bg-bpvp-input px-3 py-2 text-xs text-bpvp-ink"
           />
           <input
             value={btcSignature}
             onChange={(e) => setBtcSignature(e.target.value)}
             placeholder={isSpanish ? "Paso 3: Pega firma del challenge" : "Step 3: Paste signature for challenge"}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-xs text-slate-100"
+            className="w-full rounded-md border border-bpvp-input-border bg-bpvp-input px-3 py-2 text-xs text-bpvp-ink"
           />
           <div>
             <button
@@ -804,7 +804,7 @@ export default function Page() {
             </button>
           </div>
         </div>
-        <ol className="list-decimal space-y-1 pl-5 text-sm text-slate-300">
+        <ol className="list-decimal space-y-1 pl-5 text-sm text-bpvp-ink">
           <li>
             {isSpanish
               ? "Flujo recomendado: Paso 1 (challenge) -> firma en wallet -> pega bloque -> Quick verify."
@@ -812,21 +812,21 @@ export default function Page() {
           </li>
           <li>
             {isSpanish ? "Llama " : "Call "}
-            <code className="text-slate-200">POST /api/auth/wallet/challenge</code>
+            <code className="text-bpvp-ink">POST /api/auth/wallet/challenge</code>
             {isSpanish ? " con sesion iniciada." : " while signed in."}
           </li>
           <li>
             {isSpanish ? "Firma el mensaje " : "Sign returned message "}
-            <code className="text-slate-200">BPVP wallet link nonce: ...</code>
+            <code className="text-bpvp-ink">BPVP wallet link nonce: ...</code>
             {isSpanish ? " en tu wallet." : " in your wallet."}
           </li>
           <li>
             {isSpanish ? "Llama " : "Call "}
-            <code className="text-slate-200">POST /api/auth/wallet/verify</code>
+            <code className="text-bpvp-ink">POST /api/auth/wallet/verify</code>
             {isSpanish ? " con " : " with "}
-            <code className="text-slate-200">address</code>, <code className="text-slate-200">nonce</code>
+            <code className="text-bpvp-ink">address</code>, <code className="text-bpvp-ink">nonce</code>
             {isSpanish ? " y " : ", and "}
-            <code className="text-slate-200">signature</code>.
+            <code className="text-bpvp-ink">signature</code>.
           </li>
           <li>{isSpanish ? "Si es exitoso, la sesion se reemite con wallet vinculada." : "On success, session is reissued with linked wallet address."}</li>
         </ol>
@@ -851,7 +851,7 @@ export default function Page() {
             <li>{isSpanish ? "Si persiste, genera un challenge nuevo y repite." : "If it persists, generate a new challenge and retry."}</li>
           </ul>
         </div>
-        <p className="mt-3 text-xs text-slate-400">
+        <p className="mt-3 text-xs text-bpvp-muted">
           {isSpanish
             ? "Nota: se agrego beta para wallet Bitcoin (Unisat/OKX + modo manual). Para cobertura institucional completa falta fase de compatibilidad ampliada BIP-322/PSBT multi-wallet."
             : "Note: Bitcoin wallet beta is now added (Unisat/OKX + manual mode). Full institutional coverage still requires expanded multi-wallet BIP-322/PSBT compatibility phase."}

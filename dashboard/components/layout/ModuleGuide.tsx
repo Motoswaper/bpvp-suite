@@ -102,23 +102,23 @@ export function ModuleGuide({ whatThisDoes, whatToTry, walletHint }: ModuleGuide
     }[keyWallet] ?? walletHint;
 
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-950/50 p-4 text-sm">
-      <p className="text-slate-300">
-        <span className="font-semibold text-slate-100 bpvp-i18n-en">What this module does:</span>
-        <span className="font-semibold text-slate-100 bpvp-i18n-es">Que hace este modulo:</span>{" "}
+    <div className="rounded-lg border border-bpvp-border bg-bpvp-card-dim p-3 text-xs leading-relaxed text-bpvp-muted">
+      <p>
+        <span className="font-semibold text-bpvp-ink bpvp-i18n-en">What this module does:</span>
+        <span className="font-semibold text-bpvp-ink bpvp-i18n-es">Que hace este modulo:</span>{" "}
         <span className="bpvp-i18n-en">{whatThisDoes}</span>
         <span className="bpvp-i18n-es">{translatedWhat}</span>
       </p>
-      <p className="mt-2 text-slate-300">
-        <span className="font-semibold text-slate-100 bpvp-i18n-en">What you should do in testnet:</span>
-        <span className="font-semibold text-slate-100 bpvp-i18n-es">Que debes hacer en testnet:</span>{" "}
+      <p className="mt-2">
+        <span className="font-semibold text-bpvp-ink bpvp-i18n-en">What you should do in testnet:</span>
+        <span className="font-semibold text-bpvp-ink bpvp-i18n-es">Que debes hacer en testnet:</span>{" "}
         <span className="bpvp-i18n-en">{whatToTry}</span>
         <span className="bpvp-i18n-es">{translatedTry}</span>
       </p>
       {walletHint ? (
-        <p className="mt-2 text-slate-400">
-          <span className="font-semibold text-slate-300 bpvp-i18n-en">Wallet note:</span>
-          <span className="font-semibold text-slate-300 bpvp-i18n-es">Nota de wallet:</span>{" "}
+        <p className="mt-2 text-bpvp-faint">
+          <span className="font-semibold text-bpvp-muted bpvp-i18n-en">Wallet note:</span>
+          <span className="font-semibold text-bpvp-muted bpvp-i18n-es">Nota de wallet:</span>{" "}
           <span className="bpvp-i18n-en">{walletHint}</span>
           <span className="bpvp-i18n-es">{translatedWallet}</span>
         </p>

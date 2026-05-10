@@ -1,9 +1,8 @@
 import "@/styles/globals.css";
 import { StaticLocaleProvider } from "@/components/layout/LocaleGate";
 import { ThemeBoot } from "@/components/layout/ThemeBoot";
-import { DeploymentBanner } from "@/components/layout/DeploymentBanner";
-import { GlobalFooter } from "@/components/layout/GlobalFooter";
-import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { ConditionalMarketingChrome } from "@/components/layout/ConditionalMarketingChrome";
+import { ThemeSync } from "@/components/layout/ThemeSync";
 import { BRAND_ASSETS } from "@/lib/brandAssets";
 import { getServerLocale } from "@/lib/serverLocale";
 import { getPublicSiteUrl } from "@/lib/siteUrl";
@@ -71,17 +70,15 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const theme = themeRaw === "dark" ? "dark" : "light";
 
   return (
-    <html lang={locale} data-theme={theme} data-bpvp-locale={locale} suppressHydrationWarning>
+    // Do not set data-theme here — RSC updates would overwrite the client's night/day toggle.
+    // ThemeBoot (inline script) + ThemeSync apply data-theme from localStorage/cookie.
+    <html lang={locale} data-bpvp-locale={locale} suppressHydrationWarning>
       <body className="min-h-screen bg-bpvp-page text-bpvp-ink antialiased">
         <ThemeBoot />
-        <DeploymentBanner />
-        <header className="sticky top-0 z-50 border-b border-bpvp-border bg-bpvp-page/95 backdrop-blur supports-[backdrop-filter]:bg-bpvp-page/80">
-          <div className="mx-auto flex max-w-6xl items-center justify-end px-3 py-2">
-            <LanguageSwitcher currentLocale={locale} currentTheme={theme} />
-          </div>
-        </header>
-        <StaticLocaleProvider locale={locale}>{children}</StaticLocaleProvider>
-        <GlobalFooter locale={locale} />
+        <ThemeSync serverTheme={theme} />
+        <ConditionalMarketingChrome locale={locale} theme={theme}>
+          <StaticLocaleProvider locale={locale}>{children}</StaticLocaleProvider>
+        </ConditionalMarketingChrome>
       </body>
     </html>
   );

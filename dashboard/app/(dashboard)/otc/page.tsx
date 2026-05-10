@@ -182,7 +182,7 @@ export default function OTCPage() {
         whatToTry="Create one RFQ, submit at least one quote, accept a quote into a trade, then settle that trade."
         walletHint='Use desk/test identities in forms. Wallet linking is available in "Profile" and not required for basic OTC tests.'
       />
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-bpvp-muted">
         {isSpanish
           ? "Flujo OTC en engine: creacion de RFQ, envio de cotizacion del maker, aceptacion del taker y liquidacion explicita."
           : "OTC desk workflow in-engine: RFQ creation, maker quote submission, taker quote acceptance, and explicit settlement marking."}
@@ -190,63 +190,63 @@ export default function OTCPage() {
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <Card title="Open RFQs">
-          <p className="text-2xl font-semibold text-slate-200">{Object.keys(data?.openRfqs ?? {}).length}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">{Object.keys(data?.openRfqs ?? {}).length}</p>
         </Card>
         <Card title="Open trades">
-          <p className="text-2xl font-semibold text-slate-200">{Object.keys(data?.openTrades ?? {}).length}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">{Object.keys(data?.openTrades ?? {}).length}</p>
         </Card>
         <Card title="Quotes total">
-          <p className="text-2xl font-semibold text-slate-200">{(data?.quotes ?? []).length}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">{(data?.quotes ?? []).length}</p>
         </Card>
         <Card title="Trades total">
-          <p className="text-2xl font-semibold text-slate-200">{(data?.trades ?? []).length}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">{(data?.trades ?? []).length}</p>
         </Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card title="Create RFQ">
           <form className="grid gap-2 text-sm" onSubmit={onCreateRFQ}>
-            <input name="rfqId" placeholder="RFQ ID (optional) e.g. rfq_20260429_001" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="pair" placeholder={isSpanish ? "Par (ej. BTC/USD)" : "Pair (e.g. BTC/USD)"} required className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <select name="side" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5">
+            <input name="rfqId" placeholder="RFQ ID (optional) e.g. rfq_20260429_001" className="bpvp-field" />
+            <input name="pair" placeholder={isSpanish ? "Par (ej. BTC/USD)" : "Pair (e.g. BTC/USD)"} required className="bpvp-field" />
+            <select name="side" className="bpvp-field">
               <option value="buy">{isSpanish ? "compra" : "buy"}</option>
               <option value="sell">{isSpanish ? "venta" : "sell"}</option>
             </select>
-            <input name="quantity" type="number" min={0} step="any" required placeholder={isSpanish ? "Cantidad ej. 2.5" : "Quantity e.g. 2.5"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="requester" required placeholder={isSpanish ? "Solicitante desk/usuario ej. desk-latam-01" : "Requester desk/user e.g. desk-latam-01"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="limitPrice" type="number" min={0} step="any" placeholder={isSpanish ? "Precio limite (opcional) ej. 64500" : "Limit price (optional) e.g. 64500"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="expiresAt" type="number" min={0} step="1" placeholder={isSpanish ? "Expira Unix (opcional) ej. 1767225600" : "ExpiresAt Unix (optional) e.g. 1767225600"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="notes" placeholder={isSpanish ? "Notas (opcional) ej. ventana NYC AM" : "Notes (optional) e.g. NYC AM window"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+            <input name="quantity" type="number" min={0} step="any" required placeholder={isSpanish ? "Cantidad ej. 2.5" : "Quantity e.g. 2.5"} className="bpvp-field" />
+            <input name="requester" required placeholder={isSpanish ? "Solicitante desk/usuario ej. desk-latam-01" : "Requester desk/user e.g. desk-latam-01"} className="bpvp-field" />
+            <input name="limitPrice" type="number" min={0} step="any" placeholder={isSpanish ? "Precio limite (opcional) ej. 64500" : "Limit price (optional) e.g. 64500"} className="bpvp-field" />
+            <input name="expiresAt" type="number" min={0} step="1" placeholder={isSpanish ? "Expira Unix (opcional) ej. 1767225600" : "ExpiresAt Unix (optional) e.g. 1767225600"} className="bpvp-field" />
+            <input name="notes" placeholder={isSpanish ? "Notas (opcional) ej. ventana NYC AM" : "Notes (optional) e.g. NYC AM window"} className="bpvp-field" />
             <Button type="submit" disabled={busy}>{isSpanish ? "Crear RFQ" : "Create RFQ"}</Button>
           </form>
         </Card>
 
         <Card title="Submit quote">
           <form className="grid gap-2 text-sm" onSubmit={onSubmitQuote}>
-            <input name="quoteId" placeholder={isSpanish ? "ID Cotizacion (opcional) ej. qte_20260429_001" : "Quote ID (optional) e.g. qte_20260429_001"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="rfqId" required placeholder="RFQ ID e.g. rfq_20260429_001" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="maker" required placeholder={isSpanish ? "Maker desk/usuario ej. mm-desk-01" : "Maker desk/user e.g. mm-desk-01"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="price" type="number" min={0} step="any" required placeholder={isSpanish ? "Precio ej. 64320.5" : "Price e.g. 64320.5"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="quantity" type="number" min={0} step="any" required placeholder={isSpanish ? "Cantidad ej. 1.25" : "Quantity e.g. 1.25"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="validUntil" type="number" min={0} step="1" placeholder={isSpanish ? "Valida hasta Unix (opcional) ej. 1767225600" : "ValidUntil Unix (optional) e.g. 1767225600"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+            <input name="quoteId" placeholder={isSpanish ? "ID Cotizacion (opcional) ej. qte_20260429_001" : "Quote ID (optional) e.g. qte_20260429_001"} className="bpvp-field" />
+            <input name="rfqId" required placeholder="RFQ ID e.g. rfq_20260429_001" className="bpvp-field" />
+            <input name="maker" required placeholder={isSpanish ? "Maker desk/usuario ej. mm-desk-01" : "Maker desk/user e.g. mm-desk-01"} className="bpvp-field" />
+            <input name="price" type="number" min={0} step="any" required placeholder={isSpanish ? "Precio ej. 64320.5" : "Price e.g. 64320.5"} className="bpvp-field" />
+            <input name="quantity" type="number" min={0} step="any" required placeholder={isSpanish ? "Cantidad ej. 1.25" : "Quantity e.g. 1.25"} className="bpvp-field" />
+            <input name="validUntil" type="number" min={0} step="1" placeholder={isSpanish ? "Valida hasta Unix (opcional) ej. 1767225600" : "ValidUntil Unix (optional) e.g. 1767225600"} className="bpvp-field" />
             <Button type="submit" disabled={busy}>{isSpanish ? "Enviar cotizacion" : "Submit quote"}</Button>
           </form>
         </Card>
 
         <Card title="Accept quote (create trade)">
           <form className="grid gap-2 text-sm" onSubmit={onAcceptQuote}>
-            <input name="tradeId" placeholder={isSpanish ? "ID Trade (opcional) ej. trd_20260429_001" : "Trade ID (optional) e.g. trd_20260429_001"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="rfqId" required placeholder="RFQ ID e.g. rfq_20260429_001" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="quoteId" required placeholder="Quote ID e.g. qte_20260429_001" className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="taker" required placeholder={isSpanish ? "Taker desk/usuario ej. buy-desk-03" : "Taker desk/user e.g. buy-desk-03"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+            <input name="tradeId" placeholder={isSpanish ? "ID Trade (opcional) ej. trd_20260429_001" : "Trade ID (optional) e.g. trd_20260429_001"} className="bpvp-field" />
+            <input name="rfqId" required placeholder="RFQ ID e.g. rfq_20260429_001" className="bpvp-field" />
+            <input name="quoteId" required placeholder="Quote ID e.g. qte_20260429_001" className="bpvp-field" />
+            <input name="taker" required placeholder={isSpanish ? "Taker desk/usuario ej. buy-desk-03" : "Taker desk/user e.g. buy-desk-03"} className="bpvp-field" />
             <Button type="submit" disabled={busy}>{isSpanish ? "Aceptar cotizacion" : "Accept quote"}</Button>
           </form>
         </Card>
 
         <Card title="Settle trade">
           <form className="grid gap-2 text-sm" onSubmit={onSettleTrade}>
-            <input name="tradeId" required placeholder={isSpanish ? "ID Trade ej. trd_20260429_001" : "Trade ID e.g. trd_20260429_001"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-            <input name="settleRef" required placeholder={isSpanish ? "Referencia liquidacion / txid ej. b3f1a9...c72e" : "Settlement reference / txid e.g. b3f1a9...c72e"} className="rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+            <input name="tradeId" required placeholder={isSpanish ? "ID Trade ej. trd_20260429_001" : "Trade ID e.g. trd_20260429_001"} className="bpvp-field" />
+            <input name="settleRef" required placeholder={isSpanish ? "Referencia liquidacion / txid ej. b3f1a9...c72e" : "Settlement reference / txid e.g. b3f1a9...c72e"} className="bpvp-field" />
             <Button type="submit" disabled={busy}>{isSpanish ? "Liquidar trade" : "Settle trade"}</Button>
           </form>
         </Card>
@@ -254,9 +254,9 @@ export default function OTCPage() {
 
       <Card title="RFQs">
         {loading ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Cargando..." : "Loading..."}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Cargando..." : "Loading..."}</p>
         ) : rfqs.length === 0 ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Aun no hay RFQs." : "No RFQs yet."}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Aun no hay RFQs." : "No RFQs yet."}</p>
         ) : (
           <Table
             headers={isSpanish ? ["ID", "Par", "Lado", "Cant", "Solicitante", "Estado", "Creado"] : ["ID", "Pair", "Side", "Qty", "Requester", "Status", "Created"]}
@@ -275,7 +275,7 @@ export default function OTCPage() {
 
       <Card title="Quotes">
         {quotes.length === 0 ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Aun no hay cotizaciones." : "No quotes yet."}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Aun no hay cotizaciones." : "No quotes yet."}</p>
         ) : (
           <Table
             headers={isSpanish ? ["ID", "RFQ", "Maker", "Precio", "Cant", "Estado", "Creado"] : ["ID", "RFQ", "Maker", "Price", "Qty", "Status", "Created"]}
@@ -294,7 +294,7 @@ export default function OTCPage() {
 
       <Card title="Trades">
         {trades.length === 0 ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Aun no hay trades." : "No trades yet."}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Aun no hay trades." : "No trades yet."}</p>
         ) : (
           <Table
             headers={isSpanish ? ["ID", "Par", "Comprador", "Vendedor", "Precio", "Cant", "Estado", "Ref liquidacion"] : ["ID", "Pair", "Buyer", "Seller", "Price", "Qty", "Status", "Settle ref"]}
@@ -313,7 +313,7 @@ export default function OTCPage() {
       </Card>
 
       <Card title="History tail">
-        <ul className="max-h-40 overflow-auto text-xs text-slate-500">
+        <ul className="max-h-40 overflow-auto text-xs text-bpvp-faint">
           {(data?.history ?? []).slice(-40).map((h, i) => (
             <li key={`${i}-${h}`}>{h}</li>
           ))}
@@ -321,7 +321,7 @@ export default function OTCPage() {
       </Card>
 
       {error ? <p className="rounded-md border border-rose-800 bg-rose-950/40 p-3 text-sm text-rose-300">{error}</p> : null}
-      {msg ? <p className="rounded-md border border-slate-700 bg-slate-900/60 p-3 text-sm text-slate-200">{msg}</p> : null}
+      {msg ? <p className="rounded-md border border-bpvp-border bg-bpvp-hover p-3 text-sm text-bpvp-ink">{msg}</p> : null}
     </section>
   );
 }

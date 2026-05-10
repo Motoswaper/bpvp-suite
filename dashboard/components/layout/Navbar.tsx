@@ -60,16 +60,10 @@ export function Navbar({ title }: { title: string }) {
           <span>{quickLabel}</span>
         </a>
       </div>
-      <section className="relative overflow-hidden rounded-xl border border-bpvp-border bg-bpvp-card">
-        <img
-          src="/brand/hero-banner.png"
-          alt={isSpanish ? "Banner del modulo" : "Module banner"}
-          className="h-20 w-full object-cover sm:h-24"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-        <div className="absolute inset-0 flex items-end justify-between px-4 py-3">
-          <h2 className="text-xl font-semibold text-white sm:text-2xl">{renderedTitle}</h2>
-          <p className="text-xs text-slate-200">{subtitle}</p>
+      <section className="rounded-xl border border-bpvp-border bg-bpvp-card px-4 py-3">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <h2 className="text-lg font-semibold text-bpvp-ink sm:text-xl">{renderedTitle}</h2>
+          <p className="text-xs text-bpvp-muted">{subtitle}</p>
         </div>
       </section>
     </header>

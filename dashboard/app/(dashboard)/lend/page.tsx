@@ -60,7 +60,7 @@ export default function Page() {
         whatToTry="Create one or more borrow positions and confirm pool/position values and APY views update as expected."
         walletHint='Wallet linking is not mandatory for lend simulation tests; use "Profile" only if you need wallet-attached sessions.'
       />
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-bpvp-muted">
         {isSpanish
           ? "Liquidez de pools y posiciones de prestamo de desk en simulacion de engine."
           : "Pool liquidity and desk borrow positions in the engine simulation. This backs desk stress and collateral views; wire real lending policies in the risk layer as you harden for production."}
@@ -68,9 +68,9 @@ export default function Page() {
 
       <Card title="Pools">
         {loading ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Cargando…" : "Loading…"}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Cargando…" : "Loading…"}</p>
         ) : poolRows.length === 0 ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Sin filas de pools." : "No pool rows."}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Sin filas de pools." : "No pool rows."}</p>
         ) : (
           <Table
             headers={["Pool", "Liquidity", "APY %"]}
@@ -81,7 +81,7 @@ export default function Page() {
 
       <Card title="Open positions">
         {positions.length === 0 ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Aun no hay posiciones." : "No positions yet."}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Aun no hay posiciones." : "No positions yet."}</p>
         ) : (
           <Table
             headers={["User", "Collateral", "Debt", "APY %"]}
@@ -100,16 +100,16 @@ export default function Page() {
       <Card title="Simulate borrow (engine action)">
         <form className="grid gap-3 text-sm md:grid-cols-4 md:items-end" onSubmit={onBorrow}>
           <label className="block space-y-1 md:col-span-2">
-              <span className="text-slate-400">{isSpanish ? "Usuario / desk" : "User / desk"}</span>
-            <input name="user" required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
+              <span className="text-bpvp-muted">{isSpanish ? "Usuario / desk" : "User / desk"}</span>
+            <input name="user" required className="w-full bpvp-field font-mono text-xs" />
           </label>
           <label className="block space-y-1">
-              <span className="text-slate-400">{isSpanish ? "Colateral" : "Collateral"}</span>
-            <input name="collateral" type="number" step="any" min={0} required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+              <span className="text-bpvp-muted">{isSpanish ? "Colateral" : "Collateral"}</span>
+            <input name="collateral" type="number" step="any" min={0} required className="w-full bpvp-field" />
           </label>
           <label className="block space-y-1">
-              <span className="text-slate-400">{isSpanish ? "Deuda" : "Debt"}</span>
-            <input name="debt" type="number" step="any" min={0} required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+              <span className="text-bpvp-muted">{isSpanish ? "Deuda" : "Debt"}</span>
+            <input name="debt" type="number" step="any" min={0} required className="w-full bpvp-field" />
           </label>
           <div className="md:col-span-4">
             <Button type="submit" disabled={busy}>
@@ -120,7 +120,7 @@ export default function Page() {
       </Card>
 
       {error ? <p className="rounded-md border border-rose-800 bg-rose-950/40 p-3 text-sm text-rose-300">{error}</p> : null}
-      {msg ? <p className="rounded-md border border-slate-700 bg-slate-900/60 p-3 text-sm text-slate-200">{msg}</p> : null}
+      {msg ? <p className="rounded-md border border-bpvp-border bg-bpvp-hover p-3 text-sm text-bpvp-ink">{msg}</p> : null}
     </section>
   );
 }

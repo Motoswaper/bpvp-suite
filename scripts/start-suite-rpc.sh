@@ -23,6 +23,7 @@ AXE_API_KEY="$(awk -F= '$1 == "AXE_API_KEY" { sub(/^[^=]*=/, ""); print; exit }'
 AXE_HMAC_SECRET="$(awk -F= '$1 == "AXE_HMAC_SECRET" { sub(/^[^=]*=/, ""); print; exit }' "$SECRETS_FILE")"
 DASHBOARD_PASSWORD="$(awk -F= '$1 == "DASHBOARD_PASSWORD" { sub(/^[^=]*=/, ""); print; exit }' "$SECRETS_FILE")"
 BPVP_ALLOW_PUBLIC_REGISTER_VALUE="${BPVP_ALLOW_PUBLIC_REGISTER:-$(awk -F= '$1 == "BPVP_ALLOW_PUBLIC_REGISTER" { sub(/^[^=]*=/, ""); print; exit }' "$SECRETS_FILE")}"
+BPVP_ALLOW_PUBLIC_REGISTER_VALUE="${BPVP_ALLOW_PUBLIC_REGISTER_VALUE:-true}"
 BPVP_MARKETPLACE_PUBLIC_API_KEY_VALUE="${BPVP_MARKETPLACE_PUBLIC_API_KEY:-$(awk -F= '$1 == "BPVP_MARKETPLACE_PUBLIC_API_KEY" { sub(/^[^=]*=/, ""); print; exit }' "$SECRETS_FILE")}"
 BPVP_MARKETPLACE_CORS_ORIGIN_VALUE="${BPVP_MARKETPLACE_CORS_ORIGIN:-$(awk -F= '$1 == "BPVP_MARKETPLACE_CORS_ORIGIN" { sub(/^[^=]*=/, ""); print; exit }' "$SECRETS_FILE")}"
 BPVP_MARKETPLACE_ALLOWED_WRITE_ORIGINS_VALUE="${BPVP_MARKETPLACE_ALLOWED_WRITE_ORIGINS:-$(awk -F= '$1 == "BPVP_MARKETPLACE_ALLOWED_WRITE_ORIGINS" { sub(/^[^=]*=/, ""); print; exit }' "$SECRETS_FILE")}"
@@ -59,6 +60,7 @@ else
   fi
   (
     PORT="${PORT:-3100}" \
+    BPVP_DOCS_DIR="$ROOT_DIR/docs" \
     BPVP_SESSION_COOKIE_SECURE=false \
     ENGINE_URL="${ENGINE_URL:-http://localhost:28080}" \
     AXE_API_KEY="$AXE_API_KEY" \

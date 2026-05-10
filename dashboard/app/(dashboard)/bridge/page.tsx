@@ -123,11 +123,11 @@ export default function BridgePage() {
         <>
           <Card title={isSpanish ? "Encolar Jobs de Bridge (admin)" : "Enqueue Bridge Jobs (admin)"}>
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-              <input value={tokenId} onChange={(e) => setTokenId(e.target.value)} placeholder="tokenId e.g. nft-001" className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-              <input value={network} onChange={(e) => setNetwork(e.target.value)} placeholder={isSpanish ? "red ej. ethereum" : "network e.g. ethereum"} className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-              <input value={standard} onChange={(e) => setStandard(e.target.value)} placeholder={isSpanish ? "estandar ej. erc721" : "standard e.g. erc721"} className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-              <input value={contract} onChange={(e) => setContract(e.target.value)} placeholder="contract e.g. 0xAbC123...7890" className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-              <input value={externalTokenId} onChange={(e) => setExternalTokenId(e.target.value)} placeholder="externalTokenId e.g. 1001" className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
+              <input value={tokenId} onChange={(e) => setTokenId(e.target.value)} placeholder="tokenId e.g. nft-001" className="bpvp-field-tight" />
+              <input value={network} onChange={(e) => setNetwork(e.target.value)} placeholder={isSpanish ? "red ej. ethereum" : "network e.g. ethereum"} className="bpvp-field-tight" />
+              <input value={standard} onChange={(e) => setStandard(e.target.value)} placeholder={isSpanish ? "estandar ej. erc721" : "standard e.g. erc721"} className="bpvp-field-tight" />
+              <input value={contract} onChange={(e) => setContract(e.target.value)} placeholder="contract e.g. 0xAbC123...7890" className="bpvp-field-tight" />
+              <input value={externalTokenId} onChange={(e) => setExternalTokenId(e.target.value)} placeholder="externalTokenId e.g. 1001" className="bpvp-field-tight" />
             </div>
             <div className="mt-3 flex flex-wrap gap-2">
               <button disabled={busy} onClick={() => void runAction("bridge_enqueue_mint", { tokenId, network, standard, contract, externalTokenId })} className="rounded bg-emerald-700 px-3 py-1 text-sm hover:bg-emerald-600 disabled:opacity-50">{isSpanish ? "Encolar Mint" : "Enqueue Mint"}</button>
@@ -138,13 +138,13 @@ export default function BridgePage() {
 
           <Card title="Bridge Policy (Admin)">
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <label className="flex items-center gap-2 text-xs text-slate-300">
+          <label className="flex items-center gap-2 text-xs text-bpvp-ink">
             <input type="checkbox" checked={requireDualApproval} onChange={(e) => setRequireDualApproval(e.target.checked)} />
             {isSpanish ? "Requiere doble aprobacion (4-ojos)" : "Require dual approval (4-eyes)"}
           </label>
-          <input value={allowedNetworks} onChange={(e) => setAllowedNetworks(e.target.value)} placeholder={isSpanish ? "redes permitidas (coma) ej. ethereum,solana" : "allowed networks (comma) e.g. ethereum,solana"} className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-          <input value={allowedStandards} onChange={(e) => setAllowedStandards(e.target.value)} placeholder={isSpanish ? "estandares (coma) ej. erc721,mpl-core" : "allowed standards (comma) e.g. erc721,mpl-core"} className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-          <input value={allowedContracts} onChange={(e) => setAllowedContracts(e.target.value)} placeholder={isSpanish ? "contratos (coma, opcional) ej. 0xA...,0xB..." : "allowed contracts (comma, optional) e.g. 0xA...,0xB..."} className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
+          <input value={allowedNetworks} onChange={(e) => setAllowedNetworks(e.target.value)} placeholder={isSpanish ? "redes permitidas (coma) ej. ethereum,solana" : "allowed networks (comma) e.g. ethereum,solana"} className="bpvp-field-tight" />
+          <input value={allowedStandards} onChange={(e) => setAllowedStandards(e.target.value)} placeholder={isSpanish ? "estandares (coma) ej. erc721,mpl-core" : "allowed standards (comma) e.g. erc721,mpl-core"} className="bpvp-field-tight" />
+          <input value={allowedContracts} onChange={(e) => setAllowedContracts(e.target.value)} placeholder={isSpanish ? "contratos (coma, opcional) ej. 0xA...,0xB..." : "allowed contracts (comma, optional) e.g. 0xA...,0xB..."} className="bpvp-field-tight" />
         </div>
         <div className="mt-3 flex gap-2">
           <button
@@ -162,17 +162,17 @@ export default function BridgePage() {
             {isSpanish ? "Aplicar Politica" : "Apply Policy"}
           </button>
         </div>
-        <p className="mt-2 text-xs text-slate-400">
+        <p className="mt-2 text-xs text-bpvp-muted">
           {isSpanish ? "Politica activa" : "Active policy"}: dualApproval={String(policy.requireDualApproval ?? false)} | networks={(policy.allowedNetworks ?? []).join(",") || "-"} | standards={(policy.allowedStandards ?? []).join(",") || "-"}
         </p>
           </Card>
 
           <Card title={isSpanish ? "Ciclo de Vida de Job de Bridge (admin)" : "Bridge Job Lifecycle (admin)"}>
         <div className="grid gap-2 sm:grid-cols-4">
-          <input value={jobId} onChange={(e) => setJobId(e.target.value)} placeholder="jobId e.g. 12" className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-          <input value={approver} onChange={(e) => setApprover(e.target.value)} placeholder={isSpanish ? "id aprobador ej. ops-admin-1" : "approver id e.g. ops-admin-1"} className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-          <input value={txHash} onChange={(e) => setTxHash(e.target.value)} placeholder={isSpanish ? "txHash (opcional) ej. 0xabc123...def9" : "txHash (optional) e.g. 0xabc123...def9"} className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
-          <input value={bridgeError} onChange={(e) => setBridgeError(e.target.value)} placeholder={isSpanish ? "texto de error ej. contract not allowed" : "error text e.g. contract not allowed"} className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-sm" />
+          <input value={jobId} onChange={(e) => setJobId(e.target.value)} placeholder="jobId e.g. 12" className="bpvp-field-tight" />
+          <input value={approver} onChange={(e) => setApprover(e.target.value)} placeholder={isSpanish ? "id aprobador ej. ops-admin-1" : "approver id e.g. ops-admin-1"} className="bpvp-field-tight" />
+          <input value={txHash} onChange={(e) => setTxHash(e.target.value)} placeholder={isSpanish ? "txHash (opcional) ej. 0xabc123...def9" : "txHash (optional) e.g. 0xabc123...def9"} className="bpvp-field-tight" />
+          <input value={bridgeError} onChange={(e) => setBridgeError(e.target.value)} placeholder={isSpanish ? "texto de error ej. contract not allowed" : "error text e.g. contract not allowed"} className="bpvp-field-tight" />
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           <button disabled={busy || !jobId || !approver} onClick={() => void runAction("bridge_approve_job", { jobId: Number(jobId), approver })} className="rounded bg-amber-700 px-3 py-1 text-sm hover:bg-amber-600 disabled:opacity-50">{isSpanish ? "Aprobar" : "Approve"}</button>
@@ -184,7 +184,7 @@ export default function BridgePage() {
         </>
       ) : (
         <Card title="Bridge Access">
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-bpvp-muted">
             {isSpanish
               ? "La ejecucion de bridge y controles de politica estan restringidos a administradores en este testnet."
               : "Bridge execution and policy controls are restricted to administrators in this testnet environment."}
@@ -194,14 +194,14 @@ export default function BridgePage() {
 
       <Card title="Bridge Queue">
         {jobs.length === 0 ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Aun no hay jobs de bridge." : "No bridge jobs yet."}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Aun no hay jobs de bridge." : "No bridge jobs yet."}</p>
         ) : (
           <div className="space-y-2">
             {jobs
               .slice()
               .reverse()
               .map((j) => (
-                <div key={j.id} className="rounded border border-slate-800 bg-slate-900/50 px-3 py-2 text-xs text-slate-300">
+                <div key={j.id} className="rounded border border-bpvp-border bg-bpvp-hover/80 px-3 py-2 text-xs text-bpvp-ink">
                   #{j.id} {j.type} {j.tokenId} [{j.network}/{j.standard}] {isSpanish ? "estado" : "status"}={j.status}{" "}
                   {isSpanish ? "aprobaciones" : "approvals"}={(j.approvers ?? []).join("|") || "-"} tx={j.txHash || "-"} err={j.error || "-"}
                 </div>

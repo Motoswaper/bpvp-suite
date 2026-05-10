@@ -42,8 +42,9 @@ html[data-theme="dark"] {
 
 body {
   margin: 0;
-  background: var(--bpvp-page);
-  color: var(--bpvp-ink);
+  /* Fallbacks if tokens fail to load (avoids “black screen” with unreadable text). */
+  background: var(--bpvp-page, #f5f6f7);
+  color: var(--bpvp-ink, #1c1917);
   font-family: Inter, system-ui, sans-serif;
 }
 
@@ -55,4 +56,17 @@ html[lang="es"] .bpvp-i18n-en {
 }
 html[lang="es"] .bpvp-i18n-es {
   display: inline;
+}
+
+@layer components {
+  /* Theme-aware form controls (replaces hardcoded slate-950/slate-700 everywhere). */
+  .bpvp-field {
+    @apply w-full rounded border border-bpvp-input-border bg-bpvp-input px-2 py-1.5 text-sm text-bpvp-ink;
+  }
+  .bpvp-field-tight {
+    @apply w-full rounded border border-bpvp-input-border bg-bpvp-input px-2 py-1 text-sm text-bpvp-ink;
+  }
+  .bpvp-field-md {
+    @apply w-full rounded-md border border-bpvp-input-border bg-bpvp-input px-3 py-2 text-sm text-bpvp-ink;
+  }
 }

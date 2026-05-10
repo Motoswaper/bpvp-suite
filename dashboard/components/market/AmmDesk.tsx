@@ -169,12 +169,12 @@ export function AmmDesk() {
         <Metric label="My Total Swaps" value={`${asNum(meStats.totalSwaps)}`} />
       </div>
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-lg border border-slate-800 bg-slate-950 p-3">
-          <p className="font-semibold text-slate-200">Auto Audit</p>
-          <p className="mt-1 text-xs text-slate-400">Status: {audit?.audit?.ok ? "PASS" : "UNKNOWN/FAIL"}</p>
-          <p className="text-xs text-slate-500">Generated: {audit?.audit?.generatedAt ?? "-"}</p>
-          <p className="text-xs text-slate-500">Signature: {audit?.signature ? `${audit.signature.slice(0, 16)}...` : "-"}</p>
-          <button onClick={refreshAudit} className="mt-2 rounded bg-slate-800 px-3 py-1 text-xs font-medium text-slate-100 hover:bg-slate-700">
+        <div className="rounded-lg border border-bpvp-border bg-bpvp-card p-3">
+          <p className="font-semibold text-bpvp-ink">Auto Audit</p>
+          <p className="mt-1 text-xs text-bpvp-muted">Status: {audit?.audit?.ok ? "PASS" : "UNKNOWN/FAIL"}</p>
+          <p className="text-xs text-bpvp-faint">Generated: {audit?.audit?.generatedAt ?? "-"}</p>
+          <p className="text-xs text-bpvp-faint">Signature: {audit?.signature ? `${audit.signature.slice(0, 16)}...` : "-"}</p>
+          <button onClick={refreshAudit} className="mt-2 rounded bg-bpvp-hover px-3 py-1 text-xs font-medium text-bpvp-ink hover:bg-bpvp-border-strong">
             Refresh audit
           </button>
         </div>
@@ -216,12 +216,12 @@ export function AmmDesk() {
           }
         >
           <label className="block space-y-1">
-            <span className="text-slate-400">Provider</span>
-            <input value={provider} onChange={(e) => setProvider(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+            <span className="text-bpvp-muted">Provider</span>
+            <input value={provider} onChange={(e) => setProvider(e.target.value)} className="w-full bpvp-field-tight" />
           </label>
           <label className="block space-y-1">
-            <span className="text-slate-400">Liquidity</span>
-            <input value={liquidity} onChange={(e) => setLiquidity(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+            <span className="text-bpvp-muted">Liquidity</span>
+            <input value={liquidity} onChange={(e) => setLiquidity(e.target.value)} className="w-full bpvp-field-tight" />
           </label>
         </ActionBox>
       </div>
@@ -246,23 +246,23 @@ export function AmmDesk() {
           <PolicyInputs label="Breaker Cooldown (sec)" value={cooldownSec} onChange={setCooldownSec} />
         </ActionBox>
         <ActionBox title="Circuit Breaker Ops" onClick={() => runAction("amm_reset_circuit_breaker", {})}>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-bpvp-muted">
             Reason: {guardrails.circuitBreakerReason ?? "-"}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-bpvp-faint">
             Tripped at: {guardrails.circuitBreakerTrippedAt ?? "-"}
           </p>
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-bpvp-faint">
             Active policy: impact&lt;={asNum(policy.maxPriceImpactBps)}, swapRatio&lt;={asNum(policy.maxSwapInRatioBps)}, twapDev&lt;={asNum(policy.twapMaxDeviationBps)}
           </p>
         </ActionBox>
       </div>
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-lg border border-slate-800 bg-slate-950 p-3">
-          <p className="font-semibold text-slate-200">Ops Security Token</p>
+        <div className="rounded-lg border border-bpvp-border bg-bpvp-card p-3">
+          <p className="font-semibold text-bpvp-ink">Ops Security Token</p>
           <label className="mt-2 block space-y-1">
-            <span className="text-slate-400">Required for sensitive actions if server enforces it</span>
-            <input type="password" value={opsToken} onChange={(e) => setOpsToken(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+            <span className="text-bpvp-muted">Required for sensitive actions if server enforces it</span>
+            <input type="password" value={opsToken} onChange={(e) => setOpsToken(e.target.value)} className="w-full bpvp-field-tight" />
           </label>
         </div>
       </div>
@@ -280,10 +280,10 @@ export function AmmDesk() {
           <PolicyInputs label="Max Notional / Window (token0)" value={limitNotional} onChange={setLimitNotional} />
           <PolicyInputs label="Window Seconds" value={limitWindowSec} onChange={setLimitWindowSec} />
         </ActionBox>
-        <div className="rounded-lg border border-slate-800 bg-slate-950 p-3">
-          <p className="font-semibold text-slate-200">Recent Executions</p>
-          <p className="text-xs text-slate-500">count: {amm.recentExecutions?.length ?? 0}</p>
-          <div className="mt-2 max-h-44 space-y-1 overflow-auto text-xs text-slate-400">
+        <div className="rounded-lg border border-bpvp-border bg-bpvp-card p-3">
+          <p className="font-semibold text-bpvp-ink">Recent Executions</p>
+          <p className="text-xs text-bpvp-faint">count: {amm.recentExecutions?.length ?? 0}</p>
+          <div className="mt-2 max-h-44 space-y-1 overflow-auto text-xs text-bpvp-muted">
             {(amm.recentExecutions ?? []).slice(-8).reverse().map((x, i) => (
               <p key={`${x.ts}-${i}`}>
                 {x.status ?? "-"} {x.trader ?? "-"} {x.tokenIn ?? "-"} in:{asNum(x.amountIn).toFixed(4)} out:{asNum(x.amountOut).toFixed(4)} reason:{x.reason ?? "-"}
@@ -305,35 +305,35 @@ export function AmmDesk() {
           }
         >
           <label className="block space-y-1">
-            <span className="text-slate-400">Token In</span>
-            <select value={tokenIn} onChange={(e) => setTokenIn(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1">
+            <span className="text-bpvp-muted">Token In</span>
+            <select value={tokenIn} onChange={(e) => setTokenIn(e.target.value)} className="w-full bpvp-field-tight">
               <option value={token0}>{token0}</option>
               <option value={token1}>{token1}</option>
             </select>
           </label>
           <label className="block space-y-1">
-            <span className="text-slate-400">Amount In</span>
-            <input value={amountIn} onChange={(e) => setAmountIn(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+            <span className="text-bpvp-muted">Amount In</span>
+            <input value={amountIn} onChange={(e) => setAmountIn(e.target.value)} className="w-full bpvp-field-tight" />
           </label>
           <label className="block space-y-1">
-            <span className="text-slate-400">Min Amount Out</span>
-            <input value={minAmountOut} onChange={(e) => setMinAmountOut(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+            <span className="text-bpvp-muted">Min Amount Out</span>
+            <input value={minAmountOut} onChange={(e) => setMinAmountOut(e.target.value)} className="w-full bpvp-field-tight" />
           </label>
           <p className="text-xs text-emerald-300">Quote out: {quoteOut.toFixed(6)}</p>
         </ActionBox>
-        <div className="rounded-lg border border-slate-800 bg-slate-950 p-3">
-          <p className="font-semibold text-slate-200">Desk Status</p>
-          <p className="mt-2 text-xs text-slate-400">{status}</p>
-          <button onClick={refresh} className="mt-3 rounded bg-slate-800 px-3 py-1 text-xs font-medium text-slate-100 hover:bg-slate-700">
+        <div className="rounded-lg border border-bpvp-border bg-bpvp-card p-3">
+          <p className="font-semibold text-bpvp-ink">Desk Status</p>
+          <p className="mt-2 text-xs text-bpvp-muted">{status}</p>
+          <button onClick={refresh} className="mt-3 rounded bg-bpvp-hover px-3 py-1 text-xs font-medium text-bpvp-ink hover:bg-bpvp-border-strong">
             Refresh state
           </button>
-          <button onClick={refreshAudit} className="ml-2 mt-3 rounded bg-slate-800 px-3 py-1 text-xs font-medium text-slate-100 hover:bg-slate-700">
+          <button onClick={refreshAudit} className="ml-2 mt-3 rounded bg-bpvp-hover px-3 py-1 text-xs font-medium text-bpvp-ink hover:bg-bpvp-border-strong">
             Refresh audit
           </button>
-          <p className="mt-3 text-xs text-slate-500">Updated: {amm.updatedAt ?? "-"}</p>
-          <p className="text-xs text-slate-500">Last price {token1}/{token0}: {asNum(amm.lastPriceToken1).toFixed(6)}</p>
-          <p className="text-xs text-slate-500">Volume: {asNum(amm.volumeToken0).toFixed(4)} {token0} / {asNum(amm.volumeToken1).toFixed(4)} {token1}</p>
-          <p className="text-xs text-slate-500">Trades tracked: {state?.trades?.length ?? 0}</p>
+          <p className="mt-3 text-xs text-bpvp-faint">Updated: {amm.updatedAt ?? "-"}</p>
+          <p className="text-xs text-bpvp-faint">Last price {token1}/{token0}: {asNum(amm.lastPriceToken1).toFixed(6)}</p>
+          <p className="text-xs text-bpvp-faint">Volume: {asNum(amm.volumeToken0).toFixed(4)} {token0} / {asNum(amm.volumeToken1).toFixed(4)} {token1}</p>
+          <p className="text-xs text-bpvp-faint">Trades tracked: {state?.trades?.length ?? 0}</p>
         </div>
       </div>
     </div>
@@ -343,25 +343,25 @@ export function AmmDesk() {
 function PolicyInputs({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
   return (
     <label className="block space-y-1">
-      <span className="text-slate-400">{label}</span>
-      <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+      <span className="text-bpvp-muted">{label}</span>
+      <input value={value} onChange={(e) => onChange(e.target.value)} className="w-full bpvp-field-tight" />
     </label>
   );
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-950 p-3">
-      <p className="text-xs text-slate-400">{label}</p>
-      <p className="mt-1 font-semibold text-slate-100">{value}</p>
+    <div className="rounded-lg border border-bpvp-border bg-bpvp-card p-3">
+      <p className="text-xs text-bpvp-muted">{label}</p>
+      <p className="mt-1 font-semibold text-bpvp-ink">{value}</p>
     </div>
   );
 }
 
 function ActionBox({ title, children, onClick }: { title: string; children: ReactNode; onClick: () => void }) {
   return (
-    <div className="space-y-2 rounded-lg border border-slate-800 bg-slate-950 p-3">
-      <p className="font-semibold text-slate-200">{title}</p>
+    <div className="space-y-2 rounded-lg border border-bpvp-border bg-bpvp-card p-3">
+      <p className="font-semibold text-bpvp-ink">{title}</p>
       <div className="space-y-2">{children}</div>
       <button onClick={onClick} className="rounded bg-indigo-600 px-3 py-1 text-xs font-semibold text-white hover:bg-indigo-500">
         Execute
@@ -392,16 +392,16 @@ function Inputs({
   return (
     <>
       <label className="block space-y-1">
-        <span className="text-slate-400">Provider</span>
-        <input value={provider} onChange={(e) => setProvider(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+        <span className="text-bpvp-muted">Provider</span>
+        <input value={provider} onChange={(e) => setProvider(e.target.value)} className="w-full bpvp-field-tight" />
       </label>
       <label className="block space-y-1">
-        <span className="text-slate-400">{token0} amount</span>
-        <input value={amount0} onChange={(e) => setAmount0(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+        <span className="text-bpvp-muted">{token0} amount</span>
+        <input value={amount0} onChange={(e) => setAmount0(e.target.value)} className="w-full bpvp-field-tight" />
       </label>
       <label className="block space-y-1">
-        <span className="text-slate-400">{token1} amount</span>
-        <input value={amount1} onChange={(e) => setAmount1(e.target.value)} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1" />
+        <span className="text-bpvp-muted">{token1} amount</span>
+        <input value={amount1} onChange={(e) => setAmount1(e.target.value)} className="w-full bpvp-field-tight" />
       </label>
     </>
   );

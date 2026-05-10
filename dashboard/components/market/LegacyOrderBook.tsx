@@ -56,16 +56,16 @@ export function LegacyOrderBook() {
   return (
     <div className="space-y-4">
       <Card title="Simulated central limit book (engine)">
-        <p className="mb-3 text-sm text-slate-400">
-          These orders live in the same <code className="text-slate-300">market</code> module as the AMM. Use a unique order id per click;
-          side must be <code className="text-slate-300">buy</code> or <code className="text-slate-300">sell</code>.
+        <p className="mb-3 text-sm text-bpvp-muted">
+          These orders live in the same <code className="text-bpvp-ink">market</code> module as the AMM. Use a unique order id per click;
+          side must be <code className="text-bpvp-ink">buy</code> or <code className="text-bpvp-ink">sell</code>.
         </p>
-        {loading ? <p className="text-sm text-slate-400">Loading…</p> : null}
+        {loading ? <p className="text-sm text-bpvp-muted">Loading…</p> : null}
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase text-slate-500">Bids</h4>
+            <h4 className="mb-2 text-xs font-semibold uppercase text-bpvp-faint">Bids</h4>
             {bids.length === 0 ? (
-              <p className="text-xs text-slate-500">Empty</p>
+              <p className="text-xs text-bpvp-faint">Empty</p>
             ) : (
               <Table
                 headers={["Id", "Side", "Price", "Qty"]}
@@ -81,9 +81,9 @@ export function LegacyOrderBook() {
             )}
           </div>
           <div>
-            <h4 className="mb-2 text-xs font-semibold uppercase text-slate-500">Asks</h4>
+            <h4 className="mb-2 text-xs font-semibold uppercase text-bpvp-faint">Asks</h4>
             {asks.length === 0 ? (
-              <p className="text-xs text-slate-500">Empty</p>
+              <p className="text-xs text-bpvp-faint">Empty</p>
             ) : (
               <Table
                 headers={["Id", "Side", "Price", "Qty"]}
@@ -99,29 +99,29 @@ export function LegacyOrderBook() {
             )}
           </div>
         </div>
-        <p className="mt-3 text-xs text-slate-500">Recent trade tags: {(data?.trades ?? []).slice(-6).join(" · ") || "—"}</p>
+        <p className="mt-3 text-xs text-bpvp-faint">Recent trade tags: {(data?.trades ?? []).slice(-6).join(" · ") || "—"}</p>
       </Card>
 
       <Card title="Place simulated order">
         <form className="grid gap-3 text-sm md:grid-cols-5 md:items-end" onSubmit={onSubmit}>
           <label className="block space-y-1 md:col-span-2">
-            <span className="text-slate-400">Order id (unique)</span>
-            <input name="orderId" required placeholder="desk-alpha-42" className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
+            <span className="text-bpvp-muted">Order id (unique)</span>
+            <input name="orderId" required placeholder="desk-alpha-42" className="w-full bpvp-field font-mono text-xs" />
           </label>
           <label className="block space-y-1">
-            <span className="text-slate-400">Side</span>
-            <select name="side" className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5">
+            <span className="text-bpvp-muted">Side</span>
+            <select name="side" className="w-full bpvp-field">
               <option value="buy">buy</option>
               <option value="sell">sell</option>
             </select>
           </label>
           <label className="block space-y-1">
-            <span className="text-slate-400">Price</span>
-            <input name="price" type="number" step="any" min={0} required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+            <span className="text-bpvp-muted">Price</span>
+            <input name="price" type="number" step="any" min={0} required className="w-full bpvp-field" />
           </label>
           <label className="block space-y-1">
-            <span className="text-slate-400">Amount</span>
-            <input name="amount" type="number" step="any" min={0} required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+            <span className="text-bpvp-muted">Amount</span>
+            <input name="amount" type="number" step="any" min={0} required className="w-full bpvp-field" />
           </label>
           <div className="md:col-span-5">
             <Button type="submit" disabled={busy}>
@@ -132,7 +132,7 @@ export function LegacyOrderBook() {
       </Card>
 
       {error ? <p className="rounded-md border border-rose-800 bg-rose-950/40 p-3 text-sm text-rose-300">{error}</p> : null}
-      {msg ? <p className="rounded-md border border-slate-700 bg-slate-900/60 p-3 text-sm text-slate-200">{msg}</p> : null}
+      {msg ? <p className="rounded-md border border-bpvp-border bg-bpvp-hover p-3 text-sm text-bpvp-ink">{msg}</p> : null}
     </div>
   );
 }

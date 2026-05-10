@@ -2,6 +2,8 @@ import { promises as fs } from "fs";
 import path from "path";
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromRequest } from "@/lib/auth";
+import { resolveRepoDocsDir } from "@/lib/docsPaths";
+import { SHARED_DOCS_FILE_SET } from "@/lib/sharedDocs";
 import { checkRateLimit, getClientIp, isSameOriginRequest } from "@/lib/security";
 
 type AskPayload = {
@@ -105,22 +107,27 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => ({}))) as AskPayload;
   const question = String(body.question ?? "").trim();
   const lang: "en" | "es" = body.lang === "es" ? "es" : "en";
-  const adminOnly = body.adminOnly === true;
+  const wantsAdminCorpus = body.adminOnly === true;
   if (!question) {
     return NextResponse.json({ ok: false, error: "question is required" }, { status: 400 });
   }
-  if (adminOnly && session.role !== "admin") {
+  if (wantsAdminCorpus && session.role !== "admin") {
     return NextResponse.json({ ok: false, error: "admin role required" }, { status: 403 });
   }
 
-  const docsDir = path.resolve(process.cwd(), "..", "docs");
+  const useFullCorpus = session.role === "admin" && wantsAdminCorpus;
+
+  const docsDir = resolveRepoDocsDir();
   const files = (await fs.readdir(docsDir)).filter((f) => f.toLowerCase().endsWith(".md"));
   const tokens = tokenize(question);
 
   const hits: DocHit[] = [];
   for (const file of files) {
-    // Do not index internal-secret policy documents in the read-only assistant response.
-    if (file === "ADMIN_ONLY_DATA_POLICY_BPVP.md") continue;
+    if (!useFullCorpus) {
+      if (!SHARED_DOCS_FILE_SET.has(file)) continue;
+    } else if (file === "ADMIN_ONLY_DATA_POLICY_BPVP.md") {
+      continue;
+    }
     const fullPath = path.join(docsDir, file);
     const content = await fs.readFile(fullPath, "utf8").catch(() => "");
     if (!content) continue;
@@ -139,7 +146,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     mode: "read_only",
-    scope: adminOnly ? "admin_only" : "authenticated_public",
+    scope: useFullCorpus ? "admin_only" : "public_md_only",
     question,
     answer,
     sources: hits.slice(0, 5).map((h) => h.file),

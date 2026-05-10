@@ -133,26 +133,26 @@ export default function MarketplacePage() {
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <p className="text-xs text-slate-400">{isSpanish ? "Listings abiertos" : "Open listings"}</p>
-          <p className="text-2xl font-semibold text-slate-100">
+        <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <p className="text-xs text-bpvp-muted">{isSpanish ? "Listings abiertos" : "Open listings"}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">
             {listings.filter((x) => x.status === "open").length}
           </p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <p className="text-xs text-slate-400">{isSpanish ? "Trades totales" : "Total trades"}</p>
-          <p className="text-2xl font-semibold text-slate-100">{trades.length}</p>
+        <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <p className="text-xs text-bpvp-muted">{isSpanish ? "Trades totales" : "Total trades"}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">{trades.length}</p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <p className="text-xs text-slate-400">Volume BTC</p>
-          <p className="text-2xl font-semibold text-slate-100">
+        <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <p className="text-xs text-bpvp-muted">Volume BTC</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">
             {trades.reduce((sum, t) => sum + Number(t.totalBtc || 0), 0).toFixed(8)}
           </p>
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-        <p className="text-xs text-slate-400">{isSpanish ? "Estado sync con engine" : "Engine sync status"}</p>
+      <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+        <p className="text-xs text-bpvp-muted">{isSpanish ? "Estado sync con engine" : "Engine sync status"}</p>
         <p className={`mt-1 text-sm font-medium ${lastEngineSync?.ok === false ? "text-rose-300" : "text-emerald-300"}`}>
           {lastEngineSync
             ? lastEngineSync.ok
@@ -163,36 +163,36 @@ export default function MarketplacePage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <form onSubmit={onCreateListing} className="space-y-2 rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <h3 className="font-semibold text-slate-200">{isSpanish ? "Crear listing" : "Create listing"}</h3>
-          <input name="seller" required placeholder={isSpanish ? "Seller (desk/usuario) ej. desk-alpha-01" : "Seller (desk/user) e.g. desk-alpha-01"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-          <input name="tokenSymbol" defaultValue="BPVP20" required placeholder="Token symbol e.g. BPVP20" className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-          <input name="quantity" type="number" min={0} step="any" required placeholder={isSpanish ? "Cantidad ej. 1250.50" : "Quantity e.g. 1250.50"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-          <input name="priceBtc" type="number" min={0} step="any" required placeholder={isSpanish ? "Precio BTC ej. 0.00001550" : "BTC price e.g. 0.00001550"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+        <form onSubmit={onCreateListing} className="space-y-2 rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <h3 className="font-semibold text-bpvp-ink">{isSpanish ? "Crear listing" : "Create listing"}</h3>
+          <input name="seller" required placeholder={isSpanish ? "Seller (desk/usuario) ej. desk-alpha-01" : "Seller (desk/user) e.g. desk-alpha-01"} className="w-full bpvp-field" />
+          <input name="tokenSymbol" defaultValue="BPVP20" required placeholder="Token symbol e.g. BPVP20" className="w-full bpvp-field" />
+          <input name="quantity" type="number" min={0} step="any" required placeholder={isSpanish ? "Cantidad ej. 1250.50" : "Quantity e.g. 1250.50"} className="w-full bpvp-field" />
+          <input name="priceBtc" type="number" min={0} step="any" required placeholder={isSpanish ? "Precio BTC ej. 0.00001550" : "BTC price e.g. 0.00001550"} className="w-full bpvp-field" />
           <button disabled={busy} className="rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-500">
             {isSpanish ? "Crear listing" : "Create listing"}
           </button>
         </form>
 
-        <form onSubmit={onCreateTrade} className="space-y-2 rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <h3 className="font-semibold text-slate-200">{isSpanish ? "Ejecutar trade" : "Execute trade"}</h3>
-          <input name="listingId" required placeholder="Listing ID e.g. lst_01HZX9P7Q1A2BC3D4E" className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-          <input name="buyer" required placeholder={isSpanish ? "Buyer (desk/usuario) ej. desk-beta-02" : "Buyer (desk/user) e.g. desk-beta-02"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-          <input name="quantity" type="number" min={0} step="any" required placeholder={isSpanish ? "Cantidad ej. 50" : "Quantity e.g. 50"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+        <form onSubmit={onCreateTrade} className="space-y-2 rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <h3 className="font-semibold text-bpvp-ink">{isSpanish ? "Ejecutar trade" : "Execute trade"}</h3>
+          <input name="listingId" required placeholder="Listing ID e.g. lst_01HZX9P7Q1A2BC3D4E" className="w-full bpvp-field" />
+          <input name="buyer" required placeholder={isSpanish ? "Buyer (desk/usuario) ej. desk-beta-02" : "Buyer (desk/user) e.g. desk-beta-02"} className="w-full bpvp-field" />
+          <input name="quantity" type="number" min={0} step="any" required placeholder={isSpanish ? "Cantidad ej. 50" : "Quantity e.g. 50"} className="w-full bpvp-field" />
           <button disabled={busy} className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500">
             {isSpanish ? "Crear trade" : "Create trade"}
           </button>
         </form>
       </div>
 
-      {msg ? <p className="text-sm text-slate-300">{msg}</p> : null}
+      {msg ? <p className="text-sm text-bpvp-ink">{msg}</p> : null}
 
-      <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-        <h3 className="mb-2 font-semibold text-slate-200">{isSpanish ? "Listings" : "Listings"}</h3>
+      <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+        <h3 className="mb-2 font-semibold text-bpvp-ink">{isSpanish ? "Listings" : "Listings"}</h3>
         <div className="overflow-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-slate-400">
+              <tr className="text-left text-bpvp-muted">
                 <th className="pb-2">ID</th>
                 <th className="pb-2">{isSpanish ? "Seller" : "Seller"}</th>
                 <th className="pb-2">Token</th>
@@ -203,7 +203,7 @@ export default function MarketplacePage() {
             </thead>
             <tbody>
               {listings.map((l) => (
-                <tr key={l.id} className="border-t border-slate-800 text-slate-200">
+                <tr key={l.id} className="border-t border-bpvp-border text-bpvp-ink">
                   <td className="py-2">{l.id}</td>
                   <td className="py-2">{l.seller}</td>
                   <td className="py-2">{l.tokenSymbol}</td>
@@ -217,12 +217,12 @@ export default function MarketplacePage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-        <h3 className="mb-2 font-semibold text-slate-200">{isSpanish ? "Trades" : "Trades"}</h3>
+      <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+        <h3 className="mb-2 font-semibold text-bpvp-ink">{isSpanish ? "Trades" : "Trades"}</h3>
         <div className="overflow-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-slate-400">
+              <tr className="text-left text-bpvp-muted">
                 <th className="pb-2">ID</th>
                 <th className="pb-2">Listing</th>
                 <th className="pb-2">Buyer</th>
@@ -234,7 +234,7 @@ export default function MarketplacePage() {
             </thead>
             <tbody>
               {trades.map((t) => (
-                <tr key={t.id} className="border-t border-slate-800 text-slate-200">
+                <tr key={t.id} className="border-t border-bpvp-border text-bpvp-ink">
                   <td className="py-2">{t.id}</td>
                   <td className="py-2">{t.listingId}</td>
                   <td className="py-2">{t.buyer}</td>

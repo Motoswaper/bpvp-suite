@@ -186,41 +186,41 @@ export default function DidPage() {
       />
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <p className="text-xs text-slate-400">{isSpanish ? "Identidades DID" : "DID identities"}</p>
-          <p className="text-2xl font-semibold text-slate-100">{identities.length}</p>
+        <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <p className="text-xs text-bpvp-muted">{isSpanish ? "Identidades DID" : "DID identities"}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">{identities.length}</p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <p className="text-xs text-slate-400">{isSpanish ? "Credenciales activas" : "Active credentials"}</p>
-          <p className="text-2xl font-semibold text-slate-100">
+        <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <p className="text-xs text-bpvp-muted">{isSpanish ? "Credenciales activas" : "Active credentials"}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">
             {credentials.filter((x) => x.status === "active").length}
           </p>
         </div>
-        <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <p className="text-xs text-slate-400">{isSpanish ? "Credenciales revocadas" : "Revoked credentials"}</p>
-          <p className="text-2xl font-semibold text-slate-100">
+        <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <p className="text-xs text-bpvp-muted">{isSpanish ? "Credenciales revocadas" : "Revoked credentials"}</p>
+          <p className="text-2xl font-semibold text-bpvp-ink">
             {credentials.filter((x) => x.status === "revoked").length}
           </p>
         </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <form onSubmit={onCreateIdentity} className="space-y-2 rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <h3 className="font-semibold text-slate-200">{isSpanish ? "Crear identidad DID" : "Create DID identity"}</h3>
-          <input name="controller" required placeholder={isSpanish ? "Controller (ej. org.bpvp.admin)" : "Controller (e.g. org.bpvp.admin)"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-          <input name="walletAddress" placeholder={isSpanish ? "Wallet BTC/EVM (opcional) ej. 0x1111111111111111111111111111111111111111" : "Wallet BTC/EVM (optional) e.g. 0x1111111111111111111111111111111111111111"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-          <input name="label" placeholder={isSpanish ? "Etiqueta (opcional) ej. cliente-enterprise-01" : "Label (optional) e.g. client-enterprise-01"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+        <form onSubmit={onCreateIdentity} className="space-y-2 rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <h3 className="font-semibold text-bpvp-ink">{isSpanish ? "Crear identidad DID" : "Create DID identity"}</h3>
+          <input name="controller" required placeholder={isSpanish ? "Controller (ej. org.bpvp.admin)" : "Controller (e.g. org.bpvp.admin)"} className="w-full bpvp-field" />
+          <input name="walletAddress" placeholder={isSpanish ? "Wallet BTC/EVM (opcional) ej. 0x1111111111111111111111111111111111111111" : "Wallet BTC/EVM (optional) e.g. 0x1111111111111111111111111111111111111111"} className="w-full bpvp-field" />
+          <input name="label" placeholder={isSpanish ? "Etiqueta (opcional) ej. cliente-enterprise-01" : "Label (optional) e.g. client-enterprise-01"} className="w-full bpvp-field" />
           <button disabled={busy} className="rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-500">
             {isSpanish ? "Crear identidad" : "Create identity"}
           </button>
         </form>
 
-        <form onSubmit={onIssueCredential} className="space-y-2 rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <h3 className="font-semibold text-slate-200">{isSpanish ? "Emitir credencial" : "Issue credential"}</h3>
-          <input name="subjectDid" required placeholder="did:bpvp:abc12345-def6-7890-gh12" className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
-          <input name="type" required placeholder={isSpanish ? "Tipo (ej. KYCVerified)" : "Type (e.g. KYCVerified)"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
-          <textarea name="claims" defaultValue={'{"kycLevel":"gold","jurisdiction":"PA","accredited":true}'} className="h-24 w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
-          <input name="expiresAt" placeholder={isSpanish ? "Expira ISO (opcional) ej. 2027-12-31T23:59:59Z" : "Expires ISO (optional) e.g. 2027-12-31T23:59:59Z"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+        <form onSubmit={onIssueCredential} className="space-y-2 rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <h3 className="font-semibold text-bpvp-ink">{isSpanish ? "Emitir credencial" : "Issue credential"}</h3>
+          <input name="subjectDid" required placeholder="did:bpvp:abc12345-def6-7890-gh12" className="w-full bpvp-field font-mono text-xs" />
+          <input name="type" required placeholder={isSpanish ? "Tipo (ej. KYCVerified)" : "Type (e.g. KYCVerified)"} className="w-full bpvp-field" />
+          <textarea name="claims" defaultValue={'{"kycLevel":"gold","jurisdiction":"PA","accredited":true}'} className="h-24 w-full bpvp-field font-mono text-xs" />
+          <input name="expiresAt" placeholder={isSpanish ? "Expira ISO (opcional) ej. 2027-12-31T23:59:59Z" : "Expires ISO (optional) e.g. 2027-12-31T23:59:59Z"} className="w-full bpvp-field" />
           <button disabled={busy} className="rounded bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500">
             {isSpanish ? "Emitir credencial" : "Issue credential"}
           </button>
@@ -228,29 +228,29 @@ export default function DidPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <form onSubmit={onVerifyCredential} className="space-y-2 rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <h3 className="font-semibold text-slate-200">{isSpanish ? "Verificar credencial" : "Verify credential"}</h3>
-          <input name="credentialId" required placeholder="vc_bpvp_8f2a1b7c9d" className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
+        <form onSubmit={onVerifyCredential} className="space-y-2 rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <h3 className="font-semibold text-bpvp-ink">{isSpanish ? "Verificar credencial" : "Verify credential"}</h3>
+          <input name="credentialId" required placeholder="vc_bpvp_8f2a1b7c9d" className="w-full bpvp-field font-mono text-xs" />
           <button disabled={busy} className="rounded bg-emerald-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-emerald-500">
             {isSpanish ? "Verificar" : "Verify"}
           </button>
         </form>
-        <form onSubmit={onRevokeCredential} className="space-y-2 rounded-lg border border-slate-800 bg-[#101523] p-4">
-          <h3 className="font-semibold text-slate-200">{isSpanish ? "Revocar credencial (admin)" : "Revoke credential (admin)"}</h3>
-          <input name="credentialId" required placeholder="vc_bpvp_8f2a1b7c9d" className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
-          <input name="reason" placeholder={isSpanish ? "Motivo (opcional) ej. documento expirado" : "Reason (optional) e.g. document expired"} className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+        <form onSubmit={onRevokeCredential} className="space-y-2 rounded-lg border border-bpvp-border bg-[#101523] p-4">
+          <h3 className="font-semibold text-bpvp-ink">{isSpanish ? "Revocar credencial (admin)" : "Revoke credential (admin)"}</h3>
+          <input name="credentialId" required placeholder="vc_bpvp_8f2a1b7c9d" className="w-full bpvp-field font-mono text-xs" />
+          <input name="reason" placeholder={isSpanish ? "Motivo (opcional) ej. documento expirado" : "Reason (optional) e.g. document expired"} className="w-full bpvp-field" />
           <button disabled={busy} className="rounded bg-rose-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-rose-500">
             {isSpanish ? "Revocar" : "Revoke"}
           </button>
         </form>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-        <h3 className="mb-2 font-semibold text-slate-200">{isSpanish ? "Identidades DID" : "DID identities"}</h3>
+      <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+        <h3 className="mb-2 font-semibold text-bpvp-ink">{isSpanish ? "Identidades DID" : "DID identities"}</h3>
         <div className="overflow-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-slate-400">
+              <tr className="text-left text-bpvp-muted">
                 <th className="pb-2">DID</th>
                 <th className="pb-2">{isSpanish ? "Controller" : "Controller"}</th>
                 <th className="pb-2">Wallet</th>
@@ -260,13 +260,13 @@ export default function DidPage() {
             </thead>
             <tbody>
               {identities.map((d) => (
-                <tr key={d.did} className="border-t border-slate-800 text-slate-200">
+                <tr key={d.did} className="border-t border-bpvp-border text-bpvp-ink">
                   <td className="py-2 font-mono text-xs">{d.did}</td>
                   <td className="py-2">{d.controller}</td>
                   <td className="py-2 font-mono text-xs">{d.walletAddress ?? "—"}</td>
                   <td className="py-2">{d.status}</td>
                   <td className="py-2">
-                    <button className="rounded border border-slate-700 px-2 py-1 text-xs hover:bg-slate-800" onClick={() => void resolveDid(d.did)}>
+                    <button className="rounded border border-bpvp-border px-2 py-1 text-xs text-bpvp-ink hover:bg-bpvp-hover" onClick={() => void resolveDid(d.did)}>
                       {isSpanish ? "Ver doc" : "View doc"}
                     </button>
                   </td>
@@ -277,12 +277,12 @@ export default function DidPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-        <h3 className="mb-2 font-semibold text-slate-200">{isSpanish ? "Credenciales" : "Credentials"}</h3>
+      <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+        <h3 className="mb-2 font-semibold text-bpvp-ink">{isSpanish ? "Credenciales" : "Credentials"}</h3>
         <div className="overflow-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left text-slate-400">
+              <tr className="text-left text-bpvp-muted">
                 <th className="pb-2">ID</th>
                 <th className="pb-2">DID</th>
                 <th className="pb-2">{isSpanish ? "Tipo" : "Type"}</th>
@@ -292,7 +292,7 @@ export default function DidPage() {
             </thead>
             <tbody>
               {credentials.map((c) => (
-                <tr key={c.id} className="border-t border-slate-800 text-slate-200">
+                <tr key={c.id} className="border-t border-bpvp-border text-bpvp-ink">
                   <td className="py-2 font-mono text-xs">{c.id}</td>
                   <td className="py-2 font-mono text-xs">{c.subjectDid}</td>
                   <td className="py-2">{c.type}</td>
@@ -305,14 +305,14 @@ export default function DidPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-        <h3 className="mb-2 font-semibold text-slate-200">{isSpanish ? "Vista DID document" : "DID document preview"}</h3>
-        <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded bg-slate-950 p-3 text-xs text-slate-300">
+      <div className="rounded-lg border border-bpvp-border bg-[#101523] p-4">
+        <h3 className="mb-2 font-semibold text-bpvp-ink">{isSpanish ? "Vista DID document" : "DID document preview"}</h3>
+        <pre className="max-h-72 overflow-auto whitespace-pre-wrap rounded bg-bpvp-card p-3 text-xs text-bpvp-ink">
           {docPreview || (isSpanish ? "Selecciona una identidad y pulsa 'Ver doc'." : "Select an identity and click 'View doc'.")}
         </pre>
       </div>
 
-      {msg ? <p className="rounded-md border border-slate-700 bg-slate-900/60 p-3 text-sm text-slate-200">{msg}</p> : null}
+      {msg ? <p className="rounded-md border border-bpvp-border bg-bpvp-hover p-3 text-sm text-bpvp-ink">{msg}</p> : null}
     </section>
   );
 }

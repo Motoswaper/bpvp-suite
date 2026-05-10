@@ -1,16 +1,54 @@
 import { promises as fs } from "fs";
 import path from "path";
 import { Navbar } from "@/components/layout/Navbar";
+import { resolveRepoDocsDir } from "@/lib/docsPaths";
 import { ModuleGuide } from "@/components/layout/ModuleGuide";
 import { AgentReadonlyPanel } from "@/components/docs/AgentReadonlyPanel";
 import { getSessionFromServerCookies } from "@/lib/auth";
 import { cookies } from "next/headers";
 
-/** Keys match files under repo root `docs/` (see dashboard path.join below). */
-const docsMapAdmin = {
+/** Paquete producto (~8): coincide con `lib/sharedDocs.ts` (agente no-admin). */
+const docsMapNonAdmin = {
+  whitepaper: {
+    title: { en: "White paper", es: "Libro blanco" },
+    file: "WHITEPAPER_BPVP.md"
+  },
+  protocol_synopsis: {
+    title: { en: "Protocol synopsis", es: "Sinopsis del protocolo" },
+    file: "PROTOCOL_SYNOPSIS_BPVP.md"
+  },
+  decentralization_governance: {
+    title: { en: "Decentralization & governance", es: "Descentralizacion y gobernanza" },
+    file: "DECENTRALIZATION_GOVERNANCE_BPVP.md"
+  },
+  conflict_resolution: {
+    title: { en: "Conflict resolution", es: "Resolucion de conflictos" },
+    file: "CONFLICT_RESOLUTION_BPVP.md"
+  },
+  module_qa: {
+    title: { en: "Module Q&A overview", es: "Q&A por modulo" },
+    file: "MODULE_QA_OVERVIEW_BPVP.md"
+  },
+  utxo_accounting: {
+    title: { en: "UTXO & accounting notes", es: "UTXO y contabilidad" },
+    file: "UTXO_COLLISIONS_AND_ACCOUNTING_BPVP.md"
+  },
+  pricing: {
+    title: { en: "Pricing (testnet)", es: "Precios (testnet)" },
+    file: "PRICING_BPVP.md"
+  },
   public_read_only_access: {
-    title: { en: "Public read-only access", es: "Acceso publico de solo lectura" },
+    title: { en: "Public API surface", es: "Superficie API publica" },
     file: "PUBLIC_READ_ONLY_ACCESS.md"
+  }
+} as const;
+
+/** Admin: todo lo anterior + runbooks, auditoria, release, IR, matriz interna. */
+const docsMapAdmin = {
+  ...docsMapNonAdmin,
+  docs_visibility_matrix: {
+    title: { en: "Visibility matrix", es: "Matriz de visibilidad" },
+    file: "DOCS_VISIBILITY_MATRIX_BPVP.md"
   },
   canonical_workspace: {
     title: { en: "Canonical workspace", es: "Workspace canonico" },
@@ -54,35 +92,24 @@ const docsMapAdmin = {
   }
 } as const;
 
-const docsMapViewer = {
-  public_read_only_access: {
-    title: { en: "Public read-only access", es: "Acceso publico de solo lectura" },
-    file: "PUBLIC_READ_ONLY_ACCESS.md"
-  },
-  canonical_workspace: {
-    title: { en: "Canonical workspace", es: "Workspace canonico" },
-    file: "CANONICAL_WORKSPACE.md"
-  },
-  operations: {
-    title: { en: "Operations runbook", es: "Runbook operativo" },
-    file: "operations.md"
-  },
-  release_checklist: {
-    title: { en: "Release checklist", es: "Checklist de release" },
-    file: "release-checklist.md"
-  }
-} as const;
+type DocMap = typeof docsMapAdmin | typeof docsMapNonAdmin;
 
-type DocMap = typeof docsMapAdmin | typeof docsMapViewer;
+const ALL_DOC_TAB_KEYS = new Set(Object.keys(docsMapAdmin));
 
-function getDocKey(raw: string | undefined, docsMap: DocMap): keyof DocMap {
+function resolveDocTab(
+  raw: string | undefined,
+  docsMap: DocMap
+): { key: keyof DocMap; blockedAdminOnly: boolean } {
   const keys = Object.keys(docsMap) as Array<keyof DocMap>;
   const fallback = keys[0];
-  if (!raw) return fallback;
+  if (!raw) return { key: fallback, blockedAdminOnly: false };
   if (Object.prototype.hasOwnProperty.call(docsMap, raw)) {
-    return raw as keyof DocMap;
+    return { key: raw as keyof DocMap, blockedAdminOnly: false };
   }
-  return fallback;
+  if (ALL_DOC_TAB_KEYS.has(raw)) {
+    return { key: fallback, blockedAdminOnly: true };
+  }
+  return { key: fallback, blockedAdminOnly: false };
 }
 
 export default async function DocsPage({
@@ -97,10 +124,11 @@ export default async function DocsPage({
   const session = await getSessionFromServerCookies();
   const cookieStore = await cookies();
   const locale = String(cookieStore.get("bpvp_locale")?.value ?? "").toLowerCase() === "es" ? "es" : "en";
-  const docsMap: DocMap = session?.role === "admin" ? docsMapAdmin : docsMapViewer;
-  const docKey = getDocKey(resolvedSearchParams?.doc, docsMap);
+  const isAdmin = session?.role === "admin";
+  const docsMap: DocMap = isAdmin ? docsMapAdmin : docsMapNonAdmin;
+  const { key: docKey, blockedAdminOnly } = resolveDocTab(resolvedSearchParams?.doc, docsMap);
   const selected = docsMap[docKey];
-  const docsDir = path.resolve(process.cwd(), "..", "docs");
+  const docsDir = resolveRepoDocsDir();
   const docPath = path.join(docsDir, selected.file);
   let content = "";
   try {
@@ -128,19 +156,23 @@ export default async function DocsPage({
       <Navbar title={locale === "es" ? "Documentacion" : "Documentation"} />
       <ModuleGuide
         whatThisDoes={
-          locale === "es"
-            ? "Este modulo ofrece explicaciones del sistema y documentacion de pruebas para usuarios."
-            : "This module provides public system explanations and testing documentation."
+          isAdmin
+            ? locale === "es"
+              ? "Como admin ves ademas runbooks, auditoria, incidentes y release."
+              : "As admin you also see runbooks, audit, incident response, and release docs."
+            : locale === "es"
+              ? "Paquete publico: libro blanco, sinopsis, descentralizacion, conflictos, Q&A modulos, UTXO, precios y API publica."
+              : "Public pack: white paper, protocol synopsis, decentralization, conflict resolution, module Q&A, UTXO notes, pricing, and public API surface."
         }
         whatToTry={
           locale === "es"
-            ? "Empieza por Acceso publico / Workspace canonico u Operaciones; los documentos de auditoria y seguridad estan disponibles para admins."
-            : "Start with Public read-only access, Canonical workspace, or Operations; audit and security packs are available to admins."
+            ? "El agente indexa solo estos 8 markdown para cuentas no admin; admin puede corpus completo."
+            : "The agent indexes only these eight markdown files for non-admin accounts; admins can use the full corpus."
         }
         walletHint={
           locale === "es"
-            ? "Los detalles de vinculacion de wallet estan documentados en Profile y endpoints de auth, no en este visor de docs."
-            : "Wallet link details are documented in Profile and auth endpoints, not in this docs viewer."
+            ? "No pegues claves ni .env en el chat del agente."
+            : "Do not paste keys or .env into the agent chat."
         }
       />
 
@@ -154,8 +186,8 @@ export default async function DocsPage({
               href={href}
               className={`rounded-md border px-3 py-2 text-sm ${
                 isActive
-                  ? "border-blue-500 bg-blue-900/40 text-blue-100"
-                  : "border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800"
+                  ? "border-bpvp-border-strong bg-bpvp-hover text-bpvp-ink"
+                  : "border-bpvp-border bg-bpvp-input text-bpvp-muted hover:bg-bpvp-hover hover:text-bpvp-ink"
               }`}
             >
               {meta.title[locale]}
@@ -164,13 +196,21 @@ export default async function DocsPage({
         })}
       </div>
 
-      <article className="rounded-lg border border-slate-800 bg-black p-4">
-        <h2 className="mb-3 text-lg font-semibold">{selected.title[locale]}</h2>
-        <pre className="overflow-auto whitespace-pre-wrap text-sm leading-6 text-slate-200">
+      {blockedAdminOnly ? (
+        <p className="rounded-md border border-amber-600/50 bg-amber-950/30 px-3 py-2 text-sm text-amber-100">
+          {locale === "es"
+            ? "Ese documento solo esta disponible para administradores. Mostramos la primera pestaña publica."
+            : "That document is only available to administrators. Showing the first public tab instead."}
+        </p>
+      ) : null}
+
+      <article className="rounded-lg border border-bpvp-border bg-bpvp-card p-4">
+        <h2 className="mb-3 text-lg font-semibold text-bpvp-ink">{selected.title[locale]}</h2>
+        <pre className="overflow-auto whitespace-pre-wrap text-sm leading-6 text-bpvp-ink">
           {content}
         </pre>
       </article>
-      <AgentReadonlyPanel locale={locale} audience="public-auth" />
+      <AgentReadonlyPanel locale={locale} audience={isAdmin ? "admin-only" : "public-auth"} />
     </section>
   );
 }

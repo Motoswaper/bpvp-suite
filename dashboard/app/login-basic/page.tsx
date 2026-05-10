@@ -34,11 +34,11 @@ export default async function LoginBasicPage({
       <div className="grid w-full max-w-3xl gap-4 md:grid-cols-2">
         <section className="space-y-4 rounded-xl border border-bpvp-border bg-bpvp-card p-6 shadow-sm">
           <img
-            src="/brand/bitcoin-corner-photo.jpg"
+            src="/brand/bpvp-suite-logo-final.png"
             alt="BPVP Suite logo"
             width={280}
-            height={160}
-            className="mx-auto h-auto max-h-52 w-full max-w-[280px] rounded-xl border-2 border-orange-400/50 bg-bpvp-input object-contain p-2 shadow-md"
+            height={120}
+            className="mx-auto h-auto max-h-52 w-full max-w-sm rounded-lg border border-bpvp-border bg-bpvp-input object-contain p-3"
           />
           <h1 className="text-xl font-semibold">
             {isSpanish ? "Inicia sesion (modo compatible)" : "Sign in (compatibility mode)"}

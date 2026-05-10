@@ -20,9 +20,9 @@ export function KpiCard({ label, value, trend, tone = "blue" }: KpiCardProps) {
   return (
     <Card title={label}>
       <div className="space-y-2">
-        <p className="text-2xl font-bold">{value}</p>
+        <p className="text-2xl font-bold text-bpvp-ink">{value}</p>
         {normalizedTrend.length > 1 ? (
-          <div className="flex h-8 items-end gap-1 rounded-md border border-slate-800/90 bg-slate-950/40 px-1 py-1">
+          <div className="flex h-8 items-end gap-1 rounded-md border border-bpvp-border bg-bpvp-hover px-1 py-1">
             {normalizedTrend.map((v, idx) => (
               <span
                 key={`${idx}-${v}`}

@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { FormEvent, useEffect, useState } from "react";
 
 const REQUEST_TIMEOUT_MS = 7000;
@@ -147,14 +148,7 @@ export default function LoginPage() {
       <div className="grid w-full max-w-3xl gap-4 md:grid-cols-2">
         <section className="space-y-4 rounded-xl border border-bpvp-border bg-bpvp-card p-6 shadow-sm">
           <div className="flex flex-col items-center gap-2">
-            <img
-              src="/brand/bitcoin-corner-photo.jpg"
-              alt="BPVP Suite"
-              width={280}
-              height={160}
-              className="mx-auto h-auto max-h-52 w-full max-w-[280px] rounded-xl border-2 border-orange-400/50 bg-bpvp-input object-contain p-2 shadow-md"
-              loading="eager"
-            />
+            <BrandLogo variant="login" alt="BPVP Suite" />
           </div>
           <h1 className="text-xl font-semibold">{isSpanish ? "Inicia sesion con usuario tester existente" : "Sign in with existing tester user"}</h1>
           <p className="text-xs text-bpvp-muted">

@@ -58,8 +58,8 @@ export function AgentReadonlyPanel({
   }
 
   return (
-    <section className="rounded-lg border border-slate-800 bg-[#101523] p-4">
-      <h3 className="mb-2 text-sm font-semibold text-slate-100">
+    <section className="rounded-lg border border-bpvp-border bg-bpvp-card p-4">
+      <h3 className="mb-2 text-sm font-semibold text-bpvp-ink">
         {locale === "es" ? "Agente BPVP (solo lectura)" : "BPVP Agent (read-only)"}
       </h3>
       <p className="mb-2 text-[11px] font-medium text-cyan-300">
@@ -71,7 +71,7 @@ export function AgentReadonlyPanel({
             ? "Alcance: publico autenticado (requiere sesion)"
             : "Scope: authenticated public (session required)"}
       </p>
-      <p className="mb-3 text-xs text-slate-400">
+      <p className="mb-3 text-xs text-bpvp-muted">
         {locale === "es"
           ? "Consulta operacion por modulo y documentacion sin ejecutar acciones mutables."
           : "Ask module operation and documentation questions without executing mutating actions."}
@@ -85,7 +85,7 @@ export function AgentReadonlyPanel({
               ? "Ejemplo: Como funciona DID verify y que rol necesita?"
               : "Example: How does DID verify work and what role is required?"
           }
-          className="min-h-[86px] w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100"
+          className="min-h-[86px] w-full rounded-md border border-bpvp-input-border bg-bpvp-input px-3 py-2 text-sm text-bpvp-ink"
         />
         <div className="flex items-center gap-2">
           <button
@@ -105,10 +105,10 @@ export function AgentReadonlyPanel({
       </form>
       {error ? <p className="mt-3 text-xs text-rose-300">{error}</p> : null}
       {answer ? (
-        <div className="mt-3 space-y-2 rounded-md border border-slate-800 bg-black/60 p-3">
-          <pre className="whitespace-pre-wrap text-xs leading-5 text-slate-200">{answer}</pre>
+        <div className="mt-3 space-y-2 rounded-md border border-bpvp-border bg-bpvp-code-bg p-3">
+          <pre className="whitespace-pre-wrap text-xs leading-5 text-bpvp-ink">{answer}</pre>
           {sources.length > 0 ? (
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-bpvp-muted">
               {locale === "es" ? "Fuentes: " : "Sources: "}
               {sources.join(", ")}
             </p>

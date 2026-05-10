@@ -192,11 +192,11 @@ export default function OpsPage() {
     <section className="space-y-6">
       <Navbar title="Ops Admin" />
 
-      <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-        <h2 className="mb-3 text-sm font-semibold text-slate-200">Local Controls</h2>
+      <div className="rounded-lg border border-bpvp-border bg-bpvp-card/40 p-4">
+        <h2 className="mb-3 text-sm font-semibold text-bpvp-ink">Local Controls</h2>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-          <button disabled={busy} onClick={() => handleAction("status")} className="rounded-md bg-slate-800 px-3 py-2 text-sm hover:bg-slate-700 disabled:opacity-50">Status</button>
-          <button disabled={busy} onClick={refreshDetailedStatus} className="rounded-md bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600 disabled:opacity-50">Detailed Status</button>
+          <button disabled={busy} onClick={() => handleAction("status")} className="rounded-md bg-bpvp-hover px-3 py-2 text-sm text-bpvp-ink hover:bg-bpvp-border-strong disabled:opacity-50">Status</button>
+          <button disabled={busy} onClick={refreshDetailedStatus} className="rounded-md bg-bpvp-hover px-3 py-2 text-sm text-bpvp-ink hover:bg-bpvp-border-strong disabled:opacity-50">Detailed Status</button>
           <button disabled={busy} onClick={() => handleAction("runProductionReadiness")} className="rounded-md bg-cyan-700 px-3 py-2 text-sm hover:bg-cyan-600 disabled:opacity-50">Run Production Readiness</button>
           <button disabled={busy} onClick={() => handleAction("start")} className="rounded-md bg-emerald-700 px-3 py-2 text-sm hover:bg-emerald-600 disabled:opacity-50">Start Suite</button>
           <button disabled={busy} onClick={() => handleAction("stop")} className="rounded-md bg-rose-700 px-3 py-2 text-sm hover:bg-rose-600 disabled:opacity-50">Stop Suite</button>
@@ -206,27 +206,27 @@ export default function OpsPage() {
         </div>
       </div>
 
-      <div className="space-y-3 rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-        <h2 className="text-sm font-semibold text-slate-200">Auth v2.1 User Management</h2>
+      <div className="space-y-3 rounded-lg border border-bpvp-border bg-bpvp-card/40 p-4">
+        <h2 className="text-sm font-semibold text-bpvp-ink">Auth v2.1 User Management</h2>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <input
             type="text"
             value={authUsername}
             onChange={(e) => setAuthUsername(e.target.value)}
             placeholder="Username e.g. trader-desk-01"
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full bpvp-field-md"
           />
           <input
             type="password"
             value={authPassword}
             onChange={(e) => setAuthPassword(e.target.value)}
             placeholder="Password (required for new user) e.g. S3cure!Pass#2026"
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full bpvp-field-md"
           />
           <select
             value={authRole}
             onChange={(e) => setAuthRole(e.target.value as ManagedUser["role"])}
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full bpvp-field-md"
           >
             <option value="admin">admin</option>
             <option value="trader">trader</option>
@@ -238,21 +238,21 @@ export default function OpsPage() {
             value={authOtpSecret}
             onChange={(e) => setAuthOtpSecret(e.target.value)}
             placeholder="OTP secret (optional) e.g. 839201"
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full bpvp-field-md"
           />
         </div>
         <div className="flex gap-2">
           <button disabled={busy || !authUsername} onClick={() => void upsertUser()} className="rounded-md bg-emerald-700 px-3 py-2 text-sm hover:bg-emerald-600 disabled:opacity-50">Create / Update User</button>
-          <button disabled={busy} onClick={() => void refreshUsers()} className="rounded-md bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600 disabled:opacity-50">Refresh Users</button>
+          <button disabled={busy} onClick={() => void refreshUsers()} className="rounded-md bg-bpvp-hover px-3 py-2 text-sm text-bpvp-ink hover:bg-bpvp-border-strong disabled:opacity-50">Refresh Users</button>
         </div>
-        <div className="overflow-auto rounded border border-slate-800 bg-black/40 p-3">
+        <div className="overflow-auto rounded border border-bpvp-border bg-black/40 p-3">
           {users.length === 0 ? (
-            <p className="text-xs text-slate-500">No users found.</p>
+            <p className="text-xs text-bpvp-faint">No users found.</p>
           ) : (
             <div className="space-y-2">
               {users.map((u) => (
-                <div key={u.username} className="flex items-center justify-between gap-3 rounded border border-slate-800 px-3 py-2">
-                  <p className="text-xs text-slate-300">
+                <div key={u.username} className="flex items-center justify-between gap-3 rounded border border-bpvp-border px-3 py-2">
+                  <p className="text-xs text-bpvp-ink">
                     <span className="font-semibold">{u.username}</span> | role={u.role} | otp={u.hasOtp ? "yes" : "no"} | {u.enabled ? "enabled" : "disabled"}
                   </p>
                   <div className="flex gap-2">
@@ -266,10 +266,10 @@ export default function OpsPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-        <h2 className="mb-3 text-sm font-semibold text-slate-200">Automation Semaphores</h2>
+      <div className="rounded-lg border border-bpvp-border bg-bpvp-card/40 p-4">
+        <h2 className="mb-3 text-sm font-semibold text-bpvp-ink">Automation Semaphores</h2>
         <div className="mb-3 flex items-center gap-3">
-          <label className="flex items-center gap-2 text-xs text-slate-300">
+          <label className="flex items-center gap-2 text-xs text-bpvp-ink">
             <input
               type="checkbox"
               checked={liveRefresh}
@@ -282,9 +282,9 @@ export default function OpsPage() {
             min={5}
             value={liveRefreshSec}
             onChange={(e) => setLiveRefreshSec(e.target.value)}
-            className="w-24 rounded-md border border-slate-700 bg-slate-900 px-2 py-1 text-xs"
+            className="w-24 rounded-md border border-bpvp-input-border bg-bpvp-input px-2 py-1 text-xs text-bpvp-ink"
           />
-          <span className="text-xs text-slate-400">seconds</span>
+          <span className="text-xs text-bpvp-muted">seconds</span>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <Sem label="Daily Agent" on={Boolean(automation?.dailyAgentInstalled)} />
@@ -296,15 +296,15 @@ export default function OpsPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-        <h2 className="mb-3 text-sm font-semibold text-slate-200">Remediation Event Log</h2>
-        <div className="max-h-56 overflow-auto rounded border border-slate-800 bg-black/40 p-3">
+      <div className="rounded-lg border border-bpvp-border bg-bpvp-card/40 p-4">
+        <h2 className="mb-3 text-sm font-semibold text-bpvp-ink">Remediation Event Log</h2>
+        <div className="max-h-56 overflow-auto rounded border border-bpvp-border bg-black/40 p-3">
           {(automation?.remediationEvents ?? []).length === 0 ? (
-            <p className="text-xs text-slate-500">No remediation events yet.</p>
+            <p className="text-xs text-bpvp-faint">No remediation events yet.</p>
           ) : (
             <div className="space-y-1">
               {(automation?.remediationEvents ?? []).slice().reverse().map((ev, idx) => (
-                <p key={`${ev.ts ?? "na"}-${idx}`} className="text-xs text-slate-300">
+                <p key={`${ev.ts ?? "na"}-${idx}`} className="text-xs text-bpvp-ink">
                   [{ev.ts ?? "-"}] {ev.status ?? "-"}: {ev.message ?? "-"}
                 </p>
               ))}
@@ -313,41 +313,41 @@ export default function OpsPage() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-        <h2 className="mb-3 text-sm font-semibold text-slate-200">Public Access (No Domain)</h2>
+      <div className="rounded-lg border border-bpvp-border bg-bpvp-card/40 p-4">
+        <h2 className="mb-3 text-sm font-semibold text-bpvp-ink">Public Access (No Domain)</h2>
         <div className="grid gap-2 sm:grid-cols-2">
           <button disabled={busy} onClick={() => handleAction("publishOnline")} className="rounded-md bg-indigo-700 px-3 py-2 text-sm hover:bg-indigo-600 disabled:opacity-50">Publish Online</button>
-          <button disabled={busy} onClick={() => handleAction("unpublishOnline")} className="rounded-md bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600 disabled:opacity-50">Unpublish Online</button>
+          <button disabled={busy} onClick={() => handleAction("unpublishOnline")} className="rounded-md bg-bpvp-hover px-3 py-2 text-sm text-bpvp-ink hover:bg-bpvp-border-strong disabled:opacity-50">Unpublish Online</button>
         </div>
       </div>
 
-      <form onSubmit={onPublishDomain} className="space-y-3 rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-        <h2 className="text-sm font-semibold text-slate-200">Public Access (Fixed Domain)</h2>
+      <form onSubmit={onPublishDomain} className="space-y-3 rounded-lg border border-bpvp-border bg-bpvp-card/40 p-4">
+        <h2 className="text-sm font-semibold text-bpvp-ink">Public Access (Fixed Domain)</h2>
         <input
           type="text"
           value={cfHostname}
           onChange={(e) => setCfHostname(e.target.value)}
           placeholder="CF hostname (e.g. testnet.btc-defi.com)"
-          className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="w-full bpvp-field-md"
         />
         <input
           type="password"
           value={cfTunnelToken}
           onChange={(e) => setCfTunnelToken(e.target.value)}
           placeholder="CF tunnel token e.g. eyJhIjoi...<token>"
-          className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="w-full bpvp-field-md"
         />
         <div className="grid gap-2 sm:grid-cols-2">
           <button type="submit" disabled={busy} className="rounded-md bg-purple-700 px-3 py-2 text-sm hover:bg-purple-600 disabled:opacity-50">Publish Domain</button>
-          <button type="button" disabled={busy} onClick={() => handleAction("unpublishDomain")} className="rounded-md bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600 disabled:opacity-50">Unpublish Domain</button>
+          <button type="button" disabled={busy} onClick={() => handleAction("unpublishDomain")} className="rounded-md bg-bpvp-hover px-3 py-2 text-sm text-bpvp-ink hover:bg-bpvp-border-strong disabled:opacity-50">Unpublish Domain</button>
         </div>
       </form>
 
-      <div className="space-y-3 rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-        <h2 className="text-sm font-semibold text-slate-200">Daily Report Automation</h2>
+      <div className="space-y-3 rounded-lg border border-bpvp-border bg-bpvp-card/40 p-4">
+        <h2 className="text-sm font-semibold text-bpvp-ink">Daily Report Automation</h2>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <button disabled={busy} onClick={() => handleAction("runDailyReport")} className="rounded-md bg-indigo-700 px-3 py-2 text-sm hover:bg-indigo-600 disabled:opacity-50">Run Daily Report</button>
-          <button disabled={busy} onClick={() => handleAction("verifyDailyReport")} className="rounded-md bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600 disabled:opacity-50">Verify Daily Report</button>
+          <button disabled={busy} onClick={() => handleAction("verifyDailyReport")} className="rounded-md bg-bpvp-hover px-3 py-2 text-sm text-bpvp-ink hover:bg-bpvp-border-strong disabled:opacity-50">Verify Daily Report</button>
           <button disabled={busy} onClick={() => handleAction("installDailyReportAgent", { dailyHour, dailyMinute })} className="rounded-md bg-emerald-700 px-3 py-2 text-sm hover:bg-emerald-600 disabled:opacity-50">Install Daily Agent</button>
           <button disabled={busy} onClick={() => handleAction("uninstallDailyReportAgent")} className="rounded-md bg-rose-700 px-3 py-2 text-sm hover:bg-rose-600 disabled:opacity-50">Uninstall Daily Agent</button>
         </div>
@@ -359,7 +359,7 @@ export default function OpsPage() {
             value={dailyHour}
             onChange={(e) => setDailyHour(e.target.value)}
             placeholder="Daily hour (0-23) e.g. 7"
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full bpvp-field-md"
           />
           <input
             type="number"
@@ -368,16 +368,16 @@ export default function OpsPage() {
             value={dailyMinute}
             onChange={(e) => setDailyMinute(e.target.value)}
             placeholder="Daily minute (0-59) e.g. 15"
-            className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+            className="w-full bpvp-field-md"
           />
         </div>
       </div>
 
-      <div className="space-y-3 rounded-lg border border-slate-800 bg-slate-950/40 p-4">
-        <h2 className="text-sm font-semibold text-slate-200">AMM Auto Audit Controls</h2>
+      <div className="space-y-3 rounded-lg border border-bpvp-border bg-bpvp-card/40 p-4">
+        <h2 className="text-sm font-semibold text-bpvp-ink">AMM Auto Audit Controls</h2>
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
           <button disabled={busy} onClick={() => handleAction("runAmmAudit")} className="rounded-md bg-indigo-700 px-3 py-2 text-sm hover:bg-indigo-600 disabled:opacity-50">Run AMM Audit</button>
-          <button disabled={busy} onClick={() => handleAction("latestAmmAudit")} className="rounded-md bg-slate-700 px-3 py-2 text-sm hover:bg-slate-600 disabled:opacity-50">Show Latest AMM Audit</button>
+          <button disabled={busy} onClick={() => handleAction("latestAmmAudit")} className="rounded-md bg-bpvp-hover px-3 py-2 text-sm text-bpvp-ink hover:bg-bpvp-border-strong disabled:opacity-50">Show Latest AMM Audit</button>
           <button disabled={busy} onClick={() => handleAction("installAmmAuditAgent", { ammAuditIntervalSeconds, ammAuditAlertWebhookUrl, ammAuditAlertWebhookSecret, ammAuditAutoRemediate: String(ammAuditAutoRemediate) })} className="rounded-md bg-emerald-700 px-3 py-2 text-sm hover:bg-emerald-600 disabled:opacity-50">Install AMM Audit Agent</button>
           <button disabled={busy} onClick={() => handleAction("uninstallAmmAuditAgent")} className="rounded-md bg-rose-700 px-3 py-2 text-sm hover:bg-rose-600 disabled:opacity-50">Uninstall AMM Audit Agent</button>
         </div>
@@ -387,23 +387,23 @@ export default function OpsPage() {
           value={ammAuditIntervalSeconds}
           onChange={(e) => setAmmAuditIntervalSeconds(e.target.value)}
           placeholder="AMM audit interval seconds (min 60) e.g. 900"
-          className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="w-full bpvp-field-md"
         />
         <input
           type="text"
           value={ammAuditAlertWebhookUrl}
           onChange={(e) => setAmmAuditAlertWebhookUrl(e.target.value)}
           placeholder="AMM alert webhook URL (optional) e.g. https://hooks.slack.com/services/..."
-          className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="w-full bpvp-field-md"
         />
         <input
           type="password"
           value={ammAuditAlertWebhookSecret}
           onChange={(e) => setAmmAuditAlertWebhookSecret(e.target.value)}
           placeholder="AMM alert webhook secret (optional) e.g. whsec_abc123"
-          className="w-full rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-sm"
+          className="w-full bpvp-field-md"
         />
-        <label className="flex items-center gap-2 text-xs text-slate-300">
+        <label className="flex items-center gap-2 text-xs text-bpvp-ink">
           <input
             type="checkbox"
             checked={ammAuditAutoRemediate}
@@ -415,9 +415,9 @@ export default function OpsPage() {
 
       {error ? <p className="rounded-md border border-rose-800 bg-rose-950/50 p-3 text-sm text-rose-300">{error}</p> : null}
 
-      <div className="rounded-lg border border-slate-800 bg-black p-4">
-        <h2 className="mb-2 text-sm font-semibold text-slate-200">Output</h2>
-        <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap text-xs text-slate-300">{output}</pre>
+      <div className="rounded-lg border border-bpvp-border bg-black p-4">
+        <h2 className="mb-2 text-sm font-semibold text-bpvp-ink">Output</h2>
+        <pre className="max-h-[420px] overflow-auto whitespace-pre-wrap text-xs text-bpvp-ink">{output}</pre>
       </div>
       <AgentReadonlyPanel locale={locale} audience="admin-only" />
     </section>
@@ -436,8 +436,8 @@ function Sem({
   negativeLabel?: string;
 }) {
   return (
-    <div className="rounded-md border border-slate-800 bg-slate-900 px-3 py-2">
-      <p className="text-xs text-slate-400">{label}</p>
+    <div className="rounded-md border border-bpvp-border bg-bpvp-card px-3 py-2">
+      <p className="text-xs text-bpvp-muted">{label}</p>
       <p className={`text-sm font-semibold ${on ? "text-emerald-300" : "text-rose-300"}`}>{on ? positiveLabel : negativeLabel}</p>
     </div>
   );

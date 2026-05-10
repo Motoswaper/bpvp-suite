@@ -107,7 +107,7 @@ export default function Page() {
         whatToTry="Mint one NFT, transfer it to another test account, and update one metadata key to confirm state transitions."
         walletHint='Wallet linking can be used for identity context, but core BPVP721 test actions work with test account strings.'
       />
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-bpvp-muted">
         {isSpanish
           ? "Inventario BPVP721 nativo en el engine. Las acciones se firman server-side y se aplican al mismo estado respaldado por journal que siguen indexer y watcher."
           : "Native BPVP721 inventory in the engine. Actions are signed server-side and applied to the same journal-backed state the indexer and watcher target."}
@@ -115,19 +115,19 @@ export default function Page() {
 
       <Card title="Assets">
         {loading ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Cargando…" : "Loading…"}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Cargando…" : "Loading…"}</p>
         ) : assets.length === 0 ? (
-          <p className="text-sm text-slate-400">{isSpanish ? "Aun no hay NFTs. Haz mint abajo." : "No NFTs yet. Mint one below."}</p>
+          <p className="text-sm text-bpvp-muted">{isSpanish ? "Aun no hay NFTs. Haz mint abajo." : "No NFTs yet. Mint one below."}</p>
         ) : (
           <ul className="space-y-3 text-sm">
             {assets.map((a) => (
-              <li key={a.tokenId} className="rounded-lg border border-slate-800 bg-slate-950/50 p-3">
-                <div className="font-mono text-xs text-slate-200">{a.tokenId}</div>
-                <div className="text-slate-400">{isSpanish ? "Propietario" : "Owner"}: {a.owner}</div>
-                <div className="mt-1 text-xs text-slate-500">
+              <li key={a.tokenId} className="rounded-lg border border-bpvp-border bg-bpvp-card/50 p-3">
+                <div className="font-mono text-xs text-bpvp-ink">{a.tokenId}</div>
+                <div className="text-bpvp-muted">{isSpanish ? "Propietario" : "Owner"}: {a.owner}</div>
+                <div className="mt-1 text-xs text-bpvp-faint">
                   {isSpanish ? "Metadatos" : "Metadata"}: {JSON.stringify(a.metadata ?? {})}
                 </div>
-                <div className="text-xs text-slate-500">{isSpanish ? "Historial" : "History"}: {(a.history ?? []).join(" → ")}</div>
+                <div className="text-xs text-bpvp-faint">{isSpanish ? "Historial" : "History"}: {(a.history ?? []).join(" → ")}</div>
               </li>
             ))}
           </ul>
@@ -138,8 +138,8 @@ export default function Page() {
         <Card title="Mint">
           <form className="space-y-3 text-sm" onSubmit={onMint}>
             <label className="block space-y-1">
-              <span className="text-slate-400">{isSpanish ? "Token id" : "Token id"}</span>
-              <input name="tokenId" required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
+              <span className="text-bpvp-muted">{isSpanish ? "Token id" : "Token id"}</span>
+              <input name="tokenId" required className="w-full bpvp-field font-mono text-xs" />
             </label>
             <Button type="submit" disabled={busy}>
               {isSpanish ? "Mint" : "Mint"}
@@ -149,12 +149,12 @@ export default function Page() {
         <Card title="Transfer">
           <form className="space-y-3 text-sm" onSubmit={onTransfer}>
             <label className="block space-y-1">
-              <span className="text-slate-400">{isSpanish ? "Token id" : "Token id"}</span>
-              <input name="tokenId" required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
+              <span className="text-bpvp-muted">{isSpanish ? "Token id" : "Token id"}</span>
+              <input name="tokenId" required className="w-full bpvp-field font-mono text-xs" />
             </label>
             <label className="block space-y-1">
-              <span className="text-slate-400">{isSpanish ? "Hacia" : "To"}</span>
-              <input name="to" required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
+              <span className="text-bpvp-muted">{isSpanish ? "Hacia" : "To"}</span>
+              <input name="to" required className="w-full bpvp-field font-mono text-xs" />
             </label>
             <Button type="submit" disabled={busy}>
               {isSpanish ? "Transferir" : "Transfer"}
@@ -164,16 +164,16 @@ export default function Page() {
         <Card title="Metadata">
           <form className="space-y-3 text-sm" onSubmit={onMetadata}>
             <label className="block space-y-1">
-              <span className="text-slate-400">{isSpanish ? "Token id" : "Token id"}</span>
-              <input name="tokenId" required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5 font-mono text-xs" />
+              <span className="text-bpvp-muted">{isSpanish ? "Token id" : "Token id"}</span>
+              <input name="tokenId" required className="w-full bpvp-field font-mono text-xs" />
             </label>
             <label className="block space-y-1">
-              <span className="text-slate-400">{isSpanish ? "Clave" : "Key"}</span>
-              <input name="key" required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+              <span className="text-bpvp-muted">{isSpanish ? "Clave" : "Key"}</span>
+              <input name="key" required className="w-full bpvp-field" />
             </label>
             <label className="block space-y-1">
-              <span className="text-slate-400">{isSpanish ? "Valor" : "Value"}</span>
-              <input name="value" required className="w-full rounded border border-slate-700 bg-slate-950 px-2 py-1.5" />
+              <span className="text-bpvp-muted">{isSpanish ? "Valor" : "Value"}</span>
+              <input name="value" required className="w-full bpvp-field" />
             </label>
             <Button type="submit" disabled={busy}>
               {isSpanish ? "Actualizar" : "Update"}
@@ -184,7 +184,7 @@ export default function Page() {
 
       {data?.bridgeJobs && data.bridgeJobs.length > 0 ? (
         <Card title={isSpanish ? "Jobs de bridge (cuando bridge esta habilitado)" : "Bridge jobs (when bridge enabled upstream)"}>
-          <ul className="text-xs text-slate-400">
+          <ul className="text-xs text-bpvp-muted">
             {data.bridgeJobs.slice(-12).map((j) => (
               <li key={j.id}>
                 #{j.id} {j.tokenId} — {j.type} — {j.status}
@@ -195,7 +195,7 @@ export default function Page() {
       ) : null}
 
       {error ? <p className="rounded-md border border-rose-800 bg-rose-950/40 p-3 text-sm text-rose-300">{error}</p> : null}
-      {msg ? <p className="rounded-md border border-slate-700 bg-slate-900/60 p-3 text-sm text-slate-200">{msg}</p> : null}
+      {msg ? <p className="rounded-md border border-bpvp-border bg-bpvp-hover p-3 text-sm text-bpvp-ink">{msg}</p> : null}
     </section>
   );
 }
