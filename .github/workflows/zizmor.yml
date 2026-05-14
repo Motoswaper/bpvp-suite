@@ -31,6 +31,6 @@ jobs:
 
       - name: Run zizmor
         continue-on-error: true
-        uses: zizmorcore/zizmor-action@v0.1.2
+        uses: zizmorcore/zizmor-action@v0.5.3
         with:
           advanced-security: false
