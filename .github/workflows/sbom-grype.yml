@@ -38,7 +38,7 @@ jobs:
           if-no-files-found: error
 
       - name: Scan repository with Grype
-        uses: anchore/scan-action@v6
+        uses: anchore/scan-action@v7
         with:
           path: .
           fail-build: false
